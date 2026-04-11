@@ -98,6 +98,23 @@ export const COPY = {
     geoLabel: "География",
     geoVal: "EU / СНГ — обсуждается индивидуально",
     contactLabel: "Контакты",
+    contactFormIntro:
+      "Или отправьте сообщение прямо с сайта — ответ придёт на указанную почту.",
+    contactFormName: "Имя",
+    contactFormEmail: "Электронная почта",
+    contactFormMessage: "Сообщение",
+    contactFormSubmit: "Отправить",
+    contactFormSending: "Отправка…",
+    contactFormSuccess: "Сообщение отправлено. Скоро ответим.",
+    contactFormError:
+      "Не удалось отправить. Попробуйте ещё раз или напишите на почту выше.",
+    contactFormHelper:
+      "Чтобы отправить форму, заполните email и текст сообщения.",
+    contactFormValidationSummary:
+      "Проверьте поля ниже — нужны корректный email и сообщение.",
+    contactFormErrorEmailRequired: "Укажите email.",
+    contactFormErrorEmailInvalid: "Проверьте формат email.",
+    contactFormErrorMessageRequired: "Напишите текст сообщения.",
     instagramSocialLabel: "Instagram*",
     footerInstagramDisclaimer:
       "*принадлежит Meta, признанной экстремистской и запрещенной на территории РФ",
@@ -200,6 +217,23 @@ export const COPY = {
     geoLabel: "Territory",
     geoVal: "EU / CIS — discussed individually",
     contactLabel: "Contact",
+    contactFormIntro:
+      "Or send a message from the site — we’ll reply to the email you enter.",
+    contactFormName: "Name",
+    contactFormEmail: "Email",
+    contactFormMessage: "Message",
+    contactFormSubmit: "Send",
+    contactFormSending: "Sending…",
+    contactFormSuccess: "Message sent. We’ll get back to you soon.",
+    contactFormError:
+      "Couldn’t send. Try again or use the email address above.",
+    contactFormHelper:
+      "To send the form, fill in your email and message.",
+    contactFormValidationSummary:
+      "Check the fields below — a valid email and message are required.",
+    contactFormErrorEmailRequired: "Enter your email.",
+    contactFormErrorEmailInvalid: "Check the email format.",
+    contactFormErrorMessageRequired: "Enter your message.",
     instagramSocialLabel: "Instagram*",
     footerInstagramDisclaimer:
       "*принадлежит Meta, признанной экстремистской и запрещенной на территории РФ",

@@ -705,6 +705,138 @@
   color: var(--text);
 }
 
+.contactFormIntro {
+  margin: var(--space-md) 0 0;
+  max-width: 28rem;
+  font-size: 0.9rem;
+  line-height: 1.5;
+  color: var(--text-muted);
+}
+
+.contactForm {
+  margin: var(--space-lg) 0 0;
+  padding: 0;
+  max-width: 28rem;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+}
+
+.contactFormHelper {
+  margin: 0;
+  font-size: 0.85rem;
+  line-height: 1.45;
+  color: var(--text-muted);
+}
+
+.contactValidationSummary {
+  margin: 0;
+  padding: 0.65rem 0.75rem;
+  font-size: 0.85rem;
+  line-height: 1.45;
+  color: var(--text);
+  background: color-mix(in srgb, var(--accent) 12%, var(--bg-elevated));
+  border: 1px solid color-mix(in srgb, var(--accent) 35%, var(--border));
+  border-radius: 2px;
+}
+
+.contactFieldError {
+  margin: 0;
+  font-size: 0.8rem;
+  line-height: 1.35;
+  color: color-mix(in srgb, var(--accent) 70%, var(--text));
+}
+
+.contactInputInvalid,
+.contactTextarea.contactInputInvalid {
+  border-color: color-mix(in srgb, var(--accent) 55%, var(--border));
+}
+
+.contactField {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+}
+
+.contactLabel {
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.contactInput,
+.contactTextarea {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 0.65rem 0.75rem;
+  font: inherit;
+  font-size: 0.95rem;
+  color: var(--text);
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: 2px;
+}
+
+.contactInput:focus,
+.contactTextarea:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+
+.contactTextarea {
+  resize: vertical;
+  min-height: 7rem;
+  line-height: 1.45;
+}
+
+.contactHoneypot {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.contactSubmit {
+  align-self: flex-start;
+  margin-top: var(--space-xs);
+  padding: 0.75rem 1.25rem;
+  font: inherit;
+  font-weight: 600;
+  font-size: 0.85rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  cursor: pointer;
+  color: var(--text);
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: 2px;
+}
+
+.contactSubmit:hover:not(:disabled) {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.contactSubmit:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.contactFormStatus {
+  margin: 0;
+  min-height: 1.25em;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
 .socialList {
   list-style: none;
   margin: var(--space-lg) 0 0;

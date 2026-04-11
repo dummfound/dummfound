@@ -75,6 +75,19 @@ const App = () => {
     geoLabel,
     geoVal,
     contactLabel,
+    contactFormIntro,
+    contactFormName,
+    contactFormEmail,
+    contactFormMessage,
+    contactFormSubmit,
+    contactFormSending,
+    contactFormSuccess,
+    contactFormError,
+    contactFormHelper,
+    contactFormValidationSummary,
+    contactFormErrorEmailRequired,
+    contactFormErrorEmailInvalid,
+    contactFormErrorMessageRequired,
     footerInstagramDisclaimer,
     gigsLabel,
     gigs,
@@ -122,7 +135,23 @@ const App = () => {
 
         <SectionGigs label={gigsLabel} gigs={gigs} />
 
-        <SectionContact label={contactLabel} socialLinks={socialLinks} />
+        <SectionContact
+          label={contactLabel}
+          socialLinks={socialLinks}
+          contactFormIntro={contactFormIntro}
+          contactFormName={contactFormName}
+          contactFormEmail={contactFormEmail}
+          contactFormMessage={contactFormMessage}
+          contactFormSubmit={contactFormSubmit}
+          contactFormSending={contactFormSending}
+          contactFormSuccess={contactFormSuccess}
+          contactFormError={contactFormError}
+          contactFormHelper={contactFormHelper}
+          contactFormValidationSummary={contactFormValidationSummary}
+          contactFormErrorEmailRequired={contactFormErrorEmailRequired}
+          contactFormErrorEmailInvalid={contactFormErrorEmailInvalid}
+          contactFormErrorMessageRequired={contactFormErrorMessageRequired}
+        />
       </main>
 
       <SiteFooter instagramDisclaimer={footerInstagramDisclaimer} />

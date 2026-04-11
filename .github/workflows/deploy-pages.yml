@@ -27,6 +27,8 @@ jobs:
         env:
           # Repository variable SITE_BASE=/ when using a custom domain (see vite.config.js).
           SITE_BASE: ${{ vars.SITE_BASE }}
+          # Optional: Formspree form id (see ContactForm.jsx, .env.local for local dev).
+          VITE_FORMSPREE_FORM_ID: ${{ vars.VITE_FORMSPREE_FORM_ID }}
       - uses: actions/upload-pages-artifact@v3
         with:
           path: dist
