@@ -102,6 +102,15 @@ export const ContactForm = ({
       {!isFormValid && status !== "success" ? (
         <p className={styles.contactFormHelper}>{helperText}</p>
       ) : null}
+      {showSummary ? (
+        <p
+          className={styles.contactValidationSummary}
+          role="alert"
+          id="contact-form-summary"
+        >
+          {validationSummary}
+        </p>
+      ) : null}
       <div className={styles.contactField}>
         <label className={styles.contactLabel} htmlFor="contact-name">
           {nameLabel}
@@ -180,15 +189,6 @@ export const ContactForm = ({
         className={styles.contactHoneypot}
         aria-hidden="true"
       />
-      {showSummary ? (
-        <p
-          className={styles.contactValidationSummary}
-          role="alert"
-          id="contact-form-summary"
-        >
-          {validationSummary}
-        </p>
-      ) : null}
       <button
         type="submit"
         className={styles.contactSubmit}
