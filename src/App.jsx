@@ -1,3 +1,5 @@
+import { useLayoutEffect } from "react";
+import { Navigate, useLocation } from "react-router-dom";
 import { Hero } from "./components/Hero";
 import { SectionAbout } from "./components/SectionAbout";
 import { SectionBooking } from "./components/SectionBooking";
@@ -11,10 +13,44 @@ import { useLanguage } from "./hooks/useLanguage";
 import { useNavMenu } from "./hooks/useNavMenu";
 import { useTheme } from "./hooks/useTheme";
 
+const ALLOWED_PATHS = new Set([
+  "/",
+  "/about",
+  "/music",
+  "/booking",
+  "/gigs",
+  "/contact",
+]);
+
+const useScrollToSection = (pathname, enabled) => {
+  useLayoutEffect(() => {
+    if (!enabled) return;
+    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)")
+      .matches;
+    const smooth = reduced ? "instant" : "smooth";
+
+    if (pathname === "/") {
+      window.scrollTo({ top: 0, behavior: reduced ? "auto" : "smooth" });
+      return;
+    }
+    const id = pathname.slice(1);
+    const el = document.getElementById(id);
+    if (el) el.scrollIntoView({ behavior: smooth, block: "start" });
+  }, [pathname, enabled]);
+};
+
 const App = () => {
+  const location = useLocation();
+  const pathOk = ALLOWED_PATHS.has(location.pathname);
+  useScrollToSection(location.pathname, pathOk);
+
   const { lang, setLang, t, navLinks, socialLinks } = useLanguage();
   const { menuOpen, closeMenu, toggleMenu } = useNavMenu();
   const { theme, toggleTheme } = useTheme();
+
+  if (!pathOk) {
+    return <Navigate to="/" replace />;
+  }
 
   const {
     skip,

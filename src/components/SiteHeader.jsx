@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom";
 import styles from "../styles.module.scss";
 
 export const SiteHeader = ({
@@ -21,22 +22,22 @@ export const SiteHeader = ({
   return (
     <header className={styles.siteHeader}>
       <div className={styles.headerInner}>
-        <a
+        <Link
           className={styles.logo}
-          href="#top"
+          to="/"
           onClick={onCloseMenu}
           aria-label={logoAria}
         >
           <span className={styles.logoMark} aria-hidden="true">
             <span className={styles.logoLetter}>D</span>
           </span>
-        </a>
+        </Link>
         <div className={styles.headerTrail}>
           <nav className={styles.nav} aria-label={navAria}>
             {navLinks.map(({ href, label }) => (
-              <a key={href} href={href}>
+              <Link key={href} to={href}>
                 {label}
-              </a>
+              </Link>
             ))}
           </nav>
           <div className={styles.langSwitch} role="group" aria-label={langGroup}>
@@ -97,9 +98,9 @@ export const SiteHeader = ({
         aria-hidden={!menuOpen}
       >
         {navLinks.map(({ href, label }) => (
-          <a key={href} href={href} onClick={onCloseMenu}>
+          <Link key={href} to={href} onClick={onCloseMenu}>
             {label}
-          </a>
+          </Link>
         ))}
       </div>
     </header>

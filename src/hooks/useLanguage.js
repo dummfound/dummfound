@@ -30,12 +30,11 @@ export const useLanguage = () => {
   const navLinks = useMemo(() => {
     const { about, music, booking, contact, gigs } = t.nav;
     return [
-      { href: "#about", label: about },
-      { href: "#music", label: music },
-      { href: "#booking", label: booking },
-      { href: "#gigs", label: gigs },
-      { href: "#contact", label: contact }
-      
+      { href: "/about", label: about },
+      { href: "/music", label: music },
+      { href: "/booking", label: booking },
+      { href: "/gigs", label: gigs },
+      { href: "/contact", label: contact },
     ];
   }, [t]);
 
