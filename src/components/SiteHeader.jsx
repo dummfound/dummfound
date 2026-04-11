@@ -1,5 +1,10 @@
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import styles from "../styles.module.scss";
+
+const scrollToTop = () => {
+  const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  window.scrollTo({ top: 0, behavior: reduced ? "auto" : "smooth" });
+};
 
 export const SiteHeader = ({
   logoAria,
@@ -19,13 +24,22 @@ export const SiteHeader = ({
   onCloseMenu,
   onToggleMenu,
 }) => {
+  const location = useLocation();
+
+  const handleLogoClick = () => {
+    onCloseMenu();
+    if (location.pathname === "/") {
+      scrollToTop();
+    }
+  };
+
   return (
     <header className={styles.siteHeader}>
       <div className={styles.headerInner}>
         <Link
           className={styles.logo}
           to="/"
-          onClick={onCloseMenu}
+          onClick={handleLogoClick}
           aria-label={logoAria}
         >
           <span className={styles.logoMark} aria-hidden="true">
