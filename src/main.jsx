@@ -4,6 +4,19 @@ import { BrowserRouter } from "react-router-dom";
 import App from "./App.jsx";
 import "./global.scss";
 
+{
+  const base = import.meta.env.BASE_URL.replace(/\/?$/, "/");
+  const href = `${base}favicon.svg`;
+  let link = document.querySelector('link[rel="icon"][type="image/svg+xml"]');
+  if (!link) {
+    link = document.createElement("link");
+    link.rel = "icon";
+    link.type = "image/svg+xml";
+    document.head.appendChild(link);
+  }
+  link.href = href;
+}
+
 try {
   localStorage.removeItem("dummfound-theme");
 } catch {
