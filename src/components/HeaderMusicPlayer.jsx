@@ -13,6 +13,16 @@ function normalizeTracks(data) {
     .filter(Boolean);
 }
 
+/** Fisher–Yates: новый порядок при каждой загрузке страницы */
+function shuffleTracks(tracks) {
+  const out = [...tracks];
+  for (let i = out.length - 1; i > 0; i -= 1) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [out[i], out[j]] = [out[j], out[i]];
+  }
+  return out;
+}
+
 const audioBase = () => import.meta.env.BASE_URL.replace(/\/?$/, "/");
 
 export const HeaderMusicPlayer = ({
@@ -31,7 +41,10 @@ export const HeaderMusicPlayer = ({
     fetch(`${audioBase()}music/tracks.json`)
       .then((r) => (r.ok ? r.json() : []))
       .then((data) => {
-        if (!cancelled) setTracks(normalizeTracks(data));
+        if (!cancelled) {
+          const list = normalizeTracks(data);
+          setTracks(list.length ? shuffleTracks(list) : list);
+        }
       })
       .catch(() => {
         if (!cancelled) setTracks([]);
