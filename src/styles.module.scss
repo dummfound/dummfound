@@ -75,30 +75,6 @@
   z-index: 1;
 }
 
-.themeToggle {
-  margin: 0;
-  padding: 0.45rem 0.7rem;
-  border: 1px solid var(--border);
-  background: transparent;
-  color: var(--text-muted);
-  cursor: pointer;
-  font-family: var(--font-mono);
-  font-size: 0.65rem;
-  font-weight: 600;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  line-height: 1;
-  transition:
-    color 0.15s ease,
-    border-color 0.15s ease,
-    background 0.15s ease;
-}
-
-.themeToggle:hover {
-  color: var(--text);
-  border-color: var(--accent);
-}
-
 .logo {
   display: flex;
   align-items: center;

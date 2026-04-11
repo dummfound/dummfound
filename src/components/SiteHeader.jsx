@@ -15,11 +15,6 @@ export const SiteHeader = ({
   navLinks,
   lang,
   onSetLang,
-  theme,
-  onToggleTheme,
-  themeToggleLabel,
-  themeDarkLabel,
-  themeLightLabel,
   menuOpen,
   onCloseMenu,
   onToggleMenu,
@@ -72,14 +67,6 @@ export const SiteHeader = ({
               EN
             </button>
           </div>
-          {/* <button
-            type="button"
-            className={styles.themeToggle}
-            onClick={onToggleTheme}
-            aria-label={`${themeToggleLabel}: ${theme === "dark" ? themeDarkLabel : themeLightLabel}`}
-          >
-            {theme === "dark" ? themeLightLabel : themeDarkLabel}
-          </button> */}
           <button
             type="button"
             className={styles.navToggle}

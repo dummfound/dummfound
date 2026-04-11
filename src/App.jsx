@@ -11,7 +11,6 @@ import { SiteHeader } from "./components/SiteHeader";
 import { SkipLink } from "./components/SkipLink";
 import { useLanguage } from "./hooks/useLanguage";
 import { useNavMenu } from "./hooks/useNavMenu";
-import { useTheme } from "./hooks/useTheme";
 
 const ALLOWED_PATHS = new Set([
   "/",
@@ -46,7 +45,6 @@ const App = () => {
 
   const { lang, setLang, t, navLinks, socialLinks } = useLanguage();
   const { menuOpen, closeMenu, toggleMenu } = useNavMenu();
-  const { theme, toggleTheme } = useTheme();
 
   if (!pathOk) {
     return <Navigate to="/" replace />;
@@ -57,9 +55,6 @@ const App = () => {
     logoAria,
     navAria,
     langGroup,
-    themeToggle,
-    themeDark,
-    themeLight,
     menu,
     drawerBackdrop,
     heroIntro,
@@ -106,11 +101,6 @@ const App = () => {
         navLinks={navLinks}
         lang={lang}
         onSetLang={setLang}
-        theme={theme}
-        onToggleTheme={toggleTheme}
-        themeToggleLabel={themeToggle}
-        themeDarkLabel={themeDark}
-        themeLightLabel={themeLight}
         menuOpen={menuOpen}
         onCloseMenu={closeMenu}
         onToggleMenu={toggleMenu}

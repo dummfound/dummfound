@@ -4,9 +4,6 @@ export const COPY = {
     logoAria: "DUMMFOUND — на главную",
     navAria: "Основная навигация",
     langGroup: "Язык",
-    themeToggle: "Тема",
-    themeDark: "Тёмная",
-    themeLight: "Светлая",
     menu: "Меню",
     drawerBackdrop: "Закрыть меню",
     nav: {
@@ -124,9 +121,6 @@ export const COPY = {
     logoAria: "DUMMFOUND — home",
     navAria: "Main navigation",
     langGroup: "Language",
-    themeToggle: "Theme",
-    themeDark: "Dark",
-    themeLight: "Light",
     menu: "Menu",
     drawerBackdrop: "Close menu",
     nav: {
