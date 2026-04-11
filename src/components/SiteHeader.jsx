@@ -1,4 +1,5 @@
 import { Link, useLocation } from "react-router-dom";
+import { HeaderMusicPlayer } from "./HeaderMusicPlayer";
 import styles from "../styles.module.scss";
 
 const scrollToTop = () => {
@@ -15,6 +16,10 @@ export const SiteHeader = ({
   navLinks,
   lang,
   onSetLang,
+  playerGroup,
+  playerPlay,
+  playerPause,
+  playerEmpty,
   menuOpen,
   onCloseMenu,
   onToggleMenu,
@@ -67,6 +72,12 @@ export const SiteHeader = ({
               EN
             </button>
           </div>
+          <HeaderMusicPlayer
+            groupLabel={playerGroup}
+            playLabel={playerPlay}
+            pauseLabel={playerPause}
+            emptyLabel={playerEmpty}
+          />
           <button
             type="button"
             className={styles.navToggle}

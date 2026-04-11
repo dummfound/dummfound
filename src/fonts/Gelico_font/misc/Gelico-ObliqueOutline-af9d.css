@@ -1,0 +1,9 @@
+/* Webfont: Gelico-ObliqueOutline */@font-face {
+    font-family: 'GelicoOutline';
+    src: url('Gelico-ObliqueOutline.woff2') format('woff2'), /* Modern Browsers */
+         url('Gelico-ObliqueOutline.otf') format('opentype'); /* Safari, Android, iOS */
+             font-style: italic;
+    font-weight: normal;
+    text-rendering: optimizeLegibility;
+}
+

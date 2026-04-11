@@ -57,6 +57,10 @@ const App = () => {
     langGroup,
     menu,
     drawerBackdrop,
+    playerGroup,
+    playerPlay,
+    playerPause,
+    playerEmpty,
     heroIntro,
     aboutLabel,
     aboutP,
@@ -101,6 +105,10 @@ const App = () => {
         navLinks={navLinks}
         lang={lang}
         onSetLang={setLang}
+        playerGroup={playerGroup}
+        playerPlay={playerPlay}
+        playerPause={playerPause}
+        playerEmpty={playerEmpty}
         menuOpen={menuOpen}
         onCloseMenu={closeMenu}
         onToggleMenu={toggleMenu}

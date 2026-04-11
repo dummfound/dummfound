@@ -6,6 +6,11 @@ export const COPY = {
     langGroup: "Язык",
     menu: "Меню",
     drawerBackdrop: "Закрыть меню",
+    playerGroup: "Фоновая музыка",
+    playerPlay: "Включить музыку",
+    playerPause: "Пауза",
+    playerEmpty:
+      "Добавьте файлы в public/music и перечислите их в tracks.json",
     nav: {
       about: "О проекте",
       music: "Музыка",
@@ -123,6 +128,10 @@ export const COPY = {
     langGroup: "Language",
     menu: "Menu",
     drawerBackdrop: "Close menu",
+    playerGroup: "Background music",
+    playerPlay: "Play music",
+    playerPause: "Pause",
+    playerEmpty: "Add files to public/music and list them in tracks.json",
     nav: {
       about: "About",
       music: "Music",
