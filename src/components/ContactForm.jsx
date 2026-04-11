@@ -199,10 +199,11 @@ export const ContactForm = ({
       >
         {status === "sending" ? sendingLabel : submitLabel}
       </button>
-      <p className={styles.contactFormStatus} role="status" aria-live="polite">
-        {status === "success" ? successMessage : null}
-        {status === "error" ? errorMessage : null}
-      </p>
+      {status === "success" || status === "error" ? (
+        <p className={styles.gigsType} role="status" aria-live="polite">
+          {status === "success" ? successMessage : errorMessage}
+        </p>
+      ) : null}
     </form>
   );
 };
