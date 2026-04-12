@@ -60,10 +60,25 @@ export const SectionContact = ({
                   rel="noopener noreferrer"
                   aria-label={socialLabel}
                 >
-                  <SocialBrandIcon
-                    brandKey={key}
-                    className={styles.socialIcon}
-                  />
+                  {key === "instagram" ? (
+                    <span className={styles.socialInstagramPair}>
+                      <SocialBrandIcon
+                        brandKey={key}
+                        className={styles.socialIcon}
+                      />
+                      <span
+                        className={styles.socialMetaAsterisk}
+                        aria-hidden="true"
+                      >
+                        *
+                      </span>
+                    </span>
+                  ) : (
+                    <SocialBrandIcon
+                      brandKey={key}
+                      className={styles.socialIcon}
+                    />
+                  )}
                 </a>
               </li>
             ))}

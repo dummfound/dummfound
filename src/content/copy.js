@@ -111,13 +111,13 @@ export const COPY = {
     contactFormError:
       "Не удалось отправить. Попробуйте ещё раз или напишите на почту выше.",
     contactFormHelper:
-      "Чтобы отправить форму, заполните email и текст сообщения.",
+      "Чтобы отправить сообщение, заполните email и текст сообщения.",
     contactFormValidationSummary:
       "Исправьте поля выше: укажите корректный email и текст сообщения.",
     contactFormErrorEmailRequired: "Укажите email.",
     contactFormErrorEmailInvalid: "Проверьте формат email.",
     contactFormErrorMessageRequired: "Напишите текст сообщения.",
-    instagramSocialLabel: "Instagram*",
+    instagramSocialLabel: "Instagram",
     footerInstagramDisclaimer:
       "*принадлежит Meta, признанной экстремистской и запрещенной на территории РФ",
   },
@@ -231,13 +231,13 @@ export const COPY = {
     contactFormError:
       "Couldn’t send. Try again or use the email address above.",
     contactFormHelper:
-      "To send the form, fill in your email and message.",
+      "To send a message, fill in your email and message text.",
     contactFormValidationSummary:
       "Fix the fields above — enter a valid email and your message.",
     contactFormErrorEmailRequired: "Enter your email.",
     contactFormErrorEmailInvalid: "Check the email format.",
     contactFormErrorMessageRequired: "Enter your message.",
-    instagramSocialLabel: "Instagram*",
+    instagramSocialLabel: "Instagram",
     footerInstagramDisclaimer:
       "*принадлежит Meta, признанной экстремистской и запрещенной на территории РФ",
   },

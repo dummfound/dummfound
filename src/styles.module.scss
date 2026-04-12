@@ -1134,6 +1134,23 @@ $hero-title-fog-gradient: linear-gradient(
   height: 1.5rem;
 }
 
+.socialInstagramPair {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.1rem;
+}
+
+.socialMetaAsterisk {
+  font-family: var(--font-sans);
+  font-size: 0.68rem;
+  font-weight: 700;
+  line-height: 1;
+  color: currentColor;
+  flex-shrink: 0;
+  translate: 0 -0.06em;
+}
+
 @media (max-width: 768px) {
   .contactSubmit {
     align-self: center;
