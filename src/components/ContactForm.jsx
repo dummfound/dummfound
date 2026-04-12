@@ -25,6 +25,7 @@ export const ContactForm = ({
   const [message, setMessage] = useState("");
   const [emailBlurred, setEmailBlurred] = useState(false);
   const [messageBlurred, setMessageBlurred] = useState(false);
+  const [submitAttempted, setSubmitAttempted] = useState(false);
   const [status, setStatus] = useState("idle");
 
   useEffect(() => {
@@ -39,12 +40,17 @@ export const ContactForm = ({
   const messageOk = messageTrim.length > 0;
   const isFormValid = emailOk && messageOk;
 
+  useEffect(() => {
+    if (isFormValid) {
+      setSubmitAttempted(false);
+    }
+  }, [isFormValid]);
+
   const showEmailError =
     emailBlurred && (!emailTrim ? true : !isValidEmail(emailTrim));
   const showMessageError = messageBlurred && !messageTrim;
 
-  const showSummary =
-    !isFormValid && (emailBlurred || messageBlurred);
+  const showSummary = !isFormValid && submitAttempted;
 
   if (!formId) {
     return null;
@@ -58,6 +64,7 @@ export const ContactForm = ({
     setMessage("");
     setEmailBlurred(false);
     setMessageBlurred(false);
+    setSubmitAttempted(false);
   };
 
   const clearSubmitStatus = () => {
@@ -69,6 +76,7 @@ export const ContactForm = ({
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!isFormValid) {
+      setSubmitAttempted(true);
       setEmailBlurred(true);
       setMessageBlurred(true);
       return;
@@ -192,7 +200,7 @@ export const ContactForm = ({
       <button
         type="submit"
         className={styles.contactSubmit}
-        disabled={!isFormValid || status === "sending"}
+        disabled={status === "sending"}
         aria-describedby={
           !isFormValid && showSummary ? "contact-form-summary" : undefined
         }

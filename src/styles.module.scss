@@ -759,15 +759,46 @@
   color: var(--text-muted);
 }
 
+@keyframes contactValidationSummaryIn {
+  from {
+    opacity: 0;
+    transform: translateX(-100%);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
 .contactValidationSummary {
   margin: 0;
-  padding: 0.65rem 0.75rem;
+  display: block;
+  padding: 0.65rem 0.85rem 0.7rem 0.75rem;
   font-size: 0.85rem;
   line-height: 1.45;
   color: var(--text);
-  background: color-mix(in srgb, var(--accent) 12%, var(--bg-elevated));
-  border: 1px solid color-mix(in srgb, var(--accent) 35%, var(--border));
-  border-radius: 2px;
+  background: linear-gradient(
+    118deg,
+    color-mix(in srgb, var(--accent) 22%, var(--bg-elevated)) 0%,
+    var(--bg-elevated) 72%
+  );
+  clip-path: polygon(
+    0 0,
+    calc(100% - 7px) 0,
+    100% 11px,
+    100% 100%,
+    11px 100%,
+    0 calc(100% - 7px)
+  );
+  filter: drop-shadow(0 0 0 1px var(--border));
+  animation: contactValidationSummaryIn 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .contactValidationSummary {
+    animation: none;
+  }
 }
 
 .contactFieldError {
