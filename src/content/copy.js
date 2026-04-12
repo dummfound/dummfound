@@ -113,7 +113,7 @@ export const COPY = {
     contactFormHelper:
       "Чтобы отправить форму, заполните email и текст сообщения.",
     contactFormValidationSummary:
-      "Исправьте поля ниже: укажите корректный email и текст сообщения.",
+      "Исправьте поля выше: укажите корректный email и текст сообщения.",
     contactFormErrorEmailRequired: "Укажите email.",
     contactFormErrorEmailInvalid: "Проверьте формат email.",
     contactFormErrorMessageRequired: "Напишите текст сообщения.",
@@ -233,7 +233,7 @@ export const COPY = {
     contactFormHelper:
       "To send the form, fill in your email and message.",
     contactFormValidationSummary:
-      "Fix the fields below — enter a valid email and your message.",
+      "Fix the fields above — enter a valid email and your message.",
     contactFormErrorEmailRequired: "Enter your email.",
     contactFormErrorEmailInvalid: "Check the email format.",
     contactFormErrorMessageRequired: "Enter your message.",

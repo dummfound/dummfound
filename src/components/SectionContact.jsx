@@ -1,4 +1,5 @@
 import { ContactForm } from "./ContactForm";
+import { SocialBrandIcon } from "./SocialBrandIcon";
 import styles from "../styles.module.scss";
 
 const MAIL = "dummfound@gmail.com";
@@ -52,8 +53,17 @@ export const SectionContact = ({
           <ul className={styles.socialList} role="list">
             {socialLinks.map(({ key, label: socialLabel, href }) => (
               <li key={key}>
-                <a href={href} target="_blank" rel="noopener noreferrer">
-                  {socialLabel}
+                <a
+                  className={styles.socialLink}
+                  href={href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label={socialLabel}
+                >
+                  <SocialBrandIcon
+                    brandKey={key}
+                    className={styles.socialIcon}
+                  />
                 </a>
               </li>
             ))}
