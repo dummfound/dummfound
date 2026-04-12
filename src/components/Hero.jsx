@@ -17,7 +17,12 @@ export const Hero = ({ introLabel }) => {
       <div className={styles.heroGrain} aria-hidden="true" />
       <div className={styles.heroInner}>
         <div className={styles.heroGrid}>
-          <h1 className={styles.heroTitle}>DUMMFOUND</h1>
+          <h1 className={styles.heroTitle}>
+            <span className={styles.heroTitleSolid}>DUMMFOUND</span>
+            <span className={styles.heroTitleGrad} aria-hidden="true">
+              DUMMFOUND
+            </span>
+          </h1>
         </div>
       </div>
     </section>

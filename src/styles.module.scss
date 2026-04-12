@@ -436,9 +436,130 @@
   .heroGrid {
     animation: none;
   }
+
+  .heroTitle {
+    animation: none;
+    filter: none;
+    opacity: 1;
+  }
+
+  .heroTitleGrad {
+    display: none;
+  }
+
+  .heroTitleSolid {
+    color: #fff;
+  }
+}
+
+$hero-title-fog-gradient: linear-gradient(
+  105deg,
+  color-mix(in srgb, var(--text-muted) 70%, var(--accent)) 0%,
+  var(--text) 20%,
+  color-mix(in srgb, var(--accent) 82%, var(--text)) 38%,
+  var(--accent) 50%,
+  color-mix(in srgb, var(--accent) 75%, var(--text)) 62%,
+  var(--text) 78%,
+  color-mix(in srgb, var(--text-muted) 55%, var(--accent)) 100%
+);
+
+@keyframes heroTitleAtmosphere {
+  0%,
+  18%,
+  82%,
+  100% {
+    filter: blur(0);
+    opacity: 1;
+  }
+
+  24% {
+    filter: blur(0.18rem);
+    opacity: 0.88;
+  }
+
+  38% {
+    filter: blur(0.48rem);
+    opacity: 0.66;
+  }
+
+  50% {
+    filter: blur(0.78rem);
+    opacity: 0.48;
+  }
+
+  62% {
+    filter: blur(0.44rem);
+    opacity: 0.64;
+  }
+
+  76% {
+    filter: blur(0.14rem);
+    opacity: 0.88;
+  }
+}
+
+@keyframes heroTitleGradReveal {
+  0%,
+  15%,
+  85%,
+  100% {
+    opacity: 0;
+  }
+
+  20% {
+    opacity: 0.12;
+  }
+
+  26% {
+    opacity: 0.55;
+  }
+
+  32%,
+  68% {
+    opacity: 1;
+  }
+
+  74% {
+    opacity: 0.55;
+  }
+
+  80% {
+    opacity: 0.12;
+  }
+}
+
+@keyframes heroTitleGradShift {
+  0%,
+  18%,
+  82%,
+  100% {
+    background-position: 22% 50%;
+  }
+
+  24% {
+    background-position: 38% 50%;
+  }
+
+  38% {
+    background-position: 68% 50%;
+  }
+
+  50% {
+    background-position: 100% 50%;
+  }
+
+  62% {
+    background-position: 62% 50%;
+  }
+
+  76% {
+    background-position: 34% 50%;
+  }
 }
 
 .heroTitle {
+  position: relative;
+  display: inline-block;
   margin: 0;
   font-family: var(--font-sans);
   font-weight: 800;
@@ -446,6 +567,30 @@
   letter-spacing: 0.04em;
   line-height: 1.05;
   text-transform: uppercase;
+  animation: heroTitleAtmosphere 15s ease-in-out infinite 0.9s;
+}
+
+.heroTitleSolid {
+  color: #fff;
+}
+
+.heroTitleGrad {
+  position: absolute;
+  left: 0;
+  top: 0;
+  white-space: nowrap;
+  background-image: $hero-title-fog-gradient;
+  background-size: 240% 100%;
+  background-repeat: no-repeat;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  -webkit-text-fill-color: transparent;
+  pointer-events: none;
+  opacity: 0;
+  animation:
+    heroTitleGradReveal 15s ease-in-out infinite 0.9s,
+    heroTitleGradShift 15s ease-in-out infinite 0.9s;
 }
 
 .section {
