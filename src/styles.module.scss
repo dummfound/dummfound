@@ -997,6 +997,17 @@
     align-self: center;
   }
 
+  .socialList {
+    gap: clamp(1.35rem, 6vw, 1.95rem);
+  }
+
+  .socialLink {
+    padding: 0.5rem 0.65rem;
+    margin: -0.5rem -0.65rem;
+    min-width: 2.625rem;
+    min-height: 2.625rem;
+  }
+
   .socialIcon {
     width: 1.35rem;
     height: 1.35rem;
