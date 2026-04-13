@@ -1102,6 +1102,12 @@ $hero-title-fog-gradient: linear-gradient(
   box-sizing: border-box;
 }
 
+.socialListFooter {
+  margin: 0;
+  max-width: 100%;
+  justify-content: flex-start;
+}
+
 .socialList li {
   flex: 0 0 auto;
   min-width: 0;

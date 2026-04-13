@@ -1,5 +1,4 @@
 import { ContactForm } from "./ContactForm";
-import { SocialBrandIcon } from "./SocialBrandIcon";
 import styles from "../styles.module.scss";
 
 const MAIL = "dummfound@gmail.com";
@@ -8,7 +7,6 @@ const hasFormspree = Boolean(import.meta.env.VITE_FORMSPREE_FORM_ID?.trim());
 
 export const SectionContact = ({
   label,
-  socialLinks,
   contactFormName,
   contactFormEmail,
   contactFormMessage,
@@ -50,39 +48,6 @@ export const SectionContact = ({
             errorEmailInvalid={contactFormErrorEmailInvalid}
             errorMessageRequired={contactFormErrorMessageRequired}
           />
-          <ul className={styles.socialList} role="list">
-            {socialLinks.map(({ key, label: socialLabel, href }) => (
-              <li key={key}>
-                <a
-                  className={styles.socialLink}
-                  href={href}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  aria-label={socialLabel}
-                >
-                  {key === "instagram" ? (
-                    <span className={styles.socialInstagramPair}>
-                      <SocialBrandIcon
-                        brandKey={key}
-                        className={styles.socialIcon}
-                      />
-                      <span
-                        className={styles.socialMetaAsterisk}
-                        aria-hidden="true"
-                      >
-                        *
-                      </span>
-                    </span>
-                  ) : (
-                    <SocialBrandIcon
-                      brandKey={key}
-                      className={styles.socialIcon}
-                    />
-                  )}
-                </a>
-              </li>
-            ))}
-          </ul>
         </div>
       </div>
     </section>

@@ -135,7 +135,6 @@ const App = () => {
 
         <SectionContact
           label={contactLabel}
-          socialLinks={socialLinks}
           contactFormIntro={contactFormIntro}
           contactFormName={contactFormName}
           contactFormEmail={contactFormEmail}
@@ -152,7 +151,10 @@ const App = () => {
         />
       </main>
 
-      <SiteFooter instagramDisclaimer={footerInstagramDisclaimer} />
+      <SiteFooter
+        instagramDisclaimer={footerInstagramDisclaimer}
+        socialLinks={socialLinks}
+      />
     </>
   );
 };
