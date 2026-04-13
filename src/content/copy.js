@@ -83,7 +83,7 @@ export const COPY = {
       {
         title: "Слияние",
         type: "festival",
-        date: "2026-06-06",
+        date: "2026-06-05",
         location: "Липецк, Россия",
         href: "https://sliyaniefest.ru/",
         image: "/img/sliyanie.jpg",
@@ -204,7 +204,7 @@ export const COPY = {
       {
         title: "Sliyanie Fest",
         type: "festival",
-        date: "2026-06-06",
+        date: "2026-06-05",
         location: "Lipetsk, Russia",
         href: "https://sliyaniefest.ru/",
         image: "/img/sliyanie.jpg",
