@@ -866,18 +866,27 @@ $hero-title-fog-gradient: linear-gradient(
   display: inline-block;
   margin: var(--space-lg) 0 0;
   padding: 0.75rem 1.25rem;
-  // border: 1px solid var(--border);
-  background: white;
-  color: black;
   font: inherit;
+  font-weight: 600;
+  font-size: 0.85rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
   text-decoration: none;
   cursor: pointer;
-  border-radius: 20px;
+  color: var(--text);
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: 2px;
+  transition:
+    border-color 0.15s ease,
+    color 0.15s ease,
+    background-color 0.15s ease;
 }
 
 .bookingButton:hover {
+  border-color: var(--accent-hover);
+  color: var(--accent-hover);
   background: var(--bg-elevated);
-  border-color: var(--accent);
 }
 
 .contactBlock {
@@ -1067,8 +1076,8 @@ $hero-title-fog-gradient: linear-gradient(
 }
 
 .contactSubmit:hover:not(:disabled) {
-  border-color: var(--accent);
-  color: var(--accent);
+  border-color: var(--accent-hover);
+  color: var(--accent-hover);
 }
 
 .contactSubmit:disabled {
