@@ -73,18 +73,26 @@ export const COPY = {
     ],
     gigs: [
       {
-        title: "Оверлок",
+        title: "Ioneweb & Friends",
         type: "TBA",
         date: "2026-04-17",
-        location: "Воронеж, Россия",
+        location: "Оверлок, Воронеж, Россия",
         href: "https://vk.com/overlockbar",
+        linkLabel: "подробнее →",
+      },
+      {
+        title: "Surprise.FM",
+        type: "Радио",
+        date: "2026-05-08",
+        location: "DEX, Москва, Россия",
+        href: "https://surprise.fm/",
         linkLabel: "подробнее →",
       },
       {
         title: "Слияние",
         type: "festival",
         date: "2026-06-05",
-        location: "Липецк, Россия",
+        location: "Event Park, Липецк, Россия",
         href: "https://sliyaniefest.ru/",
         image: "/img/sliyanie.jpg",
         linkLabel: "подробнее →",
@@ -194,7 +202,7 @@ export const COPY = {
     ],
     gigs: [
       {
-        title: "Overlock",
+        title: "Ioneweb & Friends",
         type: "TBA",
         date: "2026-04-17",
         location: "Voronezh, Russia",
@@ -202,10 +210,18 @@ export const COPY = {
         linkLabel: "details →",
       },
       {
+        title: "Surprise.FM",
+        type: "radio",
+        date: "2026-05-08",
+        location: "DEX, Moscow, Russia",
+        href: "https://surprise.fm/",
+        linkLabel: "подробнее →",
+      },
+      {
         title: "Sliyanie Fest",
         type: "festival",
         date: "2026-06-05",
-        location: "Lipetsk, Russia",
+        location: "Event Park, Lipetsk, Russia",
         href: "https://sliyaniefest.ru/",
         image: "/img/sliyanie.jpg",
         linkLabel: "details →",
