@@ -73,14 +73,6 @@ export const COPY = {
     ],
     gigs: [
       {
-        title: "Ioneweb & Friends",
-        type: "TBA",
-        date: "2026-04-17",
-        location: "Оверлок, Воронеж, Россия",
-        href: "https://vk.com/overlockbar",
-        linkLabel: "подробнее →",
-      },
-      {
         title: "Surprise.FM",
         type: "Радио",
         date: "2026-05-08",
@@ -96,8 +88,15 @@ export const COPY = {
         href: "https://sliyaniefest.ru/",
         image: "/img/sliyanie.jpg",
         linkLabel: "подробнее →",
+      },
+      {
+        title: "SYSTEM 108: одиннадцать лет",
+        type: "TBA",
+        date: "2026-06-13",
+        location: "ДК КРИСТАЛЛ, Москва, Россия",
+        href: "https://system108.com/e130626",
+        linkLabel: "подробнее →",
       }
-   
     ],
     bookingLabel: "Букинг",
     bookingP:
@@ -202,14 +201,6 @@ export const COPY = {
     ],
     gigs: [
       {
-        title: "Ioneweb & Friends",
-        type: "TBA",
-        date: "2026-04-17",
-        location: "Voronezh, Russia",
-        href: "https://vk.com/overlock_club",
-        linkLabel: "details →",
-      },
-      {
         title: "Surprise.FM",
         type: "radio",
         date: "2026-05-08",
@@ -224,6 +215,14 @@ export const COPY = {
         location: "Event Park, Lipetsk, Russia",
         href: "https://sliyaniefest.ru/",
         image: "/img/sliyanie.jpg",
+        linkLabel: "details →",
+      },
+      {
+        title: "SYSTEM 108: 11 years anniversary",
+        type: "TBA",
+        date: "2026-06-13",
+        location: "Crystal Hall, Moscow, Russia",
+        href: "https://system108.com/e130626",
         linkLabel: "details →",
       },
     ],
