@@ -103,7 +103,7 @@ export const COPY = {
         date: "2026-06-20",
         location: "Салют, Липецк, Россия",
         href: "",
-        linkLabel: "details →",
+        linkLabel: "подробнее →",
       }
     ],
     bookingLabel: "Букинг",
