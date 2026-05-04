@@ -96,6 +96,14 @@ export const COPY = {
         location: "ДК КРИСТАЛЛ, Москва, Россия",
         href: "https://system108.com/e130626",
         linkLabel: "подробнее →",
+      },
+      {
+        title: "B2B Wasta",
+        type: "TBA",
+        date: "2026-06-20",
+        location: "Салют, Липецк, Россия",
+        href: "",
+        linkLabel: "details →",
       }
     ],
     bookingLabel: "Букинг",
@@ -225,6 +233,14 @@ export const COPY = {
         href: "https://system108.com/e130626",
         linkLabel: "details →",
       },
+      {
+        title: "B2B Wasta",
+        type: "TBA",
+        date: "2026-06-20",
+        location: "Salut, Lipetsk, Russia",
+        href: "",
+        linkLabel: "details →",
+      }
     ],
     bookingLabel: "Booking",
     bookingP:
