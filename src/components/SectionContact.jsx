@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { ContactForm } from "./ContactForm";
 import { IosMailIcon } from "./IosMailIcon";
 import styles from "../styles.module.scss";
@@ -26,6 +26,25 @@ export const SectionContact = ({
   contactFormToggleClose,
 }) => {
   const [formOpen, setFormOpen] = useState(false);
+  const formPanelRef = useRef(null);
+
+  useEffect(() => {
+    if (!formOpen || !formPanelRef.current) return undefined;
+
+    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const id = window.setTimeout(
+      () => {
+        formPanelRef.current?.scrollIntoView({
+          behavior: reduced ? "auto" : "smooth",
+          block: "end",
+          inline: "nearest",
+        });
+      },
+      reduced ? 0 : 200
+    );
+
+    return () => window.clearTimeout(id);
+  }, [formOpen]);
 
   return (
     <section id="contact" className={`${styles.section} ${styles.sectionContact}`}>
@@ -70,6 +89,7 @@ export const SectionContact = ({
           </address>
           {hasFormspree ? (
             <div
+              ref={formPanelRef}
               id="contact-form-panel"
               className={`${styles.contactFormPanel} ${formOpen ? styles.contactFormPanelOpen : ""}`}
               aria-hidden={!formOpen}
