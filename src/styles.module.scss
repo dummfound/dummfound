@@ -1181,10 +1181,11 @@
 
 .siteFooterCopyright {
   margin: 0;
-  font-family: var(--font-mono);
-  font-size: 0.65rem;
-  letter-spacing: 0.2em;
-  text-transform: uppercase;
+  font-family: var(--font-sans);
+  font-size: 0.75rem;
+  font-weight: 400;
+  letter-spacing: -0.01em;
+  text-transform: none;
   color: var(--text-muted);
 }
 
@@ -1193,10 +1194,10 @@
   margin: 0;
   max-width: 100%;
   font-family: var(--font-sans);
-  font-size: 0.55rem;
+  font-size: 0.75rem;
   font-weight: 400;
   line-height: 1.45;
-  letter-spacing: 0.02em;
+  letter-spacing: -0.01em;
   text-transform: none;
   color: var(--text-muted);
   overflow-wrap: break-word;
