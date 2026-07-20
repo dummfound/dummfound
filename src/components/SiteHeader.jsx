@@ -76,17 +76,35 @@ export const SiteHeader = ({
             pauseLabel={playerPause}
             emptyLabel={playerEmpty}
           />
-          <button
-            type="button"
-            className={styles.navToggle}
-            aria-expanded={menuOpen}
-            aria-controls="nav-panel"
-            aria-label={menuLabel}
-            onClick={onToggleMenu}
-          >
-            <span className={styles.navToggleBar} />
-            <span className={styles.navToggleBar} />
-          </button>
+          <div className={styles.headerMenuWrap}>
+            <button
+              type="button"
+              className={styles.navToggle}
+              aria-expanded={menuOpen}
+              aria-controls="nav-panel"
+              aria-label={menuLabel}
+              onClick={onToggleMenu}
+            >
+              <span className={styles.navToggleBar} />
+              <span className={styles.navToggleBar} />
+            </button>
+
+            <div
+              id="nav-panel"
+              className={`${styles.navPanel} ${menuOpen ? styles.navPanelOpen : ""}`}
+              role={menuOpen ? "dialog" : undefined}
+              aria-modal={menuOpen ? true : undefined}
+              aria-hidden={!menuOpen}
+            >
+              <nav className={styles.navPanelNav} aria-label={navAria}>
+                {navLinks.map(({ href, label }) => (
+                  <Link key={href} to={href} onClick={onCloseMenu}>
+                    {label}
+                  </Link>
+                ))}
+              </nav>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -98,22 +116,6 @@ export const SiteHeader = ({
         tabIndex={-1}
         onClick={onCloseMenu}
       />
-
-      <div
-        id="nav-panel"
-        className={`${styles.navPanel} ${menuOpen ? styles.navPanelOpen : ""}`}
-        role={menuOpen ? "dialog" : undefined}
-        aria-modal={menuOpen ? true : undefined}
-        aria-hidden={!menuOpen}
-      >
-        <nav className={styles.navPanelNav} aria-label={navAria}>
-          {navLinks.map(({ href, label }) => (
-            <Link key={href} to={href} onClick={onCloseMenu}>
-              {label}
-            </Link>
-          ))}
-        </nav>
-      </div>
     </header>
   );
 };
