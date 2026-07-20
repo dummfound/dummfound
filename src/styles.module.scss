@@ -2,44 +2,34 @@
   border-radius: $radius;
   background: linear-gradient(
     145deg,
-    rgba(255, 255, 255, 0.13) 0%,
-    rgba(255, 255, 255, 0.06) 48%,
-    rgba(255, 255, 255, 0.025) 100%
+    rgba(255, 255, 255, 0.11) 0%,
+    rgba(255, 255, 255, 0.05) 100%
   );
   backdrop-filter: blur(var(--ios-blur)) saturate(185%);
   -webkit-backdrop-filter: blur(var(--ios-blur)) saturate(185%);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  border-top-color: rgba(255, 255, 255, 0.34);
-  border-left-color: rgba(255, 255, 255, 0.26);
-  border-bottom-color: rgba(255, 255, 255, 0.08);
-  border-right-color: rgba(255, 255, 255, 0.1);
+  border: none;
   box-shadow:
-    inset 1px 1px 0 rgba(255, 255, 255, 0.16),
-    inset 0 -1px 0 rgba(0, 0, 0, 0.12),
-    0 18px 52px rgba(0, 0, 0, 0.48),
-    0 4px 14px rgba(0, 0, 0, 0.28);
+    inset 0 0 0 1px rgba(255, 255, 255, 0.14),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08),
+    0 16px 48px rgba(0, 0, 0, 0.42),
+    0 2px 8px rgba(0, 0, 0, 0.22);
 }
 
 @mixin ios-glass-accent($radius: var(--ios-radius)) {
   border-radius: $radius;
   background: linear-gradient(
     145deg,
-    rgba(255, 255, 255, 0.18) 0%,
-    rgba(255, 255, 255, 0.08) 48%,
-    rgba(255, 255, 255, 0.035) 100%
+    rgba(255, 255, 255, 0.14) 0%,
+    rgba(255, 255, 255, 0.06) 100%
   );
   backdrop-filter: blur(48px) saturate(195%);
   -webkit-backdrop-filter: blur(48px) saturate(195%);
-  border: 1px solid rgba(255, 255, 255, 0.24);
-  border-top-color: rgba(255, 255, 255, 0.42);
-  border-left-color: rgba(255, 255, 255, 0.32);
-  border-bottom-color: rgba(255, 255, 255, 0.1);
-  border-right-color: rgba(255, 255, 255, 0.12);
+  border: none;
   box-shadow:
-    inset 1px 1px 0 rgba(255, 255, 255, 0.24),
-    inset 0 -1px 0 rgba(0, 0, 0, 0.16),
-    0 22px 60px rgba(0, 0, 0, 0.58),
-    0 6px 18px rgba(0, 0, 0, 0.34);
+    inset 0 0 0 1px rgba(255, 255, 255, 0.18),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1),
+    0 20px 56px rgba(0, 0, 0, 0.5),
+    0 4px 12px rgba(0, 0, 0, 0.28);
 }
 
 @mixin hover-tint {
@@ -60,10 +50,9 @@
   background: rgba(255, 255, 255, 0.1);
   backdrop-filter: blur(20px) saturate(160%);
   -webkit-backdrop-filter: blur(20px) saturate(160%);
-  border: 1px solid rgba(255, 255, 255, 0.16);
-  border-top-color: rgba(255, 255, 255, 0.24);
+  border: 1px solid rgba(255, 255, 255, 0.14);
   border-radius: var(--ios-radius-pill);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.14);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.1);
 }
 
 @mixin ios-segmented {
