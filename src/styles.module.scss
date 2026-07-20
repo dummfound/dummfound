@@ -382,21 +382,20 @@
     max-height: 100dvh;
     margin: 0;
     z-index: 201;
+    box-sizing: border-box;
     background: rgba(28, 28, 30, 0.58);
     backdrop-filter: blur(var(--ios-blur)) saturate(190%);
     -webkit-backdrop-filter: blur(var(--ios-blur)) saturate(190%);
-    border: 1px solid var(--border);
-    border-right: none;
-    border-radius: var(--ios-radius) 0 0 var(--ios-radius);
-    box-shadow:
-      inset 0 1px 0 var(--ios-highlight),
-      -12px 0 40px rgba(0, 0, 0, 0.28);
+    border: none;
+    border-left: 1px solid var(--border);
+    box-shadow: -12px 0 40px rgba(0, 0, 0, 0.28);
     transform: translateX(100%);
     transition:
       transform 0.28s cubic-bezier(0.4, 0, 0.2, 1),
       visibility 0.28s;
     visibility: hidden;
     pointer-events: none;
+    overflow-x: hidden;
     overflow-y: auto;
     padding-top: max(0.75rem, env(safe-area-inset-top, 0px));
     padding-right: max(var(--space-md), env(safe-area-inset-right));
@@ -810,34 +809,104 @@
   font-style: normal;
   display: flex;
   flex-direction: column;
+  align-items: flex-start;
   gap: var(--space-xs);
   min-width: 0;
   max-width: 100%;
-  margin: var(--space-md) var(--space-lg) 0;
-  padding: var(--space-md) var(--space-lg);
-  @include ios-glass(var(--ios-radius-sm));
+  margin: 0;
+  padding: 0.85rem var(--space-lg);
+  border-bottom: 1px solid var(--ios-separator);
+}
+
+@keyframes contactMailShimmer {
+  0%,
+  72%,
+  100% {
+    transform: translateX(-130%);
+    opacity: 0;
+  }
+
+  82% {
+    opacity: 1;
+  }
+
+  92% {
+    transform: translateX(130%);
+    opacity: 0;
+  }
 }
 
 .contactMail {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
   font-family: var(--font-mono);
-  font-size: 1.05rem;
-  font-weight: 400;
+  font-size: 0.84rem;
+  font-weight: 600;
   letter-spacing: -0.01em;
   border-bottom: none;
-  display: inline-block;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
   width: fit-content;
   max-width: 100%;
   overflow-wrap: anywhere;
   color: var(--text);
-  border-radius: var(--ios-radius-sm);
-  padding: 0.15rem 0.35rem;
-  margin: -0.15rem -0.35rem;
+  padding: 0.55rem 0.95rem 0.55rem 0.75rem;
+  @include ios-pill;
   @include hover-tint;
+}
+
+.contactMail::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background: linear-gradient(
+    105deg,
+    transparent 38%,
+    rgba(255, 255, 255, 0.14) 50%,
+    transparent 62%
+  );
+  transform: translateX(-130%);
+  animation: contactMailShimmer 5.5s ease-in-out infinite;
+  pointer-events: none;
 }
 
 .contactMail:hover {
   color: var(--text);
-  background: rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.14);
+  border-color: rgba(232, 48, 79, 0.32);
+}
+
+.contactMailIcon {
+  position: relative;
+  z-index: 1;
+  width: 1rem;
+  height: 1rem;
+  color: var(--accent-soft);
+  flex-shrink: 0;
+  transition: color 0.2s ease, transform 0.2s ease;
+}
+
+.contactMail:hover .contactMailIcon {
+  color: var(--accent-hover);
+  transform: scale(1.06);
+}
+
+.contactMailText {
+  position: relative;
+  z-index: 1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .contactMail::after {
+    animation: none;
+  }
+
+  .contactMail:hover .contactMailIcon {
+    transform: none;
+  }
 }
 
 .contactFormIntro {
@@ -983,16 +1052,17 @@
   font-size: 1rem;
   letter-spacing: -0.01em;
   cursor: pointer;
-  color: var(--text);
-  background: rgba(255, 255, 255, 0.1);
-  border: 1px solid var(--border);
+  color: #fff;
+  background: var(--accent-soft);
+  border: 1px solid rgba(255, 255, 255, 0.14);
   border-radius: var(--ios-radius-sm);
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.12) inset;
   @include hover-tint;
 }
 
 .contactSubmit:hover:not(:disabled) {
-  background: rgba(255, 255, 255, 0.16);
-  color: var(--text);
+  background: var(--accent-hover);
+  color: #fff;
 }
 
 .contactSubmit:focus-visible {
@@ -1091,6 +1161,15 @@
 
   .contactForm > .gigsType {
     align-self: center;
+  }
+
+  .siteFooterInner {
+    align-items: center;
+    text-align: center;
+  }
+
+  .socialListFooter {
+    justify-content: center;
   }
 
   .socialList {

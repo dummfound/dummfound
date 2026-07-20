@@ -1,4 +1,5 @@
 import { ContactForm } from "./ContactForm";
+import { IosMailIcon } from "./IosMailIcon";
 import styles from "../styles.module.scss";
 
 const MAIL = "dummfound@gmail.com";
@@ -28,7 +29,8 @@ export const SectionContact = ({
         <div className={styles.sectionBody}>
           <address className={styles.contactBlock}>
             <a className={styles.contactMail} href={`mailto:${MAIL}`}>
-              {MAIL}
+              <IosMailIcon className={styles.contactMailIcon} />
+              <span className={styles.contactMailText}>{MAIL}</span>
             </a>
           </address>
           {hasFormspree && contactFormIntro ? (
