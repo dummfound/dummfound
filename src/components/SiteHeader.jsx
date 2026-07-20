@@ -1,4 +1,3 @@
-import { createPortal } from "react-dom";
 import { Link, useLocation } from "react-router-dom";
 import { HeaderMusicPlayer } from "./HeaderMusicPlayer";
 import styles from "../styles.module.scss";
@@ -91,58 +90,30 @@ export const SiteHeader = ({
         </div>
       </div>
 
-      {typeof document !== "undefined"
-        ? createPortal(
-            <>
-              <button
-                type="button"
-                className={`${styles.navDrawerBackdrop} ${menuOpen ? styles.isVisible : ""}`}
-                aria-label={drawerBackdropLabel}
-                aria-hidden={!menuOpen}
-                tabIndex={-1}
-                onClick={onCloseMenu}
-              />
+      <button
+        type="button"
+        className={`${styles.navDrawerBackdrop} ${menuOpen ? styles.isVisible : ""}`}
+        aria-label={drawerBackdropLabel}
+        aria-hidden={!menuOpen}
+        tabIndex={-1}
+        onClick={onCloseMenu}
+      />
 
-              <div
-                id="nav-panel"
-                className={`${styles.navPanel} ${menuOpen ? styles.navPanelOpen : ""}`}
-                role={menuOpen ? "dialog" : undefined}
-                aria-modal={menuOpen ? true : undefined}
-                aria-hidden={!menuOpen}
-              >
-                <button
-                  type="button"
-                  className={styles.navPanelClose}
-                  aria-label={drawerBackdropLabel}
-                  onClick={onCloseMenu}
-                >
-                  <svg
-                    className={styles.navPanelCloseIcon}
-                    viewBox="0 0 24 24"
-                    aria-hidden="true"
-                    focusable="false"
-                  >
-                    <path
-                      d="M6 6l12 12M18 6L6 18"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="1.75"
-                      strokeLinecap="round"
-                    />
-                  </svg>
-                </button>
-                <nav className={styles.navPanelNav} aria-label={navAria}>
-                  {navLinks.map(({ href, label }) => (
-                    <Link key={href} to={href} onClick={onCloseMenu}>
-                      {label}
-                    </Link>
-                  ))}
-                </nav>
-              </div>
-            </>,
-            document.body
-          )
-        : null}
+      <div
+        id="nav-panel"
+        className={`${styles.navPanel} ${menuOpen ? styles.navPanelOpen : ""}`}
+        role={menuOpen ? "dialog" : undefined}
+        aria-modal={menuOpen ? true : undefined}
+        aria-hidden={!menuOpen}
+      >
+        <nav className={styles.navPanelNav} aria-label={navAria}>
+          {navLinks.map(({ href, label }) => (
+            <Link key={href} to={href} onClick={onCloseMenu}>
+              {label}
+            </Link>
+          ))}
+        </nav>
+      </div>
     </header>
   );
 };
