@@ -28,7 +28,7 @@ export const SectionContact = ({
   const [formOpen, setFormOpen] = useState(false);
 
   return (
-    <section id="contact" className={styles.section}>
+    <section id="contact" className={`${styles.section} ${styles.sectionContact}`}>
       <div className={styles.sectionInner}>
         <h2 className={styles.sectionLabel}>{label}</h2>
         <div className={styles.sectionBody}>

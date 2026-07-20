@@ -467,6 +467,10 @@
   padding-block: var(--space-xs);
 }
 
+.sectionContact .sectionInner {
+  padding-bottom: var(--space-sm);
+}
+
 .sectionInner {
   max-width: var(--max-width);
   margin: 0 auto;
@@ -603,7 +607,19 @@
 }
 
 .gigsItem:last-child {
-  border-bottom: none;
+  border-bottom: 1px solid var(--ios-separator);
+}
+
+.gigsTba {
+  margin: 0;
+  padding: 0.85rem var(--space-lg);
+  font-family: var(--font-mono);
+  font-size: 0.9rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  color: var(--text-muted);
+  border-bottom-left-radius: inherit;
+  border-bottom-right-radius: inherit;
 }
 
 .gigsItem:hover {
@@ -1295,7 +1311,7 @@
 }
 
 .siteFooter {
-  padding: var(--space-lg) var(--space-md);
+  padding: var(--space-sm) var(--space-md);
   padding-inline: max(var(--space-md), env(safe-area-inset-left))
     max(var(--space-md), env(safe-area-inset-right));
   padding-bottom: max(var(--space-lg), env(safe-area-inset-bottom));

@@ -39,6 +39,7 @@ export const SectionGigs = ({ label, gigs = [] }) => {
               </li>
             ))}
           </ul>
+          <p className={styles.gigsTba}>{"& TBA"}</p>
         </div>
       </div>
     </section>
