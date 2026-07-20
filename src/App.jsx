@@ -87,6 +87,8 @@ const App = () => {
     contactFormErrorEmailRequired,
     contactFormErrorEmailInvalid,
     contactFormErrorMessageRequired,
+    contactFormToggleOpen,
+    contactFormToggleClose,
     footerInstagramDisclaimer,
     gigsLabel,
     gigs,
@@ -148,6 +150,8 @@ const App = () => {
           contactFormErrorEmailRequired={contactFormErrorEmailRequired}
           contactFormErrorEmailInvalid={contactFormErrorEmailInvalid}
           contactFormErrorMessageRequired={contactFormErrorMessageRequired}
+          contactFormToggleOpen={contactFormToggleOpen}
+          contactFormToggleClose={contactFormToggleClose}
         />
       </main>
 

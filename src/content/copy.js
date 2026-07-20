@@ -115,6 +115,8 @@ export const COPY = {
     contactFormErrorEmailRequired: "Укажите email.",
     contactFormErrorEmailInvalid: "Проверьте формат email.",
     contactFormErrorMessageRequired: "Напишите текст сообщения.",
+    contactFormToggleOpen: "Написать",
+    contactFormToggleClose: "Скрыть",
     instagramSocialLabel: "Instagram",
     footerInstagramDisclaimer:
       "*принадлежит Meta, признанной экстремистской и запрещенной на территории РФ",
@@ -234,6 +236,8 @@ export const COPY = {
     contactFormErrorEmailRequired: "Enter your email.",
     contactFormErrorEmailInvalid: "Check the email format.",
     contactFormErrorMessageRequired: "Enter your message.",
+    contactFormToggleOpen: "Write",
+    contactFormToggleClose: "Hide",
     instagramSocialLabel: "Instagram",
     footerInstagramDisclaimer:
       "*принадлежит Meta, признанной экстремистской и запрещенной на территории РФ",

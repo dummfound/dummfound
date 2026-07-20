@@ -806,14 +806,92 @@
 .contactBlock {
   font-style: normal;
   display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: var(--space-xs);
+  flex-direction: row;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.65rem 1rem;
   min-width: 0;
   max-width: 100%;
   margin: 0;
   padding: 0.85rem var(--space-lg);
-  border-bottom: 1px solid var(--ios-separator);
+  border-bottom: 1px solid transparent;
+  border-bottom-left-radius: inherit;
+  border-bottom-right-radius: inherit;
+}
+
+.contactBlockOpen {
+  border-bottom-color: var(--ios-separator);
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
+}
+
+.contactFormToggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+  margin: 0;
+  padding: 0.5rem 0.75rem;
+  width: fit-content;
+  border: none;
+  font: inherit;
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  line-height: 1;
+  color: var(--text);
+  cursor: pointer;
+  @include ios-pill;
+  @include hover-tint;
+}
+
+.contactFormToggle:hover {
+  background: rgba(255, 255, 255, 0.14);
+  color: var(--text);
+}
+
+.contactFormToggleIcon {
+  display: block;
+  width: 0.9rem;
+  height: 0.9rem;
+  flex-shrink: 0;
+  transition: transform 0.28s cubic-bezier(0.32, 0.72, 0, 1);
+}
+
+.contactFormToggleOpen .contactFormToggleIcon {
+  transform: rotate(180deg);
+}
+
+.contactFormPanel {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows 0.38s cubic-bezier(0.32, 0.72, 0, 1);
+}
+
+.contactFormPanelOpen {
+  grid-template-rows: 1fr;
+}
+
+.contactFormPanelOpen .contactForm {
+  border-bottom-left-radius: var(--ios-radius);
+  border-bottom-right-radius: var(--ios-radius);
+}
+
+.contactFormPanelInner {
+  overflow: hidden;
+  min-height: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .contactFormPanel {
+    transition: none;
+  }
+
+  .contactFormToggleIcon {
+    transition: none;
+  }
 }
 
 @keyframes contactMailShimmer {
@@ -1110,6 +1188,10 @@
   justify-content: flex-start;
 }
 
+.socialListFooter .socialLink {
+  margin: 0;
+}
+
 .socialList li {
   flex: 0 0 auto;
   min-width: 0;
@@ -1167,6 +1249,21 @@
     align-self: center;
   }
 
+  .contactMail {
+    flex: 0 1 auto;
+    min-width: 0;
+  }
+
+  .contactFormToggle {
+    flex: 1 1 auto;
+    width: auto;
+    min-width: 0;
+  }
+
+  .contactBlock {
+    flex-wrap: nowrap;
+  }
+
   .siteFooterInner {
     align-items: center;
     text-align: center;
@@ -1185,6 +1282,10 @@
     margin: -0.5rem -0.65rem;
     min-width: 2.625rem;
     min-height: 2.625rem;
+  }
+
+  .socialListFooter .socialLink {
+    margin: 0;
   }
 
   .socialIcon {
@@ -1213,7 +1314,8 @@
   align-items: stretch;
   gap: var(--space-sm);
   @include ios-grouped;
-  padding: var(--space-lg);
+  padding-block: var(--space-md);
+  padding-inline: var(--space-lg);
 }
 
 .siteFooterCopyright {
