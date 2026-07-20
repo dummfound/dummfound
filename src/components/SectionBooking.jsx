@@ -34,7 +34,7 @@ export const SectionBooking = ({
             target="_blank"
             rel="noopener noreferrer"
           >
-            {ctaLabel}
+            <span className={styles.bookingButtonText}>{ctaLabel}</span>
           </a>
         </div>
         
