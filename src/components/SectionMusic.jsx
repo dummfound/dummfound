@@ -1,3 +1,4 @@
+import { IosLinkIcon } from "./IosLinkIcon";
 import styles from "../styles.module.scss";
 
 export const SectionMusic = ({ label, releases }) => {
@@ -17,7 +18,8 @@ export const SectionMusic = ({ label, releases }) => {
                   target="_blank"
                   rel="noopener noreferrer"
                 >
-                  {linkLabel}
+                  <span>{linkLabel}</span>
+                  <IosLinkIcon className={styles.linkIcon} />
                 </a>
               </li>
             ))}

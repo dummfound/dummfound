@@ -32,10 +32,12 @@ export const useNavMenu = () => {
     if (!menuOpen) return;
     const mq = window.matchMedia(MOBILE_NAV_MATCH);
     if (!mq.matches) return;
-    const prev = document.body.style.overflow;
+    const prevOverflow = document.body.style.overflow;
+    document.body.classList.add("nav-open");
     document.body.style.overflow = "hidden";
     return () => {
-      document.body.style.overflow = prev;
+      document.body.classList.remove("nav-open");
+      document.body.style.overflow = prevOverflow;
     };
   }, [menuOpen]);
 

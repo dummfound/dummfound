@@ -1,30 +1,44 @@
+import { useEffect, useRef } from "react";
 import styles from "../styles.module.scss";
 
+const HERO_VIDEO = "/video/IMG_6766.mov";
+
 export const Hero = ({ introLabel }) => {
+  const videoRef = useRef(null);
+
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video) return;
+
+    const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const sync = () => {
+      if (mq.matches) {
+        video.pause();
+      } else {
+        video.play().catch(() => {});
+      }
+    };
+
+    sync();
+    mq.addEventListener("change", sync);
+    return () => mq.removeEventListener("change", sync);
+  }, []);
+
   return (
     <section id="top" className={styles.hero} aria-label={introLabel}>
       <div className={styles.heroBg} aria-hidden="true">
-        <img
-          className={styles.heroBgImg}
-          src="/dummfound-portrait.png"
-          alt=""
-          width={900}
-          height={1200}
-          decoding="async"
+        <video
+          ref={videoRef}
+          className={styles.heroBgVideo}
+          src={HERO_VIDEO}
+          autoPlay
+          muted
+          loop
+          playsInline
+          preload="auto"
         />
       </div>
       <div className={styles.heroScrim} aria-hidden="true" />
-      <div className={styles.heroGrain} aria-hidden="true" />
-      <div className={styles.heroInner}>
-        <div className={styles.heroGrid}>
-          <h1 className={styles.heroTitle}>
-            <span className={styles.heroTitleSolid}>DUMMFOUND</span>
-            <span className={styles.heroTitleGrad} aria-hidden="true">
-              DUMMFOUND
-            </span>
-          </h1>
-        </div>
-      </div>
     </section>
   );
 };

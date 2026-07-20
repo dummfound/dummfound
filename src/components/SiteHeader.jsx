@@ -1,3 +1,4 @@
+import { createPortal } from "react-dom";
 import { Link, useLocation } from "react-router-dom";
 import { HeaderMusicPlayer } from "./HeaderMusicPlayer";
 import styles from "../styles.module.scss";
@@ -42,9 +43,7 @@ export const SiteHeader = ({
           onClick={handleLogoClick}
           aria-label={logoAria}
         >
-          <span className={styles.logoMark} aria-hidden="true">
-            <span className={styles.logoLetter}>D</span>
-          </span>
+          <h1 className={styles.logoWordmark}>DUMMFOUND</h1>
         </Link>
         <div className={styles.headerTrail}>
           <nav className={styles.nav} aria-label={navAria}>
@@ -92,29 +91,58 @@ export const SiteHeader = ({
         </div>
       </div>
 
-      <button
-        type="button"
-        className={`${styles.navDrawerBackdrop} ${menuOpen ? styles.isVisible : ""}`}
-        aria-label={drawerBackdropLabel}
-        aria-hidden={!menuOpen}
-        tabIndex={-1}
-        onClick={onCloseMenu}
-      />
+      {typeof document !== "undefined"
+        ? createPortal(
+            <>
+              <button
+                type="button"
+                className={`${styles.navDrawerBackdrop} ${menuOpen ? styles.isVisible : ""}`}
+                aria-label={drawerBackdropLabel}
+                aria-hidden={!menuOpen}
+                tabIndex={-1}
+                onClick={onCloseMenu}
+              />
 
-      <div
-        id="nav-panel"
-        className={`${styles.navPanel} ${menuOpen ? styles.navPanelOpen : ""}`}
-        role={menuOpen ? "dialog" : undefined}
-        aria-modal={menuOpen ? true : undefined}
-        aria-label={navAria}
-        aria-hidden={!menuOpen}
-      >
-        {navLinks.map(({ href, label }) => (
-          <Link key={href} to={href} onClick={onCloseMenu}>
-            {label}
-          </Link>
-        ))}
-      </div>
+              <div
+                id="nav-panel"
+                className={`${styles.navPanel} ${menuOpen ? styles.navPanelOpen : ""}`}
+                role={menuOpen ? "dialog" : undefined}
+                aria-modal={menuOpen ? true : undefined}
+                aria-hidden={!menuOpen}
+              >
+                <button
+                  type="button"
+                  className={styles.navPanelClose}
+                  aria-label={drawerBackdropLabel}
+                  onClick={onCloseMenu}
+                >
+                  <svg
+                    className={styles.navPanelCloseIcon}
+                    viewBox="0 0 24 24"
+                    aria-hidden="true"
+                    focusable="false"
+                  >
+                    <path
+                      d="M6 6l12 12M18 6L6 18"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="1.75"
+                      strokeLinecap="round"
+                    />
+                  </svg>
+                </button>
+                <nav className={styles.navPanelNav} aria-label={navAria}>
+                  {navLinks.map(({ href, label }) => (
+                    <Link key={href} to={href} onClick={onCloseMenu}>
+                      {label}
+                    </Link>
+                  ))}
+                </nav>
+              </div>
+            </>,
+            document.body
+          )
+        : null}
     </header>
   );
 };
