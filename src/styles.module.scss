@@ -1,35 +1,10 @@
 @mixin ios-glass($radius: var(--ios-radius)) {
+  background: var(--ios-glass);
+  backdrop-filter: blur(var(--ios-blur)) saturate(180%);
+  -webkit-backdrop-filter: blur(var(--ios-blur)) saturate(180%);
+  border: 1px solid var(--border);
   border-radius: $radius;
-  background: linear-gradient(
-    145deg,
-    rgba(255, 255, 255, 0.11) 0%,
-    rgba(255, 255, 255, 0.05) 100%
-  );
-  backdrop-filter: blur(var(--ios-blur)) saturate(185%);
-  -webkit-backdrop-filter: blur(var(--ios-blur)) saturate(185%);
-  border: none;
-  box-shadow:
-    inset 0 0 0 1px rgba(255, 255, 255, 0.14),
-    inset 0 1px 0 rgba(255, 255, 255, 0.08),
-    0 16px 48px rgba(0, 0, 0, 0.42),
-    0 2px 8px rgba(0, 0, 0, 0.22);
-}
-
-@mixin ios-glass-accent($radius: var(--ios-radius)) {
-  border-radius: $radius;
-  background: linear-gradient(
-    145deg,
-    rgba(255, 255, 255, 0.14) 0%,
-    rgba(255, 255, 255, 0.06) 100%
-  );
-  backdrop-filter: blur(48px) saturate(195%);
-  -webkit-backdrop-filter: blur(48px) saturate(195%);
-  border: none;
-  box-shadow:
-    inset 0 0 0 1px rgba(255, 255, 255, 0.18),
-    inset 0 1px 0 rgba(255, 255, 255, 0.1),
-    0 20px 56px rgba(0, 0, 0, 0.5),
-    0 4px 12px rgba(0, 0, 0, 0.28);
+  box-shadow: inset 0 1px 0 var(--ios-highlight);
 }
 
 @mixin hover-tint {
@@ -47,12 +22,12 @@
 }
 
 @mixin ios-pill {
-  background: rgba(255, 255, 255, 0.1);
+  background: var(--ios-glass-strong);
   backdrop-filter: blur(20px) saturate(160%);
   -webkit-backdrop-filter: blur(20px) saturate(160%);
-  border: 1px solid rgba(255, 255, 255, 0.14);
+  border: 1px solid var(--border);
   border-radius: var(--ios-radius-pill);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  box-shadow: inset 0 1px 0 var(--ios-highlight);
 }
 
 @mixin ios-segmented {
@@ -260,6 +235,7 @@
   padding: 0;
   @include ios-pill;
   border-radius: var(--ios-radius-sm);
+  background: var(--ios-glass);
   cursor: pointer;
   display: none;
   flex-direction: column;
@@ -289,11 +265,6 @@
   transform: translateY(-3.5px) rotate(-45deg);
 }
 
-.headerMenuWrap {
-  position: relative;
-  flex-shrink: 0;
-}
-
 .navPanel {
   padding: 0.35rem;
   display: flex;
@@ -316,15 +287,12 @@
   padding: 0.7rem 0.85rem;
   border-bottom: none;
   border-radius: calc(var(--ios-radius) - 6px);
-  border: 1px solid transparent;
   @include hover-tint;
 }
 
 .navPanelNav a:hover {
-  background: rgba(255, 255, 255, 0.16);
-  border-color: rgba(255, 255, 255, 0.14);
+  background: rgba(255, 255, 255, 0.1);
   color: var(--text);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.12);
 }
 
 .navDrawerBackdrop {
@@ -365,10 +333,6 @@
     margin-left: 0.75rem;
   }
 
-  .headerMenuWrap {
-    position: relative;
-  }
-
   .navDrawerBackdrop {
     display: block;
     position: fixed;
@@ -382,9 +346,9 @@
     height: 100%;
     min-height: 100dvh;
     cursor: pointer;
-    background: rgba(0, 0, 0, 0.58);
-    backdrop-filter: blur(36px) saturate(160%);
-    -webkit-backdrop-filter: blur(36px) saturate(160%);
+    background: rgba(0, 0, 0, 0.52);
+    backdrop-filter: blur(28px) saturate(140%);
+    -webkit-backdrop-filter: blur(28px) saturate(140%);
     opacity: 0;
     visibility: hidden;
     pointer-events: none;
@@ -403,17 +367,25 @@
 
   .navPanel {
     position: absolute;
-    top: calc(100% + 0.45rem);
-    right: 0;
+    top: 100%;
+    right: max(0.75rem, env(safe-area-inset-right));
     left: auto;
     bottom: auto;
     width: min(15.5rem, calc(100vw - 1.5rem));
     height: auto;
     max-height: min(70dvh, 24rem);
-    margin: 0;
-    z-index: 2;
+    margin: 0.45rem 0 0;
+    z-index: 1;
     box-sizing: border-box;
-    @include ios-glass-accent(var(--ios-radius));
+    background: rgba(28, 28, 30, 0.88);
+    backdrop-filter: blur(var(--ios-blur)) saturate(190%);
+    -webkit-backdrop-filter: blur(var(--ios-blur)) saturate(190%);
+    border: 1px solid var(--border);
+    border-radius: var(--ios-radius);
+    box-shadow:
+      0 16px 48px rgba(0, 0, 0, 0.42),
+      0 4px 12px rgba(0, 0, 0, 0.24),
+      inset 0 1px 0 var(--ios-highlight);
     opacity: 0;
     visibility: hidden;
     pointer-events: none;
@@ -425,7 +397,7 @@
       visibility 0.38s;
     overflow-x: hidden;
     overflow-y: auto;
-    padding: 0.45rem;
+    padding: 0.35rem;
   }
 
   .navPanelOpen {
@@ -528,8 +500,7 @@
 
 .sectionBody {
   min-width: 0;
-  @include ios-glass(var(--ios-radius));
-  overflow: hidden;
+  @include ios-grouped;
   padding: 0;
 }
 
@@ -718,7 +689,7 @@
   aspect-ratio: 4 / 5;
   width: min(9rem, 32vw);
   justify-self: start;
-  background: rgba(255, 255, 255, 0.06);
+  background: var(--ios-glass);
 }
 
 .gigsImage {
@@ -1204,18 +1175,16 @@
   flex-direction: column;
   align-items: stretch;
   gap: var(--space-sm);
-  @include ios-glass(var(--ios-radius));
-  overflow: hidden;
+  @include ios-grouped;
   padding: var(--space-lg);
 }
 
 .siteFooterCopyright {
   margin: 0;
-  font-family: var(--font-sans);
-  font-size: 0.75rem;
-  font-weight: 400;
-  letter-spacing: -0.01em;
-  text-transform: none;
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
   color: var(--text-muted);
 }
 
@@ -1224,10 +1193,10 @@
   margin: 0;
   max-width: 100%;
   font-family: var(--font-sans);
-  font-size: 0.75rem;
+  font-size: 0.55rem;
   font-weight: 400;
   line-height: 1.45;
-  letter-spacing: -0.01em;
+  letter-spacing: 0.02em;
   text-transform: none;
   color: var(--text-muted);
   overflow-wrap: break-word;
