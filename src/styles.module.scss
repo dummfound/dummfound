@@ -634,11 +634,19 @@
 }
 
 .gigPage {
+  position: relative;
+  isolation: isolate;
   min-width: 0;
   padding-block: var(--space-xs);
 }
 
+.gigPageBg {
+  display: none;
+}
+
 .gigPageInner {
+  position: relative;
+  z-index: 1;
   max-width: var(--max-width);
   margin: 0 auto;
   padding: var(--space-xl) var(--space-md) var(--space-2xl);
@@ -646,6 +654,38 @@
     max(var(--space-md), env(safe-area-inset-right));
   min-width: 0;
   box-sizing: border-box;
+}
+
+@media (max-width: 768px) {
+  .gigPageWithBg .gigPageBg {
+    display: block;
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    overflow: hidden;
+  }
+
+  .gigPageBgImage {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center top;
+    filter: brightness(0.32) saturate(0.85);
+  }
+
+  .gigPageWithBg .gigPageBg::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      180deg,
+      rgba(8, 8, 10, 0.45) 0%,
+      rgba(8, 8, 10, 0.72) 42%,
+      rgba(8, 8, 10, 0.9) 100%
+    );
+  }
 }
 
 .gigBack {

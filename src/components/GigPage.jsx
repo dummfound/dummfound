@@ -63,7 +63,23 @@ export const GigPage = ({
         onToggleMenu={onToggleMenu}
       />
 
-      <main id="main" className={styles.gigPage}>
+      <main
+        id="main"
+        className={
+          gig.image ? `${styles.gigPage} ${styles.gigPageWithBg}` : styles.gigPage
+        }
+      >
+        {gig.image ? (
+          <div className={styles.gigPageBg} aria-hidden="true">
+            <img
+              src={gig.image}
+              alt=""
+              className={styles.gigPageBgImage}
+              decoding="async"
+            />
+          </div>
+        ) : null}
+
         <div className={styles.gigPageInner}>
           <Link className={styles.gigBack} to="/gigs">
             <IosBackIcon className={styles.gigBackIcon} />

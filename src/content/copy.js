@@ -75,11 +75,12 @@ export const COPY = {
       {
         slug: "police-in-paris",
         title: "POLICE IN PARIS — большое рейв-шоу",
-        type: "club",
+        type: "discoklub",
         date: "2026-07-18",
         location: "Суперметалл, Москва, Россия",
         href: "https://discoklub.com/e180726",
         linkLabel: "подробнее",
+        image: "/gigs/police-in-paris.jpg",
         body: "Большое рейв-шоу POLICE IN PARIS в Суперметалле.",
       },
       {
@@ -90,6 +91,7 @@ export const COPY = {
         location: "база отдыха «Крутояк», Владимирская область, Россия",
         href: "https://krutofestival.com/",
         linkLabel: "подробнее",
+        image: "/gigs/kruto-artwork.png",
         body: "Фестиваль КРУТО на базе отдыха «Крутояк».",
       },
     ],
@@ -203,7 +205,7 @@ export const COPY = {
       {
         slug: "police-in-paris",
         title: "POLICE IN PARIS — big rave show",
-        type: "club",
+        type: "discoklub",
         date: "2026-07-18",
         location: "Supermetall, Moscow, Russia",
         href: "https://discoklub.com/e180726",
