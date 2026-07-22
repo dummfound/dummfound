@@ -1,5 +1,6 @@
 import { useLayoutEffect } from "react";
-import { Navigate, useLocation } from "react-router-dom";
+import { Navigate, Route, Routes, useLocation } from "react-router-dom";
+import { GigPage } from "./components/GigPage";
 import { Hero } from "./components/Hero";
 import { SectionAbout } from "./components/SectionAbout";
 import { SectionBooking } from "./components/SectionBooking";
@@ -38,7 +39,7 @@ const useScrollToSection = (pathname, enabled) => {
   }, [pathname, enabled]);
 };
 
-const App = () => {
+const HomePage = () => {
   const location = useLocation();
   const pathOk = ALLOWED_PATHS.has(location.pathname);
   useScrollToSection(location.pathname, pathOk);
@@ -162,5 +163,43 @@ const App = () => {
     </>
   );
 };
+
+const GigPageRoute = () => {
+  const { lang, setLang, t, navLinks, socialLinks } = useLanguage();
+  const { menuOpen, closeMenu, toggleMenu } = useNavMenu();
+
+  return (
+    <GigPage
+      gigs={t.gigs}
+      backLabel={t.gigsBackLabel}
+      ticketsLabel={t.gigsTicketsLabel}
+      skip={t.skip}
+      logoAria={t.logoAria}
+      navAria={t.navAria}
+      langGroup={t.langGroup}
+      menuLabel={t.menu}
+      drawerBackdropLabel={t.drawerBackdrop}
+      navLinks={navLinks}
+      lang={lang}
+      onSetLang={setLang}
+      playerGroup={t.playerGroup}
+      playerPlay={t.playerPlay}
+      playerPause={t.playerPause}
+      playerEmpty={t.playerEmpty}
+      menuOpen={menuOpen}
+      onCloseMenu={closeMenu}
+      onToggleMenu={toggleMenu}
+      footerInstagramDisclaimer={t.footerInstagramDisclaimer}
+      socialLinks={socialLinks}
+    />
+  );
+};
+
+const App = () => (
+  <Routes>
+    <Route path="/gigs/:slug" element={<GigPageRoute />} />
+    <Route path="*" element={<HomePage />} />
+  </Routes>
+);
 
 export default App;

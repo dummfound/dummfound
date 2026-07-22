@@ -622,6 +622,136 @@
   border-bottom-right-radius: inherit;
 }
 
+.gigsTitleLink {
+  color: inherit;
+  border-bottom: none;
+  text-decoration: none;
+}
+
+.gigsTitleLink:hover {
+  color: color-mix(in srgb, var(--text) 88%, white);
+  border-bottom: none;
+}
+
+.gigPage {
+  min-width: 0;
+  padding-block: var(--space-xs);
+}
+
+.gigPageInner {
+  max-width: var(--max-width);
+  margin: 0 auto;
+  padding: var(--space-xl) var(--space-md) var(--space-2xl);
+  padding-inline: max(var(--space-md), env(safe-area-inset-left))
+    max(var(--space-md), env(safe-area-inset-right));
+  min-width: 0;
+  box-sizing: border-box;
+}
+
+.gigBack {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  width: fit-content;
+  margin: 0 0 var(--space-md);
+  padding: 0.45rem 0.85rem 0.45rem 0.65rem;
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  line-height: 1;
+  color: var(--text);
+  text-decoration: none;
+  @include ios-pill;
+  @include hover-tint;
+}
+
+.gigBack:hover {
+  color: var(--text);
+  background: rgba(255, 255, 255, 0.14);
+}
+
+.gigBackIcon {
+  display: block;
+  width: 0.9rem;
+  height: 0.9rem;
+  flex-shrink: 0;
+}
+
+.gigArticle {
+  @include ios-grouped;
+  padding: var(--space-lg);
+  display: grid;
+  gap: var(--space-sm);
+  min-width: 0;
+}
+
+.gigTitle {
+  margin: 0;
+  font-size: clamp(1.35rem, 3vw, 1.85rem);
+  font-weight: 700;
+  letter-spacing: -0.022em;
+  line-height: 1.2;
+}
+
+.gigBody {
+  margin: var(--space-xs) 0 0;
+  max-width: 40rem;
+  font-size: 1.05rem;
+  line-height: 1.5;
+  letter-spacing: -0.022em;
+  color: var(--text);
+}
+
+.gigHeroMedia {
+  margin: var(--space-sm) 0 0;
+  border-radius: var(--ios-radius-sm);
+  overflow: hidden;
+  aspect-ratio: 16 / 10;
+  max-width: 28rem;
+  background: var(--ios-glass);
+}
+
+.gigHeroImage {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.gigTickets {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  width: fit-content;
+  margin-top: var(--space-sm);
+  padding: 0.75rem 1.2rem;
+  font-family: var(--font-mono);
+  font-size: 1.05rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: #fff;
+  background: var(--accent-soft);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: var(--ios-radius-sm);
+  border-bottom: none;
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.12) inset;
+  @include hover-tint;
+}
+
+.gigTickets:hover {
+  background: color-mix(in srgb, var(--accent-soft) 78%, black);
+  color: #fff;
+  border-bottom: none;
+}
+
+.gigTickets .linkIcon {
+  width: 1.15rem;
+  height: 1.15rem;
+  opacity: 1;
+  color: currentColor;
+}
+
 .gigsItem:hover {
   background: rgba(255, 255, 255, 0.06);
 }
@@ -711,6 +841,9 @@
   width: min(9rem, 32vw);
   justify-self: start;
   background: var(--ios-glass);
+  display: block;
+  text-decoration: none;
+  border-bottom: none;
 }
 
 .gigsImage {
