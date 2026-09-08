@@ -50,7 +50,7 @@
   line-height: 1;
 }
 
-/* Berghain Kantine panel: slanted right edge (wider at bottom) */
+/* Панель Berghain Kantine: скос правого края (шире снизу) */
 @mixin slant-panel($top: 96%) {
   clip-path: polygon(0 0, #{$top} 0, 100% 100%, 0 100%);
   border: none;
@@ -415,7 +415,10 @@
   flex-direction: column;
   gap: 0.28rem;
   margin-top: 0.25rem;
-  max-width: 7.5rem;
+  max-width: 9rem;
+  position: relative;
+  z-index: 2;
+  touch-action: none;
 }
 
 .radioVolumeLabel {
@@ -430,40 +433,56 @@
 .radioVolumeInput {
   -webkit-appearance: none;
   appearance: none;
+  display: block;
   width: 100%;
-  height: 0.85rem;
+  height: 1.35rem;
   margin: 0;
-  padding: 0;
+  padding: 0.25rem 0;
   background: transparent;
-  border: 1px solid rgba(255, 255, 255, 0.55);
+  border: none;
   border-radius: 0;
   outline: none;
   cursor: pointer;
+  touch-action: none;
+}
+
+.radioVolumeInput::-webkit-slider-runnable-track {
+  width: 100%;
+  height: 0.85rem;
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.55);
+  border-radius: 0;
 }
 
 .radioVolumeInput::-webkit-slider-thumb {
   -webkit-appearance: none;
   appearance: none;
-  width: 0.55rem;
+  width: 0.7rem;
   height: 0.85rem;
+  margin-top: -1px;
   background: #fff;
   border: none;
   border-radius: 0;
   cursor: pointer;
-}
-
-.radioVolumeInput::-moz-range-thumb {
-  width: 0.55rem;
-  height: 0.85rem;
-  background: #fff;
-  border: none;
-  border-radius: 0;
-  cursor: pointer;
+  /* Чуть больше зона нажатия пальцем */
+  box-shadow: 0 0 0 8px transparent;
 }
 
 .radioVolumeInput::-moz-range-track {
+  width: 100%;
+  height: 0.85rem;
   background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.55);
+  border-radius: 0;
+}
+
+.radioVolumeInput::-moz-range-thumb {
+  width: 0.7rem;
+  height: 0.85rem;
+  background: #fff;
   border: none;
+  border-radius: 0;
+  cursor: pointer;
 }
 
 .radioPlayBtn {
@@ -632,7 +651,7 @@
   transition-delay: 0.04s;
 }
 
-/* Meet in the center, then open into a crisp X */
+/* Сходятся в центре, затем раскрываются в чёткий X */
 .navToggle[aria-expanded="true"] .navToggleBar:first-child {
   width: 1.35rem;
   transform: translate(-50%, -50%) rotate(45deg);
@@ -874,7 +893,7 @@
   margin: 0;
   font-family: var(--font-display);
   font-weight: 600;
-  /* Size to the padded content box so L/R gutters stay equal */
+  /* По размеру контента с паддингом — равные поля слева/справа */
   font-size: clamp(2.05rem, 10.6vw, 9.5rem);
   font-size: clamp(2.05rem, 13.8cqi, 9.5rem);
   line-height: 0.9;
@@ -1399,14 +1418,14 @@
 
 // ─── Gigs ────────────────────────────────────────────────────────────────────
 
-/* Ostgut Ton: parallel L→R shear — used on gig detail page */
+/* Ostgut Ton: параллельный сдвиг L→R — страница гига */
 @mixin tour-card {
   background: #2a2a2a;
   border: none;
   clip-path: polygon(0 0, 100% 12%, 100% 100%, 0 88%);
 }
 
-/* Kantine-style tour panel on the home page */
+/* Тур-панель в стиле Kantine на главной */
 .gigsPanel {
   position: relative;
   display: grid;
@@ -1415,7 +1434,7 @@
   background: #0a0a0a;
 }
 
-/* Covers Chrome clip-path / compositing white fringe on the top edge */
+/* Закрывает белую каёмку Chrome от clip-path / compositing сверху */
 .gigsPanel::after {
   content: "";
   position: absolute;
@@ -1587,7 +1606,7 @@
   }
 }
 
-/* shared type chip still used in contact form */
+/* общий тип — ещё используется в форме контакта */
 .gigsType {
   margin: 0;
   display: inline-block;
@@ -1680,7 +1699,7 @@
   overflow: hidden;
 }
 
-/* Match left figure brightness to the darker right side */
+/* Подровнять яркость левой фигуры к более тёмной правой */
 .gigPageWithBg .gigPageBg::before {
   content: "";
   position: absolute;
@@ -1740,7 +1759,7 @@
     min-height: calc(100svh - 4.75rem);
   }
 
-  /* Photo stage: full duo visible, letterboxed on black */
+  /* Сцена фото: весь дуэт виден, letterbox на чёрном */
   .gigPageWithBg .gigPageBg {
     position: relative;
     inset: auto;
@@ -1778,7 +1797,7 @@
     opacity: 1;
   }
 
-  /* Content card sits over the lower edge of the photo */
+  /* Карточка контента поверх нижнего края фото */
   .gigPageWithBg .gigPageInner {
     margin-top: -3.75rem;
     margin-inline: max(0.85rem, env(safe-area-inset-left))
@@ -1878,7 +1897,7 @@
 
 .gigArticle {
   @include tour-card;
-  /* Gentler slant so bottom lines (Details soon) aren't clipped */
+  /* Мягче скос, чтобы нижние строки (Details soon) не обрезались */
   clip-path: polygon(0 0, 100% 5%, 100% 100%, 0 97%);
   padding: 2.25rem 2.5rem 3.35rem 1.75rem;
   display: grid;
@@ -2060,7 +2079,7 @@
   margin-top: var(--space-md);
 }
 
-/* Clip wrapper only — keeps padding/borders from leaking when collapsed */
+/* Только обёртка клипа — паддинг/бордеры не протекают в свёрнутом виде */
 .contactFormPanelClip {
   overflow: hidden;
   min-height: 0;

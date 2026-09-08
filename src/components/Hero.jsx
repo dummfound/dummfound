@@ -99,7 +99,7 @@ export const Hero = ({
       setPromoClosed(true);
       return;
     }
-    // Drop any leftover inline opacity so CSS fade can run in place
+    // Сброс инлайн-opacity, чтобы CSS-fade шёл на месте
     if (promoRef.current) {
       gsap.set(promoRef.current, { clearProps: "opacity" });
     }

@@ -1,5 +1,5 @@
 :root {
-  /* Black club neo-minimal — Belgrade discipline */
+  /* Чёрный клубный нео-минимал */
   --bg: #050505;
   --bg-elevated: #0c0c0c;
   --bg-panel: #0a0a0a;
@@ -78,7 +78,7 @@ body::before {
   display: none;
 }
 
-/* Film grain over the whole UI */
+/* Плёночное зерно поверх всего UI */
 body::after {
   content: "";
   position: fixed;

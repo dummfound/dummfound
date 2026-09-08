@@ -29,11 +29,61 @@ export const Radio = ({
   const titleId = useId();
   const audioRef = useRef(null);
   const dialogRef = useRef(null);
+  const audioCtxRef = useRef(null);
+  const gainRef = useRef(null);
+  const volumeRef = useRef(0.75);
   const [open, setOpen] = useState(false);
   const [playing, setPlaying] = useState(false);
   const [volume, setVolume] = useState(0.75);
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(NaN);
+
+  volumeRef.current = volume;
+
+  const applyVolume = useCallback((value) => {
+    const clamped = Math.min(1, Math.max(0, value));
+    if (gainRef.current) {
+      gainRef.current.gain.value = clamped;
+    }
+    const a = audioRef.current;
+    /* После GainNode уровень элемента держим 1 (на iOS volume всё равно игнорируется). */
+    if (a && !gainRef.current) a.volume = clamped;
+  }, []);
+
+  /* На iOS HTMLMediaElement.volume не работает — громкость через GainNode. */
+  const ensureAudioGraph = useCallback(async () => {
+    const a = audioRef.current;
+    if (!a) return null;
+
+    const AC = window.AudioContext || window.webkitAudioContext;
+    if (!AC) {
+      a.volume = volumeRef.current;
+      return null;
+    }
+
+    if (!audioCtxRef.current) {
+      const ctx = new AC();
+      const source = ctx.createMediaElementSource(a);
+      const gain = ctx.createGain();
+      gain.gain.value = volumeRef.current;
+      source.connect(gain);
+      gain.connect(ctx.destination);
+      audioCtxRef.current = ctx;
+      gainRef.current = gain;
+      a.volume = 1;
+    }
+
+    const ctx = audioCtxRef.current;
+    if (ctx.state === "suspended") {
+      try {
+        await ctx.resume();
+      } catch {
+        /* проигнорировать — повторим на следующем жесте */
+      }
+    }
+
+    return ctx;
+  }, []);
 
   useEffect(() => {
     const a = audioRef.current;
@@ -43,21 +93,26 @@ export const Radio = ({
   }, []);
 
   useEffect(() => {
-    const a = audioRef.current;
-    if (!a) return;
-    a.volume = volume;
-  }, [volume]);
+    applyVolume(volume);
+  }, [volume, applyVolume]);
 
   useEffect(() => {
     const a = audioRef.current;
     if (!a) return;
     if (playing) {
-      const p = a.play();
-      if (p !== undefined) p.catch(() => setPlaying(false));
+      const run = async () => {
+        await ensureAudioGraph();
+        try {
+          await a.play();
+        } catch {
+          setPlaying(false);
+        }
+      };
+      run();
     } else {
       a.pause();
     }
-  }, [playing]);
+  }, [playing, ensureAudioGraph]);
 
   useEffect(() => {
     if (!open) return undefined;
@@ -71,9 +126,7 @@ export const Radio = ({
     document.body.style.overflow = "hidden";
 
     const previouslyFocused = document.activeElement;
-    const closeBtn = dialogRef.current?.querySelector(
-      `[data-radio-close]`
-    );
+    const closeBtn = dialogRef.current?.querySelector(`[data-radio-close]`);
     closeBtn?.focus?.();
 
     return () => {
@@ -94,7 +147,6 @@ export const Radio = ({
     a.currentTime = 0;
     setCurrentTime(0);
     setPlaying(true);
-    a.play()?.catch(() => setPlaying(false));
   }, []);
 
   const togglePlay = () => {
@@ -109,6 +161,13 @@ export const Radio = ({
       return;
     }
     setPlaying(true);
+  };
+
+  const handleVolumeInput = (event) => {
+    const next = Number(event.target.value);
+    setVolume(next);
+    applyVolume(next);
+    void ensureAudioGraph();
   };
 
   const openRadio = () => setOpen(true);
@@ -200,9 +259,8 @@ export const Radio = ({
                         step="0.01"
                         value={volume}
                         aria-label={volumeLabel}
-                        onChange={(event) =>
-                          setVolume(Number(event.target.value))
-                        }
+                        onInput={handleVolumeInput}
+                        onChange={handleVolumeInput}
                       />
                     </label>
                   </div>
@@ -250,6 +308,7 @@ export const Radio = ({
       <audio
         ref={audioRef}
         preload="metadata"
+        playsInline
         onEnded={handleEnded}
         onPlay={() => setPlaying(true)}
         onPause={() => setPlaying(false)}
