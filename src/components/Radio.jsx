@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useId, useRef, useState } from "react";
 import { createPortal } from "react-dom";
+import { useDrag } from "@use-gesture/react";
 import styles from "../styles.module.scss";
 
 const TRACK = {
@@ -31,13 +32,13 @@ export const Radio = ({
   volumeLabel,
 }) => {
   const titleId = useId();
+  const volumeLabelId = `${titleId}-vol`;
   const audioRef = useRef(null);
   const dialogRef = useRef(null);
   const volumeTrackRef = useRef(null);
   const audioCtxRef = useRef(null);
   const gainRef = useRef(null);
   const volumeRef = useRef(0.75);
-  const draggingVolumeRef = useRef(false);
   const [open, setOpen] = useState(false);
   const [playing, setPlaying] = useState(false);
   const [volume, setVolume] = useState(0.75);
@@ -100,6 +101,37 @@ export const Radio = ({
     }
     return ctx;
   }, []);
+
+  const setVolumeFromClientX = useCallback(
+    (clientX) => {
+      const track = volumeTrackRef.current;
+      if (!track) return;
+      const rect = track.getBoundingClientRect();
+      if (rect.width <= 0) return;
+      const next = clamp01((clientX - rect.left) / rect.width);
+      volumeRef.current = next;
+      setVolume(next);
+      applyVolume(next);
+    },
+    [applyVolume]
+  );
+
+  /* Touch-события + touch-action: none — стабильнее на iPhone, чем pointer. */
+  const bindVolume = useDrag(
+    ({ xy: [x], first, event }) => {
+      if (first) {
+        event?.preventDefault?.();
+        ensureAudioGraph();
+      }
+      setVolumeFromClientX(x);
+    },
+    {
+      axis: "x",
+      filterTaps: false,
+      pointer: { touch: true, capture: true },
+      eventOptions: { passive: false },
+    }
+  );
 
   useEffect(() => {
     const a = audioRef.current;
@@ -184,44 +216,6 @@ export const Radio = ({
     startPlayback();
   };
 
-  const setVolumeFromClientX = useCallback(
-    (clientX) => {
-      const track = volumeTrackRef.current;
-      if (!track) return;
-      const rect = track.getBoundingClientRect();
-      if (rect.width <= 0) return;
-      const next = clamp01((clientX - rect.left) / rect.width);
-      volumeRef.current = next;
-      setVolume(next);
-      applyVolume(next);
-    },
-    [applyVolume]
-  );
-
-  const onVolumePointerDown = (event) => {
-    event.preventDefault();
-    event.stopPropagation();
-    draggingVolumeRef.current = true;
-    event.currentTarget.setPointerCapture(event.pointerId);
-    ensureAudioGraph();
-    setVolumeFromClientX(event.clientX);
-  };
-
-  const onVolumePointerMove = (event) => {
-    if (!draggingVolumeRef.current) return;
-    event.preventDefault();
-    setVolumeFromClientX(event.clientX);
-  };
-
-  const onVolumePointerUp = (event) => {
-    if (!draggingVolumeRef.current) return;
-    draggingVolumeRef.current = false;
-    if (event.currentTarget.hasPointerCapture(event.pointerId)) {
-      event.currentTarget.releasePointerCapture(event.pointerId);
-    }
-    setVolumeFromClientX(event.clientX);
-  };
-
   const openRadio = () => setOpen(true);
   const closeRadio = () => setOpen(false);
 
@@ -302,7 +296,10 @@ export const Radio = ({
                       {formatTime(duration)}
                     </p>
                     <div className={styles.radioVolume}>
-                      <span className={styles.radioVolumeLabel} id={titleId + "-vol"}>
+                      <span
+                        className={styles.radioVolumeLabel}
+                        id={volumeLabelId}
+                      >
                         {volumeLabel}
                       </span>
                       <div
@@ -314,14 +311,15 @@ export const Radio = ({
                         aria-valuemax={100}
                         aria-valuenow={Math.round(volume * 100)}
                         aria-valuetext={volumePercent}
-                        aria-labelledby={titleId + "-vol"}
-                        onPointerDown={onVolumePointerDown}
-                        onPointerMove={onVolumePointerMove}
-                        onPointerUp={onVolumePointerUp}
-                        onPointerCancel={onVolumePointerUp}
+                        aria-labelledby={volumeLabelId}
+                        style={{ touchAction: "none" }}
+                        {...bindVolume()}
                         onKeyDown={(event) => {
                           let next = volume;
-                          if (event.key === "ArrowRight" || event.key === "ArrowUp") {
+                          if (
+                            event.key === "ArrowRight" ||
+                            event.key === "ArrowUp"
+                          ) {
                             next = clamp01(volume + 0.05);
                           } else if (
                             event.key === "ArrowLeft" ||
@@ -342,7 +340,10 @@ export const Radio = ({
                           applyVolume(next);
                         }}
                       >
-                        <div className={styles.radioVolumeTrack} aria-hidden="true">
+                        <div
+                          className={styles.radioVolumeTrack}
+                          aria-hidden="true"
+                        >
                           <div
                             className={styles.radioVolumeFill}
                             style={{ width: volumePercent }}

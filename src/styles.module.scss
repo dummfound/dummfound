@@ -435,7 +435,7 @@
   color: rgba(255, 255, 255, 0.48);
 }
 
-/* Кастомный слайдер — нативный range на iOS часто «мёртвый» */
+/* Кастомный слайдер на @use-gesture/react (touch) — под iPhone */
 .radioVolumeSlider {
   position: relative;
   width: 100%;
