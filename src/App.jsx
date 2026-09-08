@@ -58,10 +58,12 @@ const HomePage = () => {
     langGroup,
     menu,
     drawerBackdrop,
-    playerGroup,
-    playerPlay,
-    playerPause,
-    playerEmpty,
+    radioOpen,
+    radioTitle,
+    radioClose,
+    radioPlay,
+    radioPause,
+    radioVolume,
     heroIntro,
     heroCtaMusic,
     heroCtaBooking,
@@ -69,6 +71,7 @@ const HomePage = () => {
     heroPromoTitle,
     heroPromoDate,
     heroPromoCta,
+    heroPromoClose,
     aboutLabel,
     aboutP,
     musicLabel,
@@ -115,10 +118,12 @@ const HomePage = () => {
         navLinks={navLinks}
         lang={lang}
         onSetLang={setLang}
-        playerGroup={playerGroup}
-        playerPlay={playerPlay}
-        playerPause={playerPause}
-        playerEmpty={playerEmpty}
+        radioOpen={radioOpen}
+        radioTitle={radioTitle}
+        radioClose={radioClose}
+        radioPlay={radioPlay}
+        radioPause={radioPause}
+        radioVolume={radioVolume}
         menuOpen={menuOpen}
         onCloseMenu={closeMenu}
         onToggleMenu={toggleMenu}
@@ -133,6 +138,7 @@ const HomePage = () => {
           promoTitle={heroPromoTitle}
           promoDate={heroPromoDate}
           promoCta={heroPromoCta}
+          promoClose={heroPromoClose}
         />
 
         <SectionAbout label={aboutLabel} body={aboutP} />
@@ -198,10 +204,12 @@ const GigPageRoute = () => {
       navLinks={navLinks}
       lang={lang}
       onSetLang={setLang}
-      playerGroup={t.playerGroup}
-      playerPlay={t.playerPlay}
-      playerPause={t.playerPause}
-      playerEmpty={t.playerEmpty}
+      radioOpen={t.radioOpen}
+      radioTitle={t.radioTitle}
+      radioClose={t.radioClose}
+      radioPlay={t.radioPlay}
+      radioPause={t.radioPause}
+      radioVolume={t.radioVolume}
       menuOpen={menuOpen}
       onCloseMenu={closeMenu}
       onToggleMenu={toggleMenu}

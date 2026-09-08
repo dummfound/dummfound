@@ -1,5 +1,7 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
+import gsap from "gsap";
+import { RevealText, REVEAL_EASE } from "./RevealText";
 import styles from "../styles.module.scss";
 
 const HERO_VIDEO = "/video/IMG_6766.mov";
@@ -16,6 +18,7 @@ export const Hero = ({
   promoTitle,
   promoDate,
   promoCta,
+  promoClose,
 }) => {
   const [reduceMotion, setReduceMotion] = useState(false);
   const [isMobile, setIsMobile] = useState(() =>
@@ -24,6 +27,11 @@ export const Hero = ({
       : false
   );
   const [mediaReady, setMediaReady] = useState(false);
+  const [promoClosed, setPromoClosed] = useState(false);
+  const [promoEntered, setPromoEntered] = useState(false);
+  const [promoClosing, setPromoClosing] = useState(false);
+  const ctasRef = useRef(null);
+  const promoRef = useRef(null);
 
   useEffect(() => {
     const motionMq = window.matchMedia("(prefers-reduced-motion: reduce)");
@@ -40,6 +48,71 @@ export const Hero = ({
       mobileMq.removeEventListener("change", syncMobile);
     };
   }, []);
+
+  useEffect(() => {
+    if (promoClosed) return undefined;
+    if (reduceMotion) {
+      setPromoEntered(true);
+      return undefined;
+    }
+
+    setPromoEntered(false);
+    let cancelled = false;
+    const id = window.requestAnimationFrame(() => {
+      window.requestAnimationFrame(() => {
+        if (!cancelled) setPromoEntered(true);
+      });
+    });
+
+    return () => {
+      cancelled = true;
+      window.cancelAnimationFrame(id);
+    };
+  }, [promoClosed, reduceMotion]);
+
+  useEffect(() => {
+    if (reduceMotion) return undefined;
+
+    const ctaDelay = 0.1 + BRAND.length * 0.04 + 0.55;
+    const ctx = gsap.context(() => {
+      if (ctasRef.current) {
+        gsap.fromTo(
+          ctasRef.current,
+          { opacity: 0, y: 18 },
+          {
+            opacity: 1,
+            y: 0,
+            duration: 0.85,
+            ease: REVEAL_EASE,
+            delay: ctaDelay,
+          }
+        );
+      }
+    });
+
+    return () => ctx.revert();
+  }, [reduceMotion]);
+
+  const dismissPromo = () => {
+    if (promoClosing || promoClosed) return;
+    if (reduceMotion) {
+      setPromoClosed(true);
+      return;
+    }
+    // Drop any leftover inline opacity so CSS fade can run in place
+    if (promoRef.current) {
+      gsap.set(promoRef.current, { clearProps: "opacity" });
+    }
+    setPromoClosing(true);
+  };
+
+  const handlePromoTransitionEnd = (event) => {
+    if (!promoClosing) return;
+    if (event.target !== event.currentTarget) return;
+    if (event.propertyName !== "opacity") return;
+    setPromoClosed(true);
+    setPromoClosing(false);
+  };
 
   return (
     <section
@@ -66,44 +139,90 @@ export const Hero = ({
 
       <div className={styles.heroInner}>
         <div className={styles.heroCopy}>
-          <h1 className={styles.heroTitle}>{BRAND}</h1>
-          <div className={styles.heroCtas}>
+          <RevealText
+            text={BRAND}
+            as="h1"
+            className={styles.heroTitle}
+            delay={0.1}
+            stagger={0.04}
+            duration={0.9}
+            scrambleDuration={0.6}
+          />
+
+          <div
+            ref={ctasRef}
+            className={styles.heroCtas}
+            style={reduceMotion ? undefined : { opacity: 0 }}
+          >
             <Link className={styles.heroCta} to="/music">
               {ctaMusic}
             </Link>
-            <Link className={`${styles.heroCta} ${styles.heroCtaGhost}`} to="/booking">
+            <Link
+              className={`${styles.heroCta} ${styles.heroCtaGhost}`}
+              to="/booking"
+            >
               {ctaBooking}
             </Link>
           </div>
 
-          <aside className={styles.heroPromo} aria-label={promoTitle}>
-            <div className={styles.heroPromoMedia} aria-hidden="true">
-              <img
-                className={styles.heroPromoLogoMark}
-                src="/img/enhanced-logo.svg"
-                alt=""
-                decoding="async"
-              />
-            </div>
-            <div className={styles.heroPromoContent}>
-              <img
-                className={styles.heroPromoLogo}
-                src="/img/enhanced-logo.svg"
-                alt={promoLabel}
-                decoding="async"
-              />
-              <p className={styles.heroPromoTitle}>{promoTitle}</p>
-              <p className={styles.heroPromoDate}>{promoDate}</p>
-              <a
-                className={styles.heroPromoCta}
-                href={PREORDER_HREF}
-                target="_blank"
-                rel="noopener noreferrer"
+          {!promoClosed ? (
+            <aside
+              ref={promoRef}
+              className={`${styles.heroPromo}${
+                promoEntered ? ` ${styles.heroPromoEntered}` : ""
+              }${promoClosing ? ` ${styles.heroPromoClosing}` : ""}`}
+              aria-label={promoTitle}
+              onTransitionEnd={handlePromoTransitionEnd}
+            >
+              <div className={styles.heroPromoMedia} aria-hidden="true">
+                <img
+                  className={styles.heroPromoLogoMark}
+                  src="/img/enhanced-logo.svg"
+                  alt=""
+                  decoding="async"
+                />
+              </div>
+              <button
+                type="button"
+                className={styles.heroPromoClose}
+                aria-label={promoClose}
+                onClick={dismissPromo}
               >
-                {promoCta}
-              </a>
-            </div>
-          </aside>
+                <svg
+                  className={styles.heroPromoCloseIcon}
+                  viewBox="0 0 16 16"
+                  aria-hidden="true"
+                  focusable="false"
+                >
+                  <path
+                    d="M4 4l8 8M12 4L4 12"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="1.5"
+                    strokeLinecap="round"
+                  />
+                </svg>
+              </button>
+              <div className={styles.heroPromoContent}>
+                <img
+                  className={styles.heroPromoLogo}
+                  src="/img/enhanced-logo.svg"
+                  alt={promoLabel}
+                  decoding="async"
+                />
+                <p className={styles.heroPromoTitle}>{promoTitle}</p>
+                <p className={styles.heroPromoDate}>{promoDate}</p>
+                <a
+                  className={styles.heroPromoCta}
+                  href={PREORDER_HREF}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  {promoCta}
+                </a>
+              </div>
+            </aside>
+          ) : null}
         </div>
       </div>
     </section>

@@ -6,11 +6,12 @@ export const COPY = {
     langGroup: "Язык",
     menu: "Меню",
     drawerBackdrop: "Закрыть меню",
-    playerGroup: "Фоновая музыка",
-    playerPlay: "Включить музыку",
-    playerPause: "Пауза",
-    playerEmpty:
-      "Добавьте файлы в public/music и перечислите их в tracks.json",
+    radioOpen: "Radio",
+    radioTitle: "Radio",
+    radioClose: "Закрыть радио",
+    radioPlay: "Воспроизвести",
+    radioPause: "Стоп",
+    radioVolume: "Громкость",
     nav: {
       about: "О проекте",
       music: "Музыка",
@@ -25,6 +26,7 @@ export const COPY = {
     heroPromoTitle: "Lørean & DUMMFOUND — Together",
     heroPromoDate: "11.09.26",
     heroPromoCta: "Предзаказ",
+    heroPromoClose: "Скрыть",
     aboutLabel: "О проекте",
     aboutP:
       "Артист современной андеграунд-сцены, с релизами на барселонском Lone Romantic, московских СТВОЛ & System 108. Актуальная электронная музыка, экзистенциально вдохновленная жизнью и особенной атмосферой полумиллионного индустриального города в центре России.",
@@ -81,7 +83,7 @@ export const COPY = {
       {
         slug: "ekaterinburg-161026",
         title: "Екатеринбург",
-        type: "БРАТАНИЯ ТУР",
+        type: "Братания Тур (совместно с WASTA)",
         date: "16.10.2026",
         location: "Екатеринбург, Россия",
         linkLabel: "подробнее",
@@ -90,7 +92,7 @@ export const COPY = {
       {
         slug: "chelyabinsk-171026",
         title: "Челябинск",
-        type: "БРАТАНИЯ ТУР",
+        type: "Братания Тур (совместно с WASTA)",
         date: "17.10.2026",
         location: "Челябинск, Россия",
         linkLabel: "подробнее",
@@ -99,7 +101,7 @@ export const COPY = {
       {
         slug: "krasnoyarsk-241026",
         title: "Красноярск",
-        type: "БРАТАНИЯ ТУР",
+        type: "Братания Тур (совместно с WASTA)",
         date: "24.10.2026",
         location: "Красноярск, Россия",
         linkLabel: "подробнее",
@@ -108,7 +110,7 @@ export const COPY = {
       {
         slug: "vladivostok-011126",
         title: "Владивосток",
-        type: "БРАТАНИЯ ТУР",
+        type: "Братания Тур (совместно с WASTA)",
         date: "01.11.2026",
         location: "Владивосток, Россия",
         linkLabel: "подробнее",
@@ -117,7 +119,7 @@ export const COPY = {
       {
         slug: "moscow-tba",
         title: "Москва",
-        type: "БРАТАНИЯ ТУР",
+        type: "Братания Тур (совместно с WASTA)",
         date: "TBA",
         location: "Москва, Россия",
         linkLabel: "подробнее",
@@ -168,10 +170,12 @@ export const COPY = {
     langGroup: "Language",
     menu: "Menu",
     drawerBackdrop: "Close menu",
-    playerGroup: "Background music",
-    playerPlay: "Play music",
-    playerPause: "Pause",
-    playerEmpty: "Add files to public/music and list them in tracks.json",
+    radioOpen: "Radio",
+    radioTitle: "Radio",
+    radioClose: "Close radio",
+    radioPlay: "Play",
+    radioPause: "Stop",
+    radioVolume: "Volume",
     nav: {
       about: "About",
       music: "Music",
@@ -186,6 +190,7 @@ export const COPY = {
     heroPromoTitle: "Lørean & DUMMFOUND — Together",
     heroPromoDate: "11.09.26",
     heroPromoCta: "Pre-order",
+    heroPromoClose: "Hide",
     aboutLabel: "About",
     aboutP:
       "Underground electronic artist with releases on Barcelona’s Lone Romantic and Moscow labels СТВОЛ & System 108. Contemporary dance music shaped by life and the atmosphere of a half‑million industrial city in central Russia.",
@@ -242,7 +247,7 @@ export const COPY = {
       {
         slug: "ekaterinburg-161026",
         title: "Yekaterinburg",
-        type: "BRATANIA TOUR",
+        type: "Bratania Tour (with WASTA)",
         date: "16.10.2026",
         location: "Yekaterinburg, Russia",
         linkLabel: "details",
@@ -251,7 +256,7 @@ export const COPY = {
       {
         slug: "chelyabinsk-171026",
         title: "Chelyabinsk",
-        type: "BRATANIA TOUR",
+        type: "Bratania Tour (with WASTA)",
         date: "17.10.2026",
         location: "Chelyabinsk, Russia",
         linkLabel: "details",
@@ -260,7 +265,7 @@ export const COPY = {
       {
         slug: "krasnoyarsk-241026",
         title: "Krasnoyarsk",
-        type: "BRATANIA TOUR",
+        type: "Bratania Tour (with WASTA)",
         date: "24.10.2026",
         location: "Krasnoyarsk, Russia",
         linkLabel: "details",
@@ -269,7 +274,7 @@ export const COPY = {
       {
         slug: "vladivostok-011126",
         title: "Vladivostok",
-        type: "BRATANIA TOUR",
+        type: "Bratania Tour (with WASTA)",
         date: "01.11.2026",
         location: "Vladivostok, Russia",
         linkLabel: "details",
@@ -278,7 +283,7 @@ export const COPY = {
       {
         slug: "moscow-tba",
         title: "Moscow",
-        type: "BRATANIA TOUR",
+        type: "Bratania Tour (with WASTA)",
         date: "TBA",
         location: "Moscow, Russia",
         linkLabel: "details",

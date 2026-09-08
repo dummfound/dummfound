@@ -1,5 +1,5 @@
 import { Link, useLocation } from "react-router-dom";
-import { HeaderMusicPlayer } from "./HeaderMusicPlayer";
+import { Radio } from "./Radio";
 import styles from "../styles.module.scss";
 
 const scrollToTop = () => {
@@ -16,10 +16,12 @@ export const SiteHeader = ({
   navLinks,
   lang,
   onSetLang,
-  playerGroup,
-  playerPlay,
-  playerPause,
-  playerEmpty,
+  radioOpen,
+  radioTitle,
+  radioClose,
+  radioPlay,
+  radioPause,
+  radioVolume,
   menuOpen,
   onCloseMenu,
   onToggleMenu,
@@ -70,11 +72,13 @@ export const SiteHeader = ({
               EN
             </button>
           </div>
-          <HeaderMusicPlayer
-            groupLabel={playerGroup}
-            playLabel={playerPlay}
-            pauseLabel={playerPause}
-            emptyLabel={playerEmpty}
+          <Radio
+            openLabel={radioOpen}
+            titleLabel={radioTitle}
+            closeLabel={radioClose}
+            playLabel={radioPlay}
+            pauseLabel={radioPause}
+            volumeLabel={radioVolume}
           />
           <button
             type="button"

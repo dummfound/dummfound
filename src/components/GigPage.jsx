@@ -21,10 +21,12 @@ export const GigPage = ({
   navLinks,
   lang,
   onSetLang,
-  playerGroup,
-  playerPlay,
-  playerPause,
-  playerEmpty,
+  radioOpen,
+  radioTitle,
+  radioClose,
+  radioPlay,
+  radioPause,
+  radioVolume,
   menuOpen,
   onCloseMenu,
   onToggleMenu,
@@ -55,10 +57,12 @@ export const GigPage = ({
         navLinks={navLinks}
         lang={lang}
         onSetLang={onSetLang}
-        playerGroup={playerGroup}
-        playerPlay={playerPlay}
-        playerPause={playerPause}
-        playerEmpty={playerEmpty}
+        radioOpen={radioOpen}
+        radioTitle={radioTitle}
+        radioClose={radioClose}
+        radioPlay={radioPlay}
+        radioPause={radioPause}
+        radioVolume={radioVolume}
         menuOpen={menuOpen}
         onCloseMenu={onCloseMenu}
         onToggleMenu={onToggleMenu}
