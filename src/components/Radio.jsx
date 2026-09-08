@@ -59,20 +59,8 @@ export const Radio = ({
   playingRef.current = playing;
 
   const applyVolume = useCallback((value) => {
-    const next = clamp01(value);
     const gain = gainRef.current;
-    if (!gain) return;
-    const ctx = ctxRef.current;
-    try {
-      if (ctx) {
-        gain.gain.cancelScheduledValues(ctx.currentTime);
-        gain.gain.setValueAtTime(next, ctx.currentTime);
-      } else {
-        gain.gain.value = next;
-      }
-    } catch {
-      gain.gain.value = next;
-    }
+    if (gain) gain.gain.value = clamp01(value);
   }, []);
 
   /*
@@ -367,9 +355,19 @@ export const Radio = ({
                       className={styles.radioVideo}
                       src={RADIO_VIDEO}
                       muted
+                      defaultMuted
                       loop
                       playsInline
                       autoPlay
+                      preload="metadata"
+                      onLoadedMetadata={(event) => {
+                        event.currentTarget.muted = true;
+                        event.currentTarget.volume = 0;
+                      }}
+                      onPlay={(event) => {
+                        event.currentTarget.muted = true;
+                        event.currentTarget.volume = 0;
+                      }}
                     />
                   ) : null}
                 </div>
