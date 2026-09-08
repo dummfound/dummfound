@@ -127,7 +127,7 @@ export const COPY = {
     gigsBackLabel: "К выступлениям",
     gigsTicketsLabel: "Билеты",
     gigsNotFound: "Событие не найдено.",
-    gigsHint: "Нажмите на дату, чтобы открыть подробности.",
+    gigsHint: "Нажмите на дату, чтобы узнать подробности.",
     gigsDetailsSoon: "Подробности скоро.",
     bookingLabel: "Букинг",
     bookingP:
