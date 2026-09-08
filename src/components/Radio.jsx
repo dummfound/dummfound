@@ -23,6 +23,10 @@ function clamp01(value) {
   return Math.min(1, Math.max(0, value));
 }
 
+function trackUrl() {
+  return `${audioBase()}music/${encodeURIComponent(TRACK.file)}`;
+}
+
 export const Radio = ({
   openLabel,
   titleLabel,
@@ -33,74 +37,186 @@ export const Radio = ({
 }) => {
   const titleId = useId();
   const volumeLabelId = `${titleId}-vol`;
-  const audioRef = useRef(null);
   const dialogRef = useRef(null);
   const volumeTrackRef = useRef(null);
-  const audioCtxRef = useRef(null);
+  const ctxRef = useRef(null);
   const gainRef = useRef(null);
+  const bufferRef = useRef(null);
+  const sourceRef = useRef(null);
+  const prefetchRef = useRef(null);
+  const startedAtRef = useRef(0);
+  const rafRef = useRef(0);
   const volumeRef = useRef(0.75);
+  const playingRef = useRef(false);
   const [open, setOpen] = useState(false);
   const [playing, setPlaying] = useState(false);
+  const [loading, setLoading] = useState(false);
   const [volume, setVolume] = useState(0.75);
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(NaN);
 
   volumeRef.current = volume;
+  playingRef.current = playing;
 
   const applyVolume = useCallback((value) => {
     const next = clamp01(value);
     const gain = gainRef.current;
-    const ctx = audioCtxRef.current;
-    if (gain && ctx) {
-      try {
+    if (!gain) return;
+    const ctx = ctxRef.current;
+    try {
+      if (ctx) {
         gain.gain.cancelScheduledValues(ctx.currentTime);
         gain.gain.setValueAtTime(next, ctx.currentTime);
-      } catch {
+      } else {
         gain.gain.value = next;
       }
+    } catch {
+      gain.gain.value = next;
     }
-    const a = audioRef.current;
-    /* Пока нет GainNode — пробуем element.volume (на iOS всё равно no-op). */
-    if (a && !gain) a.volume = next;
   }, []);
 
   /*
-   * На iOS HTMLMediaElement.volume игнорируется.
-   * Громкость только через GainNode; граф создаём синхронно в жесте.
+   * На iPhone MediaElementSource часто НЕ ведёт звук через Web Audio:
+   * GainNode крутится вхолостую, а играет сам <audio>.
+   * Поэтому играем через AudioBufferSourceNode + GainNode.
    */
-  const ensureAudioGraph = useCallback(() => {
-    const a = audioRef.current;
-    if (!a) return null;
-
+  const ensureContext = useCallback(() => {
     const AC = window.AudioContext || window.webkitAudioContext;
-    if (!AC) {
-      a.volume = volumeRef.current;
-      return null;
+    if (!AC) return null;
+
+    if (!ctxRef.current) {
+      const ctx = new AC();
+      const gain = ctx.createGain();
+      gain.gain.value = volumeRef.current;
+      gain.connect(ctx.destination);
+      ctxRef.current = ctx;
+      gainRef.current = gain;
     }
 
-    if (!audioCtxRef.current) {
-      try {
-        const ctx = new AC();
-        const source = ctx.createMediaElementSource(a);
-        const gain = ctx.createGain();
-        gain.gain.value = volumeRef.current;
-        source.connect(gain);
-        gain.connect(ctx.destination);
-        audioCtxRef.current = ctx;
-        gainRef.current = gain;
-        a.volume = 1;
-      } catch {
-        a.volume = volumeRef.current;
-        return null;
-      }
-    }
-
-    const ctx = audioCtxRef.current;
-    if (ctx?.state === "suspended") {
+    const ctx = ctxRef.current;
+    if (ctx.state === "suspended") {
       void ctx.resume();
     }
     return ctx;
   }, []);
+
+  const stopSource = useCallback(() => {
+    const source = sourceRef.current;
+    if (!source) return;
+    try {
+      source.onended = null;
+      source.stop();
+    } catch {
+      /* уже остановлен */
+    }
+    try {
+      source.disconnect();
+    } catch {
+      /* ignore */
+    }
+    sourceRef.current = null;
+  }, []);
+
+  const stopClock = useCallback(() => {
+    if (rafRef.current) {
+      cancelAnimationFrame(rafRef.current);
+      rafRef.current = 0;
+    }
+  }, []);
+
+  const tick = useCallback(() => {
+    if (!playingRef.current) return;
+    const ctx = ctxRef.current;
+    const buffer = bufferRef.current;
+    if (ctx && buffer?.duration) {
+      const elapsed =
+        (ctx.currentTime - startedAtRef.current) % buffer.duration;
+      setCurrentTime(elapsed);
+    }
+    rafRef.current = requestAnimationFrame(tick);
+  }, []);
+
+  const startClock = useCallback(() => {
+    stopClock();
+    rafRef.current = requestAnimationFrame(tick);
+  }, [stopClock, tick]);
+
+  const loadBuffer = useCallback(async () => {
+    if (bufferRef.current) return bufferRef.current;
+    const ctx = ctxRef.current;
+    if (!ctx) throw new Error("no audio context");
+
+    if (!prefetchRef.current) {
+      prefetchRef.current = fetch(trackUrl()).then((res) => {
+        if (!res.ok) throw new Error("track fetch failed");
+        return res.arrayBuffer();
+      });
+    }
+
+    const bytes = await prefetchRef.current;
+    const buffer = await ctx.decodeAudioData(bytes.slice(0));
+    bufferRef.current = buffer;
+    setDuration(buffer.duration);
+    return buffer;
+  }, []);
+
+  const startSource = useCallback(() => {
+    const ctx = ctxRef.current;
+    const gain = gainRef.current;
+    const buffer = bufferRef.current;
+    if (!ctx || !gain || !buffer) return;
+
+    stopSource();
+    applyVolume(volumeRef.current);
+
+    const source = ctx.createBufferSource();
+    source.buffer = buffer;
+    source.loop = true;
+    source.connect(gain);
+    source.start(0);
+    startedAtRef.current = ctx.currentTime;
+    sourceRef.current = source;
+    setCurrentTime(0);
+    startClock();
+  }, [applyVolume, startClock, stopSource]);
+
+  const stopPlayback = useCallback(() => {
+    stopClock();
+    stopSource();
+    setCurrentTime(0);
+    setPlaying(false);
+    playingRef.current = false;
+  }, [stopClock, stopSource]);
+
+  const startPlayback = useCallback(async () => {
+    /* Контекст — синхронно в жесте, иначе iOS не unlock’нет звук. */
+    const ctx = ensureContext();
+    if (!ctx) return;
+
+    setLoading(true);
+    try {
+      await loadBuffer();
+      if (ctx.state === "suspended") {
+        await ctx.resume();
+      }
+      startSource();
+      setPlaying(true);
+      playingRef.current = true;
+    } catch {
+      stopPlayback();
+    } finally {
+      setLoading(false);
+    }
+  }, [ensureContext, loadBuffer, startSource, stopPlayback]);
+
+  const togglePlay = () => {
+    if (playing || loading) {
+      stopPlayback();
+      setLoading(false);
+      return;
+    }
+    void startPlayback();
+  };
 
   const setVolumeFromClientX = useCallback(
     (clientX) => {
@@ -111,17 +227,17 @@ export const Radio = ({
       const next = clamp01((clientX - rect.left) / rect.width);
       volumeRef.current = next;
       setVolume(next);
+      ensureContext();
       applyVolume(next);
     },
-    [applyVolume]
+    [applyVolume, ensureContext]
   );
 
-  /* Touch-события + touch-action: none — стабильнее на iPhone, чем pointer. */
   const bindVolume = useDrag(
     ({ xy: [x], first, event }) => {
       if (first) {
         event?.preventDefault?.();
-        ensureAudioGraph();
+        ensureContext();
       }
       setVolumeFromClientX(x);
     },
@@ -133,12 +249,18 @@ export const Radio = ({
     }
   );
 
+  /* Подгружаем файл при открытии окна, чтобы play не ждал сеть. */
   useEffect(() => {
-    const a = audioRef.current;
-    if (!a) return;
-    a.src = `${audioBase()}music/${encodeURIComponent(TRACK.file)}`;
-    a.volume = volumeRef.current;
-  }, []);
+    if (!open || prefetchRef.current) return;
+    prefetchRef.current = fetch(trackUrl())
+      .then((res) => {
+        if (!res.ok) throw new Error("track fetch failed");
+        return res.arrayBuffer();
+      })
+      .catch(() => {
+        prefetchRef.current = null;
+      });
+  }, [open]);
 
   useEffect(() => {
     if (!open) return undefined;
@@ -167,54 +289,19 @@ export const Radio = ({
     };
   }, [open]);
 
-  const handleEnded = useCallback(() => {
-    const a = audioRef.current;
-    if (!a) return;
-    a.currentTime = 0;
-    setCurrentTime(0);
-    ensureAudioGraph();
-    const playPromise = a.play();
-    if (playPromise !== undefined) {
-      playPromise
-        .then(() => setPlaying(true))
-        .catch(() => setPlaying(false));
-    } else {
-      setPlaying(true);
-    }
-  }, [ensureAudioGraph]);
-
-  const stopPlayback = useCallback(() => {
-    const a = audioRef.current;
-    if (a) {
-      a.pause();
-      a.currentTime = 0;
-      setCurrentTime(0);
-    }
-    setPlaying(false);
-  }, []);
-
-  const startPlayback = useCallback(() => {
-    const a = audioRef.current;
-    if (!a) return;
-    /* Важно синхронно в клике — иначе iOS не даст resume/play. */
-    ensureAudioGraph();
-    const playPromise = a.play();
-    if (playPromise !== undefined) {
-      playPromise
-        .then(() => setPlaying(true))
-        .catch(() => setPlaying(false));
-    } else {
-      setPlaying(true);
-    }
-  }, [ensureAudioGraph]);
-
-  const togglePlay = () => {
-    if (playing) {
-      stopPlayback();
-      return;
-    }
-    startPlayback();
-  };
+  useEffect(
+    () => () => {
+      stopClock();
+      stopSource();
+      const ctx = ctxRef.current;
+      if (ctx) {
+        void ctx.close();
+        ctxRef.current = null;
+        gainRef.current = null;
+      }
+    },
+    [stopClock, stopSource]
+  );
 
   const openRadio = () => setOpen(true);
   const closeRadio = () => setOpen(false);
@@ -334,9 +421,9 @@ export const Radio = ({
                             return;
                           }
                           event.preventDefault();
-                          ensureAudioGraph();
                           volumeRef.current = next;
                           setVolume(next);
+                          ensureContext();
                           applyVolume(next);
                         }}
                       >
@@ -361,7 +448,10 @@ export const Radio = ({
                     type="button"
                     className={styles.radioPlayBtn}
                     onClick={togglePlay}
-                    aria-label={playing ? pauseLabel : playLabel}
+                    aria-label={
+                      loading ? playLabel : playing ? pauseLabel : playLabel
+                    }
+                    aria-busy={loading || undefined}
                   >
                     {playing ? (
                       <svg
@@ -397,19 +487,6 @@ export const Radio = ({
 
   return (
     <>
-      <audio
-        ref={audioRef}
-        preload="auto"
-        playsInline
-        onEnded={handleEnded}
-        onPlay={() => setPlaying(true)}
-        onPause={() => setPlaying(false)}
-        onTimeUpdate={(event) => setCurrentTime(event.currentTarget.currentTime)}
-        onLoadedMetadata={(event) =>
-          setDuration(event.currentTarget.duration)
-        }
-      />
-
       <button
         type="button"
         className={`${styles.radioTrigger}${
