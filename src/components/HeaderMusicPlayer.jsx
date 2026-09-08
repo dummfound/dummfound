@@ -38,7 +38,8 @@ export const HeaderMusicPlayer = ({
 
   useEffect(() => {
     let cancelled = false;
-    fetch(`${audioBase()}music/tracks.json`)
+    const url = `${audioBase()}music/tracks.json?v=${Date.now()}`;
+    fetch(url, { cache: "no-store" })
       .then((r) => (r.ok ? r.json() : []))
       .then((data) => {
         if (!cancelled) {
