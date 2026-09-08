@@ -350,6 +350,7 @@
 .radioMedia {
   position: absolute;
   inset: 0;
+  pointer-events: none;
 }
 
 .radioVideo {
@@ -358,11 +359,13 @@
   object-fit: cover;
   object-position: center;
   filter: grayscale(1) contrast(1.05);
+  pointer-events: none;
 }
 
 .radioOverlay {
   position: absolute;
   inset: 0;
+  z-index: 2;
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
@@ -417,8 +420,10 @@
   margin-top: 0.25rem;
   max-width: 9rem;
   position: relative;
-  z-index: 2;
+  z-index: 3;
   touch-action: none;
+  -webkit-user-select: none;
+  user-select: none;
 }
 
 .radioVolumeLabel {
@@ -430,59 +435,50 @@
   color: rgba(255, 255, 255, 0.48);
 }
 
-.radioVolumeInput {
-  -webkit-appearance: none;
-  appearance: none;
-  display: block;
+/* Кастомный слайдер — нативный range на iOS часто «мёртвый» */
+.radioVolumeSlider {
+  position: relative;
   width: 100%;
-  height: 1.35rem;
+  height: 2rem;
   margin: 0;
-  padding: 0.25rem 0;
-  background: transparent;
-  border: none;
-  border-radius: 0;
-  outline: none;
+  padding: 0.55rem 0;
+  box-sizing: border-box;
   cursor: pointer;
   touch-action: none;
+  outline: none;
 }
 
-.radioVolumeInput::-webkit-slider-runnable-track {
+.radioVolumeSlider:focus-visible .radioVolumeTrack {
+  border-color: #fff;
+}
+
+.radioVolumeTrack {
+  position: relative;
   width: 100%;
   height: 0.85rem;
-  background: transparent;
   border: 1px solid rgba(255, 255, 255, 0.55);
   border-radius: 0;
-}
-
-.radioVolumeInput::-webkit-slider-thumb {
-  -webkit-appearance: none;
-  appearance: none;
-  width: 0.7rem;
-  height: 0.85rem;
-  margin-top: -1px;
-  background: #fff;
-  border: none;
-  border-radius: 0;
-  cursor: pointer;
-  /* Чуть больше зона нажатия пальцем */
-  box-shadow: 0 0 0 8px transparent;
-}
-
-.radioVolumeInput::-moz-range-track {
-  width: 100%;
-  height: 0.85rem;
   background: transparent;
-  border: 1px solid rgba(255, 255, 255, 0.55);
-  border-radius: 0;
+  overflow: visible;
 }
 
-.radioVolumeInput::-moz-range-thumb {
+.radioVolumeFill {
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  background: rgba(255, 255, 255, 0.22);
+  pointer-events: none;
+}
+
+.radioVolumeThumb {
+  position: absolute;
+  top: 0;
+  bottom: 0;
   width: 0.7rem;
-  height: 0.85rem;
   background: #fff;
-  border: none;
-  border-radius: 0;
-  cursor: pointer;
+  transform: translateX(-50%);
+  pointer-events: none;
 }
 
 .radioPlayBtn {

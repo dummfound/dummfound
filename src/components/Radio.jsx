@@ -18,6 +18,10 @@ function formatTime(seconds) {
   return `${m}:${String(s).padStart(2, "0")}`;
 }
 
+function clamp01(value) {
+  return Math.min(1, Math.max(0, value));
+}
+
 export const Radio = ({
   openLabel,
   titleLabel,
@@ -29,9 +33,11 @@ export const Radio = ({
   const titleId = useId();
   const audioRef = useRef(null);
   const dialogRef = useRef(null);
+  const volumeTrackRef = useRef(null);
   const audioCtxRef = useRef(null);
   const gainRef = useRef(null);
   const volumeRef = useRef(0.75);
+  const draggingVolumeRef = useRef(false);
   const [open, setOpen] = useState(false);
   const [playing, setPlaying] = useState(false);
   const [volume, setVolume] = useState(0.75);
@@ -41,17 +47,27 @@ export const Radio = ({
   volumeRef.current = volume;
 
   const applyVolume = useCallback((value) => {
-    const clamped = Math.min(1, Math.max(0, value));
-    if (gainRef.current) {
-      gainRef.current.gain.value = clamped;
+    const next = clamp01(value);
+    const gain = gainRef.current;
+    const ctx = audioCtxRef.current;
+    if (gain && ctx) {
+      try {
+        gain.gain.cancelScheduledValues(ctx.currentTime);
+        gain.gain.setValueAtTime(next, ctx.currentTime);
+      } catch {
+        gain.gain.value = next;
+      }
     }
     const a = audioRef.current;
-    /* После GainNode уровень элемента держим 1 (на iOS volume всё равно игнорируется). */
-    if (a && !gainRef.current) a.volume = clamped;
+    /* Пока нет GainNode — пробуем element.volume (на iOS всё равно no-op). */
+    if (a && !gain) a.volume = next;
   }, []);
 
-  /* На iOS HTMLMediaElement.volume не работает — громкость через GainNode. */
-  const ensureAudioGraph = useCallback(async () => {
+  /*
+   * На iOS HTMLMediaElement.volume игнорируется.
+   * Громкость только через GainNode; граф создаём синхронно в жесте.
+   */
+  const ensureAudioGraph = useCallback(() => {
     const a = audioRef.current;
     if (!a) return null;
 
@@ -62,26 +78,26 @@ export const Radio = ({
     }
 
     if (!audioCtxRef.current) {
-      const ctx = new AC();
-      const source = ctx.createMediaElementSource(a);
-      const gain = ctx.createGain();
-      gain.gain.value = volumeRef.current;
-      source.connect(gain);
-      gain.connect(ctx.destination);
-      audioCtxRef.current = ctx;
-      gainRef.current = gain;
-      a.volume = 1;
-    }
-
-    const ctx = audioCtxRef.current;
-    if (ctx.state === "suspended") {
       try {
-        await ctx.resume();
+        const ctx = new AC();
+        const source = ctx.createMediaElementSource(a);
+        const gain = ctx.createGain();
+        gain.gain.value = volumeRef.current;
+        source.connect(gain);
+        gain.connect(ctx.destination);
+        audioCtxRef.current = ctx;
+        gainRef.current = gain;
+        a.volume = 1;
       } catch {
-        /* проигнорировать — повторим на следующем жесте */
+        a.volume = volumeRef.current;
+        return null;
       }
     }
 
+    const ctx = audioCtxRef.current;
+    if (ctx?.state === "suspended") {
+      void ctx.resume();
+    }
     return ctx;
   }, []);
 
@@ -89,30 +105,8 @@ export const Radio = ({
     const a = audioRef.current;
     if (!a) return;
     a.src = `${audioBase()}music/${encodeURIComponent(TRACK.file)}`;
-    a.volume = volume;
+    a.volume = volumeRef.current;
   }, []);
-
-  useEffect(() => {
-    applyVolume(volume);
-  }, [volume, applyVolume]);
-
-  useEffect(() => {
-    const a = audioRef.current;
-    if (!a) return;
-    if (playing) {
-      const run = async () => {
-        await ensureAudioGraph();
-        try {
-          await a.play();
-        } catch {
-          setPlaying(false);
-        }
-      };
-      run();
-    } else {
-      a.pause();
-    }
-  }, [playing, ensureAudioGraph]);
 
   useEffect(() => {
     if (!open) return undefined;
@@ -146,32 +140,92 @@ export const Radio = ({
     if (!a) return;
     a.currentTime = 0;
     setCurrentTime(0);
-    setPlaying(true);
+    ensureAudioGraph();
+    const playPromise = a.play();
+    if (playPromise !== undefined) {
+      playPromise
+        .then(() => setPlaying(true))
+        .catch(() => setPlaying(false));
+    } else {
+      setPlaying(true);
+    }
+  }, [ensureAudioGraph]);
+
+  const stopPlayback = useCallback(() => {
+    const a = audioRef.current;
+    if (a) {
+      a.pause();
+      a.currentTime = 0;
+      setCurrentTime(0);
+    }
+    setPlaying(false);
   }, []);
+
+  const startPlayback = useCallback(() => {
+    const a = audioRef.current;
+    if (!a) return;
+    /* Важно синхронно в клике — иначе iOS не даст resume/play. */
+    ensureAudioGraph();
+    const playPromise = a.play();
+    if (playPromise !== undefined) {
+      playPromise
+        .then(() => setPlaying(true))
+        .catch(() => setPlaying(false));
+    } else {
+      setPlaying(true);
+    }
+  }, [ensureAudioGraph]);
 
   const togglePlay = () => {
     if (playing) {
-      const a = audioRef.current;
-      if (a) {
-        a.pause();
-        a.currentTime = 0;
-        setCurrentTime(0);
-      }
-      setPlaying(false);
+      stopPlayback();
       return;
     }
-    setPlaying(true);
+    startPlayback();
   };
 
-  const handleVolumeInput = (event) => {
-    const next = Number(event.target.value);
-    setVolume(next);
-    applyVolume(next);
-    void ensureAudioGraph();
+  const setVolumeFromClientX = useCallback(
+    (clientX) => {
+      const track = volumeTrackRef.current;
+      if (!track) return;
+      const rect = track.getBoundingClientRect();
+      if (rect.width <= 0) return;
+      const next = clamp01((clientX - rect.left) / rect.width);
+      volumeRef.current = next;
+      setVolume(next);
+      applyVolume(next);
+    },
+    [applyVolume]
+  );
+
+  const onVolumePointerDown = (event) => {
+    event.preventDefault();
+    event.stopPropagation();
+    draggingVolumeRef.current = true;
+    event.currentTarget.setPointerCapture(event.pointerId);
+    ensureAudioGraph();
+    setVolumeFromClientX(event.clientX);
+  };
+
+  const onVolumePointerMove = (event) => {
+    if (!draggingVolumeRef.current) return;
+    event.preventDefault();
+    setVolumeFromClientX(event.clientX);
+  };
+
+  const onVolumePointerUp = (event) => {
+    if (!draggingVolumeRef.current) return;
+    draggingVolumeRef.current = false;
+    if (event.currentTarget.hasPointerCapture(event.pointerId)) {
+      event.currentTarget.releasePointerCapture(event.pointerId);
+    }
+    setVolumeFromClientX(event.clientX);
   };
 
   const openRadio = () => setOpen(true);
   const closeRadio = () => setOpen(false);
+
+  const volumePercent = `${Math.round(volume * 100)}%`;
 
   const windowNode =
     typeof document !== "undefined"
@@ -247,22 +301,59 @@ export const Radio = ({
                       <span aria-hidden="true"> / </span>
                       {formatTime(duration)}
                     </p>
-                    <label className={styles.radioVolume}>
-                      <span className={styles.radioVolumeLabel}>
+                    <div className={styles.radioVolume}>
+                      <span className={styles.radioVolumeLabel} id={titleId + "-vol"}>
                         {volumeLabel}
                       </span>
-                      <input
-                        className={styles.radioVolumeInput}
-                        type="range"
-                        min="0"
-                        max="1"
-                        step="0.01"
-                        value={volume}
-                        aria-label={volumeLabel}
-                        onInput={handleVolumeInput}
-                        onChange={handleVolumeInput}
-                      />
-                    </label>
+                      <div
+                        ref={volumeTrackRef}
+                        className={styles.radioVolumeSlider}
+                        role="slider"
+                        tabIndex={0}
+                        aria-valuemin={0}
+                        aria-valuemax={100}
+                        aria-valuenow={Math.round(volume * 100)}
+                        aria-valuetext={volumePercent}
+                        aria-labelledby={titleId + "-vol"}
+                        onPointerDown={onVolumePointerDown}
+                        onPointerMove={onVolumePointerMove}
+                        onPointerUp={onVolumePointerUp}
+                        onPointerCancel={onVolumePointerUp}
+                        onKeyDown={(event) => {
+                          let next = volume;
+                          if (event.key === "ArrowRight" || event.key === "ArrowUp") {
+                            next = clamp01(volume + 0.05);
+                          } else if (
+                            event.key === "ArrowLeft" ||
+                            event.key === "ArrowDown"
+                          ) {
+                            next = clamp01(volume - 0.05);
+                          } else if (event.key === "Home") {
+                            next = 0;
+                          } else if (event.key === "End") {
+                            next = 1;
+                          } else {
+                            return;
+                          }
+                          event.preventDefault();
+                          ensureAudioGraph();
+                          volumeRef.current = next;
+                          setVolume(next);
+                          applyVolume(next);
+                        }}
+                      >
+                        <div className={styles.radioVolumeTrack} aria-hidden="true">
+                          <div
+                            className={styles.radioVolumeFill}
+                            style={{ width: volumePercent }}
+                          />
+                          <div
+                            className={styles.radioVolumeThumb}
+                            style={{ left: volumePercent }}
+                          />
+                        </div>
+                      </div>
+                    </div>
                   </div>
 
                   <button
@@ -307,7 +398,7 @@ export const Radio = ({
     <>
       <audio
         ref={audioRef}
-        preload="metadata"
+        preload="auto"
         playsInline
         onEnded={handleEnded}
         onPlay={() => setPlaying(true)}
