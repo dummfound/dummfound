@@ -4,7 +4,6 @@ import styles from "../styles.module.scss";
 
 const HERO_VIDEO = "/video/IMG_6766.mov";
 const HERO_VIDEO_MOBILE = "/video/mobile.MOV";
-const HERO_POSTER = "/dummfound-portrait.png";
 const BRAND = "DUMMFOUND";
 const MOBILE_MQ = "(max-width: 768px)";
 const PREORDER_HREF = "https://progressive.enhncd.co/0703";
@@ -19,7 +18,12 @@ export const Hero = ({
   promoCta,
 }) => {
   const [reduceMotion, setReduceMotion] = useState(false);
-  const [isMobile, setIsMobile] = useState(false);
+  const [isMobile, setIsMobile] = useState(() =>
+    typeof window !== "undefined"
+      ? window.matchMedia(MOBILE_MQ).matches
+      : false
+  );
+  const [mediaReady, setMediaReady] = useState(false);
 
   useEffect(() => {
     const motionMq = window.matchMedia("(prefers-reduced-motion: reduce)");
@@ -28,6 +32,7 @@ export const Hero = ({
     const syncMobile = () => setIsMobile(mobileMq.matches);
     syncMotion();
     syncMobile();
+    setMediaReady(true);
     motionMq.addEventListener("change", syncMotion);
     mobileMq.addEventListener("change", syncMobile);
     return () => {
@@ -43,29 +48,19 @@ export const Hero = ({
       aria-label={introLabel}
     >
       <div className={styles.heroBg} aria-hidden="true">
-        {reduceMotion ? (
-          <img
-            className={styles.heroBgImg}
-            src={HERO_POSTER}
-            alt=""
-            width={900}
-            height={1200}
-            decoding="async"
-          />
-        ) : (
+        {mediaReady && !reduceMotion ? (
           <video
             key={isMobile ? "mobile" : "desktop"}
             className={`${styles.heroBgVideo} ${
               isMobile ? styles.heroBgVideoMobile : styles.heroBgVideoDesktop
             }`}
             src={isMobile ? HERO_VIDEO_MOBILE : HERO_VIDEO}
-            poster={HERO_POSTER}
             autoPlay
             muted
             loop
             playsInline
           />
-        )}
+        ) : null}
       </div>
       <div className={styles.heroScrim} aria-hidden="true" />
 
