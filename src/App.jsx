@@ -63,6 +63,12 @@ const HomePage = () => {
     playerPause,
     playerEmpty,
     heroIntro,
+    heroCtaMusic,
+    heroCtaBooking,
+    heroPromoLabel,
+    heroPromoTitle,
+    heroPromoDate,
+    heroPromoCta,
     aboutLabel,
     aboutP,
     musicLabel,
@@ -118,7 +124,15 @@ const HomePage = () => {
       />
 
       <main id="main">
-        <Hero introLabel={heroIntro} />
+        <Hero
+          introLabel={heroIntro}
+          ctaMusic={heroCtaMusic}
+          ctaBooking={heroCtaBooking}
+          promoLabel={heroPromoLabel}
+          promoTitle={heroPromoTitle}
+          promoDate={heroPromoDate}
+          promoCta={heroPromoCta}
+        />
 
         <SectionAbout label={aboutLabel} body={aboutP} />
 

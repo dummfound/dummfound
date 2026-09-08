@@ -51,9 +51,7 @@ export const SectionContact = ({
       <div className={styles.sectionInner}>
         <h2 className={styles.sectionLabel}>{label}</h2>
         <div className={styles.sectionBody}>
-          <address
-            className={`${styles.contactBlock} ${formOpen ? styles.contactBlockOpen : ""}`}
-          >
+          <address className={styles.contactBlock}>
             <a className={styles.contactMail} href={`mailto:${MAIL}`}>
               <IosMailIcon className={styles.contactMailIcon} />
               <span className={styles.contactMailText}>{MAIL}</span>
@@ -93,25 +91,28 @@ export const SectionContact = ({
               id="contact-form-panel"
               className={`${styles.contactFormPanel} ${formOpen ? styles.contactFormPanelOpen : ""}`}
               aria-hidden={!formOpen}
+              inert={!formOpen ? true : undefined}
             >
-              <div className={styles.contactFormPanelInner}>
-                {contactFormIntro ? (
-                  <p className={styles.contactFormIntro}>{contactFormIntro}</p>
-                ) : null}
-                <ContactForm
-                  nameLabel={contactFormName}
-                  emailLabel={contactFormEmail}
-                  messageLabel={contactFormMessage}
-                  submitLabel={contactFormSubmit}
-                  sendingLabel={contactFormSending}
-                  successMessage={contactFormSuccess}
-                  errorMessage={contactFormError}
-                  helperText={contactFormHelper}
-                  validationSummary={contactFormValidationSummary}
-                  errorEmailRequired={contactFormErrorEmailRequired}
-                  errorEmailInvalid={contactFormErrorEmailInvalid}
-                  errorMessageRequired={contactFormErrorMessageRequired}
-                />
+              <div className={styles.contactFormPanelClip}>
+                <div className={styles.contactFormPanelInner}>
+                  {contactFormIntro ? (
+                    <p className={styles.contactFormIntro}>{contactFormIntro}</p>
+                  ) : null}
+                  <ContactForm
+                    nameLabel={contactFormName}
+                    emailLabel={contactFormEmail}
+                    messageLabel={contactFormMessage}
+                    submitLabel={contactFormSubmit}
+                    sendingLabel={contactFormSending}
+                    successMessage={contactFormSuccess}
+                    errorMessage={contactFormError}
+                    helperText={contactFormHelper}
+                    validationSummary={contactFormValidationSummary}
+                    errorEmailRequired={contactFormErrorEmailRequired}
+                    errorEmailInvalid={contactFormErrorEmailInvalid}
+                    errorMessageRequired={contactFormErrorMessageRequired}
+                  />
+                </div>
               </div>
             </div>
           ) : null}

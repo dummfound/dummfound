@@ -1,44 +1,116 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 import styles from "../styles.module.scss";
 
 const HERO_VIDEO = "/video/IMG_6766.mov";
+const HERO_VIDEO_MOBILE = "/video/mobile.MOV";
+const HERO_POSTER = "/dummfound-portrait.png";
+const BRAND = "DUMMFOUND";
+const MOBILE_MQ = "(max-width: 768px)";
+const PREORDER_HREF = "https://progressive.enhncd.co/0703";
 
-export const Hero = ({ introLabel }) => {
-  const videoRef = useRef(null);
+export const Hero = ({
+  introLabel,
+  ctaMusic,
+  ctaBooking,
+  promoLabel,
+  promoTitle,
+  promoDate,
+  promoCta,
+}) => {
+  const [reduceMotion, setReduceMotion] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
-    const video = videoRef.current;
-    if (!video) return;
-
-    const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
-    const sync = () => {
-      if (mq.matches) {
-        video.pause();
-      } else {
-        video.play().catch(() => {});
-      }
+    const motionMq = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const mobileMq = window.matchMedia(MOBILE_MQ);
+    const syncMotion = () => setReduceMotion(motionMq.matches);
+    const syncMobile = () => setIsMobile(mobileMq.matches);
+    syncMotion();
+    syncMobile();
+    motionMq.addEventListener("change", syncMotion);
+    mobileMq.addEventListener("change", syncMobile);
+    return () => {
+      motionMq.removeEventListener("change", syncMotion);
+      mobileMq.removeEventListener("change", syncMobile);
     };
-
-    sync();
-    mq.addEventListener("change", sync);
-    return () => mq.removeEventListener("change", sync);
   }, []);
 
   return (
-    <section id="top" className={styles.hero} aria-label={introLabel}>
+    <section
+      id="top"
+      className={`${styles.hero}${reduceMotion ? ` ${styles.heroStatic}` : ""}`}
+      aria-label={introLabel}
+    >
       <div className={styles.heroBg} aria-hidden="true">
-        <video
-          ref={videoRef}
-          className={styles.heroBgVideo}
-          src={HERO_VIDEO}
-          autoPlay
-          muted
-          loop
-          playsInline
-          preload="auto"
-        />
+        {reduceMotion ? (
+          <img
+            className={styles.heroBgImg}
+            src={HERO_POSTER}
+            alt=""
+            width={900}
+            height={1200}
+            decoding="async"
+          />
+        ) : (
+          <video
+            key={isMobile ? "mobile" : "desktop"}
+            className={`${styles.heroBgVideo} ${
+              isMobile ? styles.heroBgVideoMobile : styles.heroBgVideoDesktop
+            }`}
+            src={isMobile ? HERO_VIDEO_MOBILE : HERO_VIDEO}
+            poster={HERO_POSTER}
+            autoPlay
+            muted
+            loop
+            playsInline
+          />
+        )}
       </div>
       <div className={styles.heroScrim} aria-hidden="true" />
+
+      <div className={styles.heroInner}>
+        <div className={styles.heroCopy}>
+          <h1 className={styles.heroTitle}>{BRAND}</h1>
+          <div className={styles.heroCtas}>
+            <Link className={styles.heroCta} to="/music">
+              {ctaMusic}
+            </Link>
+            <Link className={`${styles.heroCta} ${styles.heroCtaGhost}`} to="/booking">
+              {ctaBooking}
+            </Link>
+          </div>
+
+          <aside className={styles.heroPromo} aria-label={promoTitle}>
+            <div className={styles.heroPromoMedia} aria-hidden="true">
+              <img
+                className={styles.heroPromoLogoMark}
+                src="/img/enhanced-logo.svg"
+                alt=""
+                decoding="async"
+              />
+            </div>
+            <div className={styles.heroPromoContent}>
+              <img
+                className={styles.heroPromoLogo}
+                src="/img/enhanced-logo.svg"
+                alt={promoLabel}
+                decoding="async"
+              />
+              <p className={styles.heroPromoTitle}>{promoTitle}</p>
+              <p className={styles.heroPromoDate}>{promoDate}</p>
+              <a
+                className={styles.heroPromoCta}
+                href={PREORDER_HREF}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                {promoCta}
+              </a>
+            </div>
+          </aside>
+        </div>
+      </div>
     </section>
   );
 };

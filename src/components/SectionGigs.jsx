@@ -1,51 +1,49 @@
-import { IosLinkIcon } from "./IosLinkIcon";
 import { Link } from "react-router-dom";
 import styles from "../styles.module.scss";
 
+const PANEL_IMAGE = "/img/DSCF4120-2.jpg";
+
+const formatGigLine = (date, title) => {
+  if (!date || date === "TBA") return `TBA  ${title}`;
+  const short = date.replace(/\.20\d{2}$/, ".");
+  return `${short}  ${title}`;
+};
+
 export const SectionGigs = ({ label, gigs = [] }) => {
+  const tourTitle = gigs[0]?.type ?? "";
+  const panelImage = gigs.find((g) => g.image)?.image ?? PANEL_IMAGE;
+
   return (
     <section id="gigs" className={styles.section}>
       <div className={styles.sectionInner}>
         <h2 className={styles.sectionLabel}>{label}</h2>
         <div className={styles.sectionBody}>
-          <ul className={styles.gigsList} role="list">
-            {gigs.map(
-              ({ slug, title, type, date, location, linkLabel, image }) => (
-                <li key={slug} className={styles.gigsItem}>
-                  <div className={styles.gigsContent}>
-                    <h3 className={styles.gigsTitle}>
-                      <Link className={styles.gigsTitleLink} to={`/gigs/${slug}`}>
-                        {title}
-                      </Link>
-                    </h3>
-                    <p className={styles.gigsType}>{type}</p>
-                    <p className={styles.gigsMeta}>{date}</p>
-                    <p className={styles.gigsLocation}>{location}</p>
-                    <Link className={styles.gigsLink} to={`/gigs/${slug}`}>
-                      <span>{linkLabel}</span>
-                      <IosLinkIcon className={styles.linkIcon} />
+          <div className={styles.gigsPanel}>
+            <div className={styles.gigsPanelMedia} aria-hidden="true">
+              <img
+                src={panelImage}
+                alt=""
+                className={styles.gigsPanelImage}
+                loading="lazy"
+                decoding="async"
+              />
+            </div>
+            <div className={styles.gigsPanelContent}>
+              {tourTitle ? (
+                <h3 className={styles.gigsPanelTitle}>{tourTitle}</h3>
+              ) : null}
+              <ul className={styles.gigsList} role="list">
+                {gigs.map(({ slug, title, date }) => (
+                  <li key={slug} className={styles.gigsItem}>
+                    <Link className={styles.gigsItemLink} to={`/gigs/${slug}`}>
+                      {formatGigLine(date, title)}
                     </Link>
-                  </div>
-                  {image ? (
-                    <Link
-                      className={styles.gigsMedia}
-                      to={`/gigs/${slug}`}
-                      aria-label={title}
-                    >
-                      <img
-                        src={image}
-                        alt=""
-                        className={styles.gigsImage}
-                        loading="lazy"
-                        decoding="async"
-                      />
-                    </Link>
-                  ) : null}
-                </li>
-              )
-            )}
-          </ul>
-          <p className={styles.gigsTba}>{"& TBA"}</p>
+                  </li>
+                ))}
+              </ul>
+              <p className={styles.gigsTba}>{"& TBA"}</p>
+            </div>
+          </div>
         </div>
       </div>
     </section>

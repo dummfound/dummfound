@@ -1,32 +1,45 @@
 :root {
-  --bg: #000000;
-  --bg-elevated: rgba(28, 28, 30, 0.72);
-  --text: #f5f5f7;
-  --text-muted: rgba(235, 235, 245, 0.55);
-  --accent: #ff375f;
-  --accent-hover: #ff6482;
-  --accent-soft: #e8304f;
-  --border: rgba(255, 255, 255, 0.1);
-  --font-display: "Unbounded", -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
-  --font-sans: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", system-ui, sans-serif;
-  --font-mono: -apple-system, BlinkMacSystemFont, "SF Pro Text", system-ui, sans-serif;
+  /* Black club neo-minimal — Belgrade discipline, no grain/mint */
+  --bg: #050505;
+  --bg-elevated: #0c0c0c;
+  --bg-panel: #0a0a0a;
+  --bg-invert: #f2f2f2;
+  --text: #f2f2f2;
+  --text-muted: #8a8a8a;
+  --text-on-invert: #050505;
+  --accent: #f2f2f2;
+  --accent-hover: #ffffff;
+  --accent-soft: #f2f2f2;
+  --border: rgba(242, 242, 242, 0.22);
+  --line: rgba(242, 242, 242, 0.14);
+  --paper: #f2f2f2;
+  --shadow: none;
+  --shadow-ink: none;
+  --font-display: "Funnel Display", "Onest", "Helvetica Neue", Helvetica, Arial,
+    sans-serif;
+  --font-sans: "Funnel Sans", "Onest", "Helvetica Neue", Helvetica, Arial,
+    sans-serif;
+  --font-mono: "Funnel Sans", "Onest", ui-monospace, monospace;
 
-  --ios-blur: 40px;
-  --ios-drawer-blur: 16px;
-  --ios-radius: 20px;
-  --ios-radius-sm: 14px;
-  --ios-radius-pill: 999px;
-  --ios-glass: rgba(255, 255, 255, 0.08);
-  --ios-glass-strong: rgba(255, 255, 255, 0.12);
-  --ios-separator: rgba(255, 255, 255, 0.08);
-  --ios-highlight: rgba(255, 255, 255, 0.18);
+  --radius: 0;
+  --radius-sm: 0;
+  --border-w: 1px;
+  --ios-blur: 0;
+  --ios-drawer-blur: 0;
+  --ios-radius: 0;
+  --ios-radius-sm: 0;
+  --ios-radius-pill: 0;
+  --ios-glass: transparent;
+  --ios-glass-strong: transparent;
+  --ios-separator: var(--line);
+  --ios-highlight: transparent;
 
   --space-xs: 0.5rem;
   --space-sm: 1rem;
   --space-md: 1.5rem;
-  --space-lg: 2.5rem;
-  --space-xl: 4rem;
-  --space-2xl: 6rem;
+  --space-lg: 2.75rem;
+  --space-xl: 4.5rem;
+  --space-2xl: 7rem;
   --max-width: 72rem;
 }
 
@@ -52,12 +65,17 @@ body {
   background: var(--bg);
   color: var(--text);
   font-family: var(--font-sans);
-  font-size: 1rem;
+  font-size: 1.05rem;
   font-weight: 400;
-  line-height: 1.47059;
-  letter-spacing: -0.022em;
+  line-height: 1.5;
+  letter-spacing: -0.01em;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+body::before,
+body::after {
+  display: none;
 }
 
 #root {
@@ -69,15 +87,22 @@ a {
   color: var(--text);
   text-decoration: none;
   border-bottom: none;
-  transition: color 0.2s ease, opacity 0.2s ease;
+  transition: opacity 0.2s ease, color 0.2s ease, background 0.2s ease,
+    border-color 0.2s ease;
 }
 
 a:hover {
-  color: color-mix(in srgb, var(--text) 88%, white);
+  opacity: 0.65;
 }
 
 a:focus-visible,
 button:focus-visible {
-  outline: none;
-  box-shadow: inset 0 0 0 2px rgba(255, 255, 255, 0.35);
+  outline: 1px solid var(--text);
+  outline-offset: 3px;
+  box-shadow: none;
+}
+
+::selection {
+  background: rgba(242, 242, 242, 0.22);
+  color: var(--text);
 }
