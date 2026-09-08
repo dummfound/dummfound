@@ -11,6 +11,7 @@ const formatGigLine = (date, title) => {
 
 export const SectionGigs = ({ label, gigs = [], hint }) => {
   const tourTitle = gigs[0]?.type ?? "";
+  const tourNote = gigs[0]?.typeNote ?? "";
   const panelImage = gigs.find((g) => g.image)?.image ?? PANEL_IMAGE;
 
   return (
@@ -30,7 +31,12 @@ export const SectionGigs = ({ label, gigs = [], hint }) => {
             </div>
             <div className={styles.gigsPanelContent}>
               {tourTitle ? (
-                <h3 className={styles.gigsPanelTitle}>{tourTitle}</h3>
+                <h3 className={styles.gigsPanelTitle}>
+                  {tourTitle}
+                  {tourNote ? (
+                    <span className={styles.gigsTitleNote}> ({tourNote})</span>
+                  ) : null}
+                </h3>
               ) : null}
               <ul className={styles.gigsList} role="list">
                 {gigs.map(({ slug, title, date }) => (

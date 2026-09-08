@@ -83,7 +83,8 @@ export const COPY = {
       {
         slug: "ekaterinburg-161026",
         title: "Екатеринбург",
-        type: "Братания Тур (совместно с WASTA)",
+        type: "Братания Тур",
+        typeNote: "совместно с WASTA",
         date: "16.10.2026",
         location: "Екатеринбург, Россия",
         linkLabel: "подробнее",
@@ -92,7 +93,8 @@ export const COPY = {
       {
         slug: "chelyabinsk-171026",
         title: "Челябинск",
-        type: "Братания Тур (совместно с WASTA)",
+        type: "Братания Тур",
+        typeNote: "совместно с WASTA",
         date: "17.10.2026",
         location: "Челябинск, Россия",
         linkLabel: "подробнее",
@@ -101,7 +103,8 @@ export const COPY = {
       {
         slug: "krasnoyarsk-241026",
         title: "Красноярск",
-        type: "Братания Тур (совместно с WASTA)",
+        type: "Братания Тур",
+        typeNote: "совместно с WASTA",
         date: "24.10.2026",
         location: "Красноярск, Россия",
         linkLabel: "подробнее",
@@ -110,7 +113,8 @@ export const COPY = {
       {
         slug: "vladivostok-011126",
         title: "Владивосток",
-        type: "Братания Тур (совместно с WASTA)",
+        type: "Братания Тур",
+        typeNote: "совместно с WASTA",
         date: "01.11.2026",
         location: "Владивосток, Россия",
         linkLabel: "подробнее",
@@ -119,7 +123,8 @@ export const COPY = {
       {
         slug: "moscow-tba",
         title: "Москва",
-        type: "Братания Тур (совместно с WASTA)",
+        type: "Братания Тур",
+        typeNote: "совместно с WASTA",
         date: "TBA",
         location: "Москва, Россия",
         linkLabel: "подробнее",
@@ -247,7 +252,8 @@ export const COPY = {
       {
         slug: "ekaterinburg-161026",
         title: "Yekaterinburg",
-        type: "Bratania Tour (with WASTA)",
+        type: "Bratania Tour",
+        typeNote: "with WASTA",
         date: "16.10.2026",
         location: "Yekaterinburg, Russia",
         linkLabel: "details",
@@ -256,7 +262,8 @@ export const COPY = {
       {
         slug: "chelyabinsk-171026",
         title: "Chelyabinsk",
-        type: "Bratania Tour (with WASTA)",
+        type: "Bratania Tour",
+        typeNote: "with WASTA",
         date: "17.10.2026",
         location: "Chelyabinsk, Russia",
         linkLabel: "details",
@@ -265,7 +272,8 @@ export const COPY = {
       {
         slug: "krasnoyarsk-241026",
         title: "Krasnoyarsk",
-        type: "Bratania Tour (with WASTA)",
+        type: "Bratania Tour",
+        typeNote: "with WASTA",
         date: "24.10.2026",
         location: "Krasnoyarsk, Russia",
         linkLabel: "details",
@@ -274,7 +282,8 @@ export const COPY = {
       {
         slug: "vladivostok-011126",
         title: "Vladivostok",
-        type: "Bratania Tour (with WASTA)",
+        type: "Bratania Tour",
+        typeNote: "with WASTA",
         date: "01.11.2026",
         location: "Vladivostok, Russia",
         linkLabel: "details",
@@ -283,7 +292,8 @@ export const COPY = {
       {
         slug: "moscow-tba",
         title: "Moscow",
-        type: "Bratania Tour (with WASTA)",
+        type: "Bratania Tour",
+        typeNote: "with WASTA",
         date: "TBA",
         location: "Moscow, Russia",
         linkLabel: "details",

@@ -1470,6 +1470,13 @@
   color: #c8c8c8;
 }
 
+.gigsTitleNote {
+  font-size: 0.72em;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  opacity: 0.78;
+}
+
 .gigsList {
   list-style: none;
   margin: 0;
@@ -1664,45 +1671,140 @@
   box-sizing: border-box;
 }
 
-@media (max-width: 768px) {
-  .gigPageWithBg .gigPageBg {
-    display: block;
-    position: fixed;
-    inset: 0;
-    z-index: 0;
-    pointer-events: none;
-    overflow: hidden;
-  }
+.gigPageWithBg .gigPageBg {
+  display: block;
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
 
-  .gigPageBgImage {
-    display: block;
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    object-position: center top;
-    filter: grayscale(1) brightness(0.4) contrast(1.05);
-  }
+/* Match left figure brightness to the darker right side */
+.gigPageWithBg .gigPageBg::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  background: linear-gradient(
+    90deg,
+    rgba(0, 0, 0, 0.1) 0%,
+    rgba(0, 0, 0, 0.06) 38%,
+    rgba(0, 0, 0, 0.02) 52%,
+    transparent 62%
+  );
+}
 
-  .gigPageWithBg .gigPageBg::after {
-    content: "";
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(
+.gigPageBgImage {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center 28%;
+  filter: grayscale(1) brightness(0.42) contrast(1.08);
+}
+
+.gigPageWithBg .gigPageBg::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+  background:
+    linear-gradient(
       180deg,
-      rgba(5, 5, 5, 0.35) 0%,
-      rgba(5, 5, 5, 0.55) 45%,
-      rgba(5, 5, 5, 0.75) 100%
+      rgba(5, 5, 5, 0.4) 0%,
+      rgba(5, 5, 5, 0.58) 45%,
+      rgba(5, 5, 5, 0.82) 100%
+    ),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.2' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='matrix' values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0.55 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-size: auto, 120px 120px;
+  background-repeat: no-repeat, repeat;
+  mix-blend-mode: soft-light;
+  opacity: 0.55;
+}
+
+.gigPageWithBg .gigPageInner {
+  background: transparent;
+  border: none;
+  box-shadow: none;
+}
+
+@media (max-width: 768px) {
+  .gigPageWithBg {
+    display: flex;
+    flex-direction: column;
+    padding-block: 0;
+    overflow: visible;
+    min-height: calc(100svh - 4.75rem);
+  }
+
+  /* Photo stage: full duo visible, letterboxed on black */
+  .gigPageWithBg .gigPageBg {
+    position: relative;
+    inset: auto;
+    width: 100%;
+    height: clamp(15.5rem, 48svh, 22rem);
+    flex: 0 0 auto;
+    background: #050505;
+  }
+
+  .gigPageWithBg .gigPageBgImage {
+    object-fit: contain;
+    object-position: center center;
+    filter: grayscale(1) brightness(0.78) contrast(1.06);
+  }
+
+  .gigPageWithBg .gigPageBg::before {
+    background: linear-gradient(
+      90deg,
+      rgba(0, 0, 0, 0.5) 0%,
+      rgba(0, 0, 0, 0.38) 40%,
+      rgba(0, 0, 0, 0.1) 54%,
+      transparent 64%
     );
   }
 
+  .gigPageWithBg .gigPageBg::after {
+    background: linear-gradient(
+      180deg,
+      transparent 0%,
+      transparent 42%,
+      rgba(5, 5, 5, 0.35) 72%,
+      rgba(5, 5, 5, 0.92) 100%
+    );
+    mix-blend-mode: normal;
+    opacity: 1;
+  }
+
+  /* Content card sits over the lower edge of the photo */
   .gigPageWithBg .gigPageInner {
-    background: transparent;
-    border: none;
-    box-shadow: none;
-    margin-top: var(--space-md);
-    margin-inline: max(var(--space-md), env(safe-area-inset-left))
-      max(var(--space-md), env(safe-area-inset-right));
-    padding: var(--space-lg) var(--space-md) var(--space-xl);
+    margin-top: -3.75rem;
+    margin-inline: max(0.85rem, env(safe-area-inset-left))
+      max(0.85rem, env(safe-area-inset-right));
+    margin-bottom: max(var(--space-lg), env(safe-area-inset-bottom));
+    padding: 0 0 var(--space-xl);
+    width: auto;
+    max-width: none;
+  }
+
+  .gigPageWithBg .gigArticle {
+    width: 100%;
+    max-width: none;
+    padding: 1.45rem 1.35rem 2.65rem 1.15rem;
+    background: rgba(20, 20, 20, 0.94);
+    border: 1px solid rgba(242, 242, 242, 0.1);
+    clip-path: polygon(0 0, 100% 3%, 100% 100%, 0 98%);
+  }
+
+  .gigPageWithBg .gigTitle {
+    font-size: clamp(1.55rem, 8vw, 2.25rem);
+  }
+
+  .gigPageWithBg .gigBack {
+    margin-bottom: 0.85rem;
+    background: rgba(42, 42, 42, 0.92);
   }
 }
 
@@ -1776,7 +1878,9 @@
 
 .gigArticle {
   @include tour-card;
-  padding: 2.25rem 2.5rem 2.5rem 1.75rem;
+  /* Gentler slant so bottom lines (Details soon) aren't clipped */
+  clip-path: polygon(0 0, 100% 5%, 100% 100%, 0 97%);
+  padding: 2.25rem 2.5rem 3.35rem 1.75rem;
   display: grid;
   gap: var(--space-sm);
   min-width: 0;
@@ -1809,7 +1913,7 @@
 }
 
 .gigDetailsSoon {
-  margin: 0.65rem 0 0;
+  margin: 0.65rem 0 0.35rem;
   max-width: 40rem;
   font-family: var(--font-sans);
   font-size: 0.78rem;

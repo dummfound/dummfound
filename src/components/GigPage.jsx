@@ -7,6 +7,8 @@ import { SiteHeader } from "./SiteHeader";
 import { SkipLink } from "./SkipLink";
 import styles from "../styles.module.scss";
 
+const TOUR_BG = "/img/bratania-duo.jpg";
+
 export const GigPage = ({
   gigs = [],
   backLabel,
@@ -68,22 +70,15 @@ export const GigPage = ({
         onToggleMenu={onToggleMenu}
       />
 
-      <main
-        id="main"
-        className={
-          gig.image ? `${styles.gigPage} ${styles.gigPageWithBg}` : styles.gigPage
-        }
-      >
-        {gig.image ? (
-          <div className={styles.gigPageBg} aria-hidden="true">
-            <img
-              src={gig.image}
-              alt=""
-              className={styles.gigPageBgImage}
-              decoding="async"
-            />
-          </div>
-        ) : null}
+      <main id="main" className={`${styles.gigPage} ${styles.gigPageWithBg}`}>
+        <div className={styles.gigPageBg} aria-hidden="true">
+          <img
+            src={TOUR_BG}
+            alt=""
+            className={styles.gigPageBgImage}
+            decoding="async"
+          />
+        </div>
 
         <div className={styles.gigPageInner}>
           <Link className={styles.gigBack} to="/gigs">
@@ -92,21 +87,15 @@ export const GigPage = ({
           </Link>
 
           <article className={styles.gigArticle}>
-            <p className={styles.gigsType}>{gig.type}</p>
+            <p className={styles.gigsType}>
+              {gig.type}
+              {gig.typeNote ? (
+                <span className={styles.gigsTitleNote}> ({gig.typeNote})</span>
+              ) : null}
+            </p>
             <h1 className={styles.gigTitle}>{gig.title}</h1>
             <p className={styles.gigsMeta}>{gig.date}</p>
             <p className={styles.gigsLocation}>{gig.location}</p>
-
-            {gig.image ? (
-              <div className={styles.gigHeroMedia}>
-                <img
-                  src={gig.image}
-                  alt={gig.title}
-                  className={styles.gigHeroImage}
-                  decoding="async"
-                />
-              </div>
-            ) : null}
 
             {gig.body ? <p className={styles.gigBody}>{gig.body}</p> : null}
 
