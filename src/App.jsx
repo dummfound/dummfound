@@ -99,6 +99,7 @@ const HomePage = () => {
     footerInstagramDisclaimer,
     gigsLabel,
     gigs,
+    gigsHint,
   } = t;
 
   return (
@@ -148,7 +149,7 @@ const HomePage = () => {
           geoValue={geoVal}
         />
 
-        <SectionGigs label={gigsLabel} gigs={gigs} />
+        <SectionGigs label={gigsLabel} gigs={gigs} hint={gigsHint} />
 
         <SectionContact
           label={contactLabel}
@@ -187,6 +188,7 @@ const GigPageRoute = () => {
       gigs={t.gigs}
       backLabel={t.gigsBackLabel}
       ticketsLabel={t.gigsTicketsLabel}
+      detailsSoon={t.gigsDetailsSoon}
       skip={t.skip}
       logoAria={t.logoAria}
       navAria={t.navAria}

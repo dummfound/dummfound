@@ -9,7 +9,7 @@ const formatGigLine = (date, title) => {
   return `${short}  ${title}`;
 };
 
-export const SectionGigs = ({ label, gigs = [] }) => {
+export const SectionGigs = ({ label, gigs = [], hint }) => {
   const tourTitle = gigs[0]?.type ?? "";
   const panelImage = gigs.find((g) => g.image)?.image ?? PANEL_IMAGE;
 
@@ -42,6 +42,7 @@ export const SectionGigs = ({ label, gigs = [] }) => {
                 ))}
               </ul>
               <p className={styles.gigsTba}>{"& TBA"}</p>
+              {hint ? <p className={styles.gigsHint}>{hint}</p> : null}
             </div>
           </div>
         </div>

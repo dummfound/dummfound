@@ -1128,6 +1128,18 @@
   color: #8a8a8a;
 }
 
+.gigsHint {
+  margin: 0.55rem 0 0;
+  padding: 0;
+  max-width: 16rem;
+  font-family: var(--font-sans);
+  font-size: 0.7rem;
+  font-weight: 500;
+  line-height: 1.4;
+  letter-spacing: 0.02em;
+  color: #7a7a7a;
+}
+
 @media (max-width: 700px) {
   .gigsPanel {
     min-height: 23rem;
@@ -1147,6 +1159,11 @@
   .gigsItemLink {
     max-width: 12.5rem;
     font-size: 0.95rem;
+  }
+
+  .gigsHint {
+    max-width: 11.5rem;
+    font-size: 0.65rem;
   }
 
   .gigsPanelImage {
@@ -1401,6 +1418,17 @@
   letter-spacing: -0.02em;
   color: var(--text);
   font-family: var(--font-sans);
+}
+
+.gigDetailsSoon {
+  margin: 0.65rem 0 0;
+  max-width: 40rem;
+  font-family: var(--font-sans);
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text-muted);
 }
 
 .gigHeroMedia {

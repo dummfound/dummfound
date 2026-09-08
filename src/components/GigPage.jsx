@@ -11,6 +11,7 @@ export const GigPage = ({
   gigs = [],
   backLabel,
   ticketsLabel,
+  detailsSoon,
   skip,
   logoAria,
   navAria,
@@ -104,6 +105,10 @@ export const GigPage = ({
             ) : null}
 
             {gig.body ? <p className={styles.gigBody}>{gig.body}</p> : null}
+
+            {detailsSoon ? (
+              <p className={styles.gigDetailsSoon}>{detailsSoon}</p>
+            ) : null}
 
             {gig.href ? (
               <a

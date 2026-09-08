@@ -127,6 +127,8 @@ export const COPY = {
     gigsBackLabel: "К выступлениям",
     gigsTicketsLabel: "Билеты",
     gigsNotFound: "Событие не найдено.",
+    gigsHint: "Нажмите на дату, чтобы открыть подробности.",
+    gigsDetailsSoon: "Подробности скоро.",
     bookingLabel: "Букинг",
     bookingP:
       "Запросы на клубы, фестивали, подкасты и коллаборации — через e-mail. Техрайдер и пресс-кит высылаются по запросу.",
@@ -286,6 +288,8 @@ export const COPY = {
     gigsBackLabel: "Back to gigs",
     gigsTicketsLabel: "Tickets",
     gigsNotFound: "Event not found.",
+    gigsHint: "Tap a date for details.",
+    gigsDetailsSoon: "Details coming soon.",
     bookingLabel: "Booking",
     bookingP:
       "For clubs, festivals, podcasts and collaborations — email. Tech rider and press kit on request.",
