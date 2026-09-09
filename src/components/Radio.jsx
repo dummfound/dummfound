@@ -3,12 +3,8 @@ import { createPortal } from "react-dom";
 import { useDrag } from "@use-gesture/react";
 import styles from "../styles.module.scss";
 
-const TRACK = {
-  file: "Together.mp3",
-  title: "Lørean & DUMMFOUND — Together",
-};
-
 const RADIO_VIDEO = "/video/RADIO.MOV";
+const EXCLUDED_TRACK_FILES = new Set(["together.mp3"]);
 
 const audioBase = () => import.meta.env.BASE_URL.replace(/\/?$/, "/");
 
@@ -23,8 +19,42 @@ function clamp01(value) {
   return Math.min(1, Math.max(0, value));
 }
 
-function trackUrl() {
-  return `${audioBase()}music/${encodeURIComponent(TRACK.file)}`;
+function normalizeTracks(data) {
+  if (!Array.isArray(data)) return [];
+  return data
+    .map((item) => {
+      if (typeof item === "string") {
+        const file = item.trim();
+        if (!file) return null;
+        return { file, title: file.replace(/\.mp3$/i, "") };
+      }
+      const file = item?.file || item?.src;
+      if (typeof file !== "string" || !file.trim()) return null;
+      const trimmed = file.trim();
+      const title =
+        typeof item?.title === "string" && item.title.trim()
+          ? item.title.trim()
+          : trimmed.replace(/\.mp3$/i, "");
+      return { file: trimmed, title };
+    })
+    .filter(
+      (track) =>
+        track && !EXCLUDED_TRACK_FILES.has(track.file.toLowerCase())
+    );
+}
+
+/** Fisher–Yates: новый порядок при каждой загрузке страницы */
+function shuffleTracks(tracks) {
+  const out = [...tracks];
+  for (let i = out.length - 1; i > 0; i -= 1) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [out[i], out[j]] = [out[j], out[i]];
+  }
+  return out;
+}
+
+function trackUrl(file) {
+  return `${audioBase()}music/${encodeURIComponent(file)}`;
 }
 
 export const Radio = ({
@@ -42,12 +72,19 @@ export const Radio = ({
   const ctxRef = useRef(null);
   const gainRef = useRef(null);
   const bufferRef = useRef(null);
+  const bufferFileRef = useRef(null);
   const sourceRef = useRef(null);
   const prefetchRef = useRef(null);
+  const prefetchFileRef = useRef(null);
   const startedAtRef = useRef(0);
   const rafRef = useRef(0);
   const volumeRef = useRef(0.75);
   const playingRef = useRef(false);
+  const playlistRef = useRef([]);
+  const trackIndexRef = useRef(0);
+  const startPlaybackRef = useRef(null);
+  const [playlist, setPlaylist] = useState([]);
+  const [trackIndex, setTrackIndex] = useState(0);
   const [open, setOpen] = useState(false);
   const [playing, setPlaying] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -57,6 +94,8 @@ export const Radio = ({
 
   volumeRef.current = volume;
   playingRef.current = playing;
+  playlistRef.current = playlist;
+  trackIndexRef.current = trackIndex;
 
   const applyVolume = useCallback((value) => {
     const gain = gainRef.current;
@@ -117,8 +156,10 @@ export const Radio = ({
     const ctx = ctxRef.current;
     const buffer = bufferRef.current;
     if (ctx && buffer?.duration) {
-      const elapsed =
-        (ctx.currentTime - startedAtRef.current) % buffer.duration;
+      const elapsed = Math.min(
+        buffer.duration,
+        Math.max(0, ctx.currentTime - startedAtRef.current)
+      );
       setCurrentTime(elapsed);
     }
     rafRef.current = requestAnimationFrame(tick);
@@ -129,13 +170,26 @@ export const Radio = ({
     rafRef.current = requestAnimationFrame(tick);
   }, [stopClock, tick]);
 
-  const loadBuffer = useCallback(async () => {
-    if (bufferRef.current) return bufferRef.current;
+  const clearDecodedTrack = useCallback(() => {
+    bufferRef.current = null;
+    bufferFileRef.current = null;
+    prefetchRef.current = null;
+    prefetchFileRef.current = null;
+    setDuration(NaN);
+  }, []);
+
+  const loadBuffer = useCallback(async (file) => {
+    if (!file) throw new Error("no track file");
+    if (bufferRef.current && bufferFileRef.current === file) {
+      return bufferRef.current;
+    }
+
     const ctx = ctxRef.current;
     if (!ctx) throw new Error("no audio context");
 
-    if (!prefetchRef.current) {
-      prefetchRef.current = fetch(trackUrl()).then((res) => {
+    if (!prefetchRef.current || prefetchFileRef.current !== file) {
+      prefetchFileRef.current = file;
+      prefetchRef.current = fetch(trackUrl(file)).then((res) => {
         if (!res.ok) throw new Error("track fetch failed");
         return res.arrayBuffer();
       });
@@ -144,9 +198,20 @@ export const Radio = ({
     const bytes = await prefetchRef.current;
     const buffer = await ctx.decodeAudioData(bytes.slice(0));
     bufferRef.current = buffer;
+    bufferFileRef.current = file;
     setDuration(buffer.duration);
     return buffer;
   }, []);
+
+  const playNextTrack = useCallback(() => {
+    const list = playlistRef.current;
+    if (!list.length) return;
+    const next = (trackIndexRef.current + 1) % list.length;
+    trackIndexRef.current = next;
+    setTrackIndex(next);
+    clearDecodedTrack();
+    void startPlaybackRef.current?.(list[next]?.file);
+  }, [clearDecodedTrack]);
 
   const startSource = useCallback(() => {
     const ctx = ctxRef.current;
@@ -159,14 +224,18 @@ export const Radio = ({
 
     const source = ctx.createBufferSource();
     source.buffer = buffer;
-    source.loop = true;
+    source.loop = false;
     source.connect(gain);
+    source.onended = () => {
+      if (!playingRef.current) return;
+      playNextTrack();
+    };
     source.start(0);
     startedAtRef.current = ctx.currentTime;
     sourceRef.current = source;
     setCurrentTime(0);
     startClock();
-  }, [applyVolume, startClock, stopSource]);
+  }, [applyVolume, playNextTrack, startClock, stopSource]);
 
   const stopPlayback = useCallback(() => {
     stopClock();
@@ -176,26 +245,36 @@ export const Radio = ({
     playingRef.current = false;
   }, [stopClock, stopSource]);
 
-  const startPlayback = useCallback(async () => {
-    /* Контекст — синхронно в жесте, иначе iOS не unlock’нет звук. */
-    const ctx = ensureContext();
-    if (!ctx) return;
+  const startPlayback = useCallback(
+    async (fileOverride) => {
+      /* Контекст — синхронно в жесте, иначе iOS не unlock’нет звук. */
+      const ctx = ensureContext();
+      if (!ctx) return;
 
-    setLoading(true);
-    try {
-      await loadBuffer();
-      if (ctx.state === "suspended") {
-        await ctx.resume();
+      const file =
+        fileOverride ||
+        playlistRef.current[trackIndexRef.current]?.file;
+      if (!file) return;
+
+      setLoading(true);
+      try {
+        await loadBuffer(file);
+        if (ctx.state === "suspended") {
+          await ctx.resume();
+        }
+        startSource();
+        setPlaying(true);
+        playingRef.current = true;
+      } catch {
+        stopPlayback();
+      } finally {
+        setLoading(false);
       }
-      startSource();
-      setPlaying(true);
-      playingRef.current = true;
-    } catch {
-      stopPlayback();
-    } finally {
-      setLoading(false);
-    }
-  }, [ensureContext, loadBuffer, startSource, stopPlayback]);
+    },
+    [ensureContext, loadBuffer, startSource, stopPlayback]
+  );
+
+  startPlaybackRef.current = startPlayback;
 
   const togglePlay = () => {
     if (playing || loading) {
@@ -203,6 +282,7 @@ export const Radio = ({
       setLoading(false);
       return;
     }
+    if (!playlistRef.current.length) return;
     void startPlayback();
   };
 
@@ -237,18 +317,50 @@ export const Radio = ({
     }
   );
 
-  /* Подгружаем файл при открытии окна, чтобы play не ждал сеть. */
   useEffect(() => {
-    if (!open || prefetchRef.current) return;
-    prefetchRef.current = fetch(trackUrl())
+    let cancelled = false;
+    fetch(`${audioBase()}music/tracks.json`)
+      .then((res) => (res.ok ? res.json() : []))
+      .then((data) => {
+        if (cancelled) return;
+        const list = normalizeTracks(data);
+        const ordered = list.length ? shuffleTracks(list) : list;
+        playlistRef.current = ordered;
+        trackIndexRef.current = 0;
+        setPlaylist(ordered);
+        setTrackIndex(0);
+      })
+      .catch(() => {
+        if (!cancelled) {
+          playlistRef.current = [];
+          setPlaylist([]);
+        }
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  /* Подгружаем текущий трек при открытии окна, чтобы play не ждал сеть. */
+  useEffect(() => {
+    if (!open) return;
+    const file = playlist[trackIndex]?.file;
+    if (!file) return;
+    if (prefetchRef.current && prefetchFileRef.current === file) return;
+
+    prefetchFileRef.current = file;
+    prefetchRef.current = fetch(trackUrl(file))
       .then((res) => {
         if (!res.ok) throw new Error("track fetch failed");
         return res.arrayBuffer();
       })
       .catch(() => {
-        prefetchRef.current = null;
+        if (prefetchFileRef.current === file) {
+          prefetchRef.current = null;
+          prefetchFileRef.current = null;
+        }
       });
-  }, [open]);
+  }, [open, playlist, trackIndex]);
 
   useEffect(() => {
     if (!open) return undefined;
@@ -374,7 +486,15 @@ export const Radio = ({
 
                 <div className={styles.radioOverlay}>
                   <div className={styles.radioInfo}>
-                    <p className={styles.radioTrack}>{TRACK.title}</p>
+                    {playing ? (
+                      <p className={styles.radioLive}>
+                        <span
+                          className={styles.radioLiveDot}
+                          aria-hidden="true"
+                        />
+                        LIVE
+                      </p>
+                    ) : null}
                     <p className={styles.radioTime}>
                       {formatTime(currentTime)}
                       <span aria-hidden="true"> / </span>
@@ -454,24 +574,21 @@ export const Radio = ({
                     {playing ? (
                       <svg
                         className={styles.radioPlayIcon}
-                        viewBox="0 0 14 14"
+                        viewBox="0 0 16 16"
                         aria-hidden="true"
                       >
-                        <rect
-                          x="1"
-                          y="1"
-                          width="12"
-                          height="12"
-                          fill="currentColor"
-                        />
+                        <rect x="1.5" y="1.5" width="13" height="13" fill="currentColor" />
                       </svg>
                     ) : (
                       <svg
-                        className={styles.radioPlayIcon}
-                        viewBox="0 0 14 14"
+                        className={`${styles.radioPlayIcon} ${styles.radioPlayIconPlay}`}
+                        viewBox="0 0 16 16"
                         aria-hidden="true"
                       >
-                        <path d="M2 1 L13 7 L2 13 Z" fill="currentColor" />
+                        <path
+                          d="M2.2 1.2 L14.2 8 L2.2 14.8 Z"
+                          fill="currentColor"
+                        />
                       </svg>
                     )}
                   </button>

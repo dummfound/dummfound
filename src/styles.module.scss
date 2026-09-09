@@ -227,7 +227,8 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .radioTriggerDot {
+  .radioTriggerDot,
+  .radioLiveDot {
     animation: none;
     opacity: 1;
   }
@@ -392,15 +393,27 @@
   max-width: min(100%, 28rem);
 }
 
-.radioTrack {
+.radioLive {
   margin: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
   font-family: var(--font-sans);
   font-size: 0.72rem;
   font-weight: 600;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.14em;
   text-transform: uppercase;
   color: #fff;
-  line-height: 1.35;
+  line-height: 1;
+}
+
+.radioLiveDot {
+  width: 0.42rem;
+  height: 0.42rem;
+  border-radius: 50%;
+  background: #e10600;
+  flex-shrink: 0;
+  animation: radioLivePulse 1.8s ease-in-out infinite;
 }
 
 .radioTime {
@@ -483,8 +496,10 @@
 
 .radioPlayBtn {
   margin: 0;
-  padding: 0.45rem;
-  border: 1px solid rgba(255, 255, 255, 0.7);
+  padding: 0;
+  width: 2.35rem;
+  height: 2.35rem;
+  border: none;
   border-radius: 0;
   background: transparent;
   color: #fff;
@@ -493,6 +508,7 @@
   align-self: flex-start;
   display: grid;
   place-items: center;
+  box-sizing: border-box;
   @include hover-tint;
 }
 
@@ -508,12 +524,18 @@
 
 .radioPlayIcon {
   display: block;
-  width: 0.85rem;
-  height: 0.85rem;
+  width: 1.85rem;
+  height: 1.85rem;
+}
+
+.radioPlayIconPlay {
+  /* Треугольник визуально смещён влево — чуть двигаем к центру кнопки */
+  transform: translateX(0.08rem);
 }
 
 @media (prefers-reduced-motion: reduce) {
   .radioTriggerDot,
+  .radioLiveDot,
   .radioLayer,
   .radioWindow {
     animation: none;
@@ -535,7 +557,7 @@
     min-height: min(22rem, 52dvh);
   }
 
-  .radioTrack {
+  .radioLive {
     font-size: 0.64rem;
   }
 
