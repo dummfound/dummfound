@@ -21,6 +21,7 @@ export const GigPage = ({
   menuLabel,
   drawerBackdropLabel,
   navLinks,
+  tgAppLabel,
   lang,
   onSetLang,
   radioOpen,
@@ -57,6 +58,7 @@ export const GigPage = ({
         menuLabel={menuLabel}
         drawerBackdropLabel={drawerBackdropLabel}
         navLinks={navLinks}
+        tgAppLabel={tgAppLabel}
         lang={lang}
         onSetLang={onSetLang}
         radioOpen={radioOpen}

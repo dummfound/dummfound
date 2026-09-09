@@ -116,6 +116,7 @@ const HomePage = () => {
         menuLabel={menu}
         drawerBackdropLabel={drawerBackdrop}
         navLinks={navLinks}
+        tgAppLabel={t.nav.app}
         lang={lang}
         onSetLang={setLang}
         radioOpen={radioOpen}
@@ -202,6 +203,7 @@ const GigPageRoute = () => {
       menuLabel={t.menu}
       drawerBackdropLabel={t.drawerBackdrop}
       navLinks={navLinks}
+      tgAppLabel={t.nav.app}
       lang={lang}
       onSetLang={setLang}
       radioOpen={t.radioOpen}

@@ -2,3 +2,7 @@ node_modules
 dist
 *.local
 .DS_Store
+
+# Large local video assets (keep on disk / host elsewhere)
+public/video/g1.MOV
+public/video/g2.MOV

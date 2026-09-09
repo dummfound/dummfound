@@ -7,6 +7,8 @@ const scrollToTop = () => {
   window.scrollTo({ top: 0, behavior: reduced ? "auto" : "smooth" });
 };
 
+const TG_APP_HREF = "https://t.me/dummfoundOSbot/app";
+
 export const SiteHeader = ({
   logoAria,
   navAria,
@@ -14,6 +16,7 @@ export const SiteHeader = ({
   menuLabel,
   drawerBackdropLabel,
   navLinks,
+  tgAppLabel,
   lang,
   onSetLang,
   radioOpen,
@@ -116,6 +119,16 @@ export const SiteHeader = ({
               {label}
             </Link>
           ))}
+          {tgAppLabel ? (
+            <a
+              href={TG_APP_HREF}
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={onCloseMenu}
+            >
+              {tgAppLabel}
+            </a>
+          ) : null}
         </nav>
       </div>
     </header>
