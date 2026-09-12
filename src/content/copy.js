@@ -122,6 +122,16 @@ export const COPY = {
         body: "Выступление во Владивостоке.",
       },
       {
+        slug: "voronezh-071126",
+        title: "Воронеж",
+        type: "Братания Тур",
+        typeNote: "совместно с WASTA",
+        date: "07.11.2026",
+        location: "Воронеж, Россия",
+        linkLabel: "подробнее",
+        body: "Выступление в Воронеже.",
+      },
+      {
         slug: "moscow-tba",
         title: "Москва",
         type: "Братания Тур",
@@ -290,6 +300,16 @@ export const COPY = {
         location: "Vladivostok, Russia",
         linkLabel: "details",
         body: "Live in Vladivostok.",
+      },
+      {
+        slug: "voronezh-071126",
+        title: "Voronezh",
+        type: "Bratania Tour",
+        typeNote: "with WASTA",
+        date: "07.11.2026",
+        location: "Voronezh, Russia",
+        linkLabel: "details",
+        body: "Live in Voronezh.",
       },
       {
         slug: "moscow-tba",
