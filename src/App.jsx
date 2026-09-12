@@ -10,7 +10,6 @@ import { SectionMusic } from "./components/SectionMusic";
 import { SiteFooter } from "./components/SiteFooter";
 import { SiteHeader } from "./components/SiteHeader";
 import { SkipLink } from "./components/SkipLink";
-import { TourIntro } from "./components/TourIntro";
 import { useLanguage } from "./hooks/useLanguage";
 import { useNavMenu } from "./hooks/useNavMenu";
 
@@ -73,9 +72,6 @@ const HomePage = () => {
     // heroPromoDate,
     // heroPromoCta,
     // heroPromoClose,
-    tourIntroTitle,
-    tourIntroClose,
-    tourIntroWait,
     aboutLabel,
     aboutP,
     musicLabel,
@@ -132,12 +128,6 @@ const HomePage = () => {
         menuOpen={menuOpen}
         onCloseMenu={closeMenu}
         onToggleMenu={toggleMenu}
-      />
-
-      <TourIntro
-        titleLabel={tourIntroTitle}
-        closeLabel={tourIntroClose}
-        waitLabel={tourIntroWait}
       />
 
       <main id="main">
