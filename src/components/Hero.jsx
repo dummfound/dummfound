@@ -8,17 +8,17 @@ const HERO_VIDEO = "/video/IMG_6766.mov";
 const HERO_VIDEO_MOBILE = "/video/mobile.MOV";
 const BRAND = "DUMMFOUND";
 const MOBILE_MQ = "(max-width: 768px)";
-const PREORDER_HREF = "https://progressive.enhncd.co/0703";
+// const PREORDER_HREF = "https://progressive.enhncd.co/0703";
 
 export const Hero = ({
   introLabel,
   ctaMusic,
   ctaBooking,
-  promoLabel,
-  promoTitle,
-  promoDate,
-  promoCta,
-  promoClose,
+  // promoLabel,
+  // promoTitle,
+  // promoDate,
+  // promoCta,
+  // promoClose,
 }) => {
   const [reduceMotion, setReduceMotion] = useState(false);
   const [isMobile, setIsMobile] = useState(() =>
@@ -27,11 +27,11 @@ export const Hero = ({
       : false
   );
   const [mediaReady, setMediaReady] = useState(false);
-  const [promoClosed, setPromoClosed] = useState(false);
-  const [promoEntered, setPromoEntered] = useState(false);
-  const [promoClosing, setPromoClosing] = useState(false);
+  // const [promoClosed, setPromoClosed] = useState(false);
+  // const [promoEntered, setPromoEntered] = useState(false);
+  // const [promoClosing, setPromoClosing] = useState(false);
   const ctasRef = useRef(null);
-  const promoRef = useRef(null);
+  // const promoRef = useRef(null);
 
   useEffect(() => {
     const motionMq = window.matchMedia("(prefers-reduced-motion: reduce)");
@@ -49,26 +49,26 @@ export const Hero = ({
     };
   }, []);
 
-  useEffect(() => {
-    if (promoClosed) return undefined;
-    if (reduceMotion) {
-      setPromoEntered(true);
-      return undefined;
-    }
-
-    setPromoEntered(false);
-    let cancelled = false;
-    const id = window.requestAnimationFrame(() => {
-      window.requestAnimationFrame(() => {
-        if (!cancelled) setPromoEntered(true);
-      });
-    });
-
-    return () => {
-      cancelled = true;
-      window.cancelAnimationFrame(id);
-    };
-  }, [promoClosed, reduceMotion]);
+  // useEffect(() => {
+  //   if (promoClosed) return undefined;
+  //   if (reduceMotion) {
+  //     setPromoEntered(true);
+  //     return undefined;
+  //   }
+  //
+  //   setPromoEntered(false);
+  //   let cancelled = false;
+  //   const id = window.requestAnimationFrame(() => {
+  //     window.requestAnimationFrame(() => {
+  //       if (!cancelled) setPromoEntered(true);
+  //     });
+  //   });
+  //
+  //   return () => {
+  //     cancelled = true;
+  //     window.cancelAnimationFrame(id);
+  //   };
+  // }, [promoClosed, reduceMotion]);
 
   useEffect(() => {
     if (reduceMotion) return undefined;
@@ -93,26 +93,25 @@ export const Hero = ({
     return () => ctx.revert();
   }, [reduceMotion]);
 
-  const dismissPromo = () => {
-    if (promoClosing || promoClosed) return;
-    if (reduceMotion) {
-      setPromoClosed(true);
-      return;
-    }
-    // Сброс инлайн-opacity, чтобы CSS-fade шёл на месте
-    if (promoRef.current) {
-      gsap.set(promoRef.current, { clearProps: "opacity" });
-    }
-    setPromoClosing(true);
-  };
-
-  const handlePromoTransitionEnd = (event) => {
-    if (!promoClosing) return;
-    if (event.target !== event.currentTarget) return;
-    if (event.propertyName !== "opacity") return;
-    setPromoClosed(true);
-    setPromoClosing(false);
-  };
+  // const dismissPromo = () => {
+  //   if (promoClosing || promoClosed) return;
+  //   if (reduceMotion) {
+  //     setPromoClosed(true);
+  //     return;
+  //   }
+  //   if (promoRef.current) {
+  //     gsap.set(promoRef.current, { clearProps: "opacity" });
+  //   }
+  //   setPromoClosing(true);
+  // };
+  //
+  // const handlePromoTransitionEnd = (event) => {
+  //   if (!promoClosing) return;
+  //   if (event.target !== event.currentTarget) return;
+  //   if (event.propertyName !== "opacity") return;
+  //   setPromoClosed(true);
+  //   setPromoClosing(false);
+  // };
 
   return (
     <section
@@ -165,6 +164,7 @@ export const Hero = ({
             </Link>
           </div>
 
+          {/* Предзаказ Together — временно выключен
           {!promoClosed ? (
             <aside
               ref={promoRef}
@@ -223,6 +223,7 @@ export const Hero = ({
               </div>
             </aside>
           ) : null}
+          */}
         </div>
       </div>
     </section>

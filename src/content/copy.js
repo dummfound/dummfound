@@ -28,6 +28,9 @@ export const COPY = {
     heroPromoDate: "11.09.26",
     heroPromoCta: "Предзаказ",
     heroPromoClose: "Скрыть",
+    tourIntroTitle: "Братания Тур",
+    tourIntroClose: "Закрыть",
+    tourIntroWait: "Закрыть через {n}",
     aboutLabel: "О проекте",
     aboutP:
       "Артист современной андеграунд-сцены, с релизами на барселонском Lone Romantic, московских СТВОЛ & System 108. Актуальная электронная музыка, экзистенциально вдохновленная жизнью и особенной атмосферой полумиллионного индустриального города в центре России.",
@@ -208,6 +211,9 @@ export const COPY = {
     heroPromoDate: "11.09.26",
     heroPromoCta: "Pre-order",
     heroPromoClose: "Hide",
+    tourIntroTitle: "Bratania Tour",
+    tourIntroClose: "Close",
+    tourIntroWait: "Close in {n}",
     aboutLabel: "About",
     aboutP:
       "Underground electronic artist with releases on Barcelona’s Lone Romantic and Moscow labels СТВОЛ & System 108. Contemporary dance music shaped by life and the atmosphere of a half‑million industrial city in central Russia.",

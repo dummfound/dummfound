@@ -10,6 +10,7 @@ import { SectionMusic } from "./components/SectionMusic";
 import { SiteFooter } from "./components/SiteFooter";
 import { SiteHeader } from "./components/SiteHeader";
 import { SkipLink } from "./components/SkipLink";
+import { TourIntro } from "./components/TourIntro";
 import { useLanguage } from "./hooks/useLanguage";
 import { useNavMenu } from "./hooks/useNavMenu";
 
@@ -67,11 +68,14 @@ const HomePage = () => {
     heroIntro,
     heroCtaMusic,
     heroCtaBooking,
-    heroPromoLabel,
-    heroPromoTitle,
-    heroPromoDate,
-    heroPromoCta,
-    heroPromoClose,
+    // heroPromoLabel,
+    // heroPromoTitle,
+    // heroPromoDate,
+    // heroPromoCta,
+    // heroPromoClose,
+    tourIntroTitle,
+    tourIntroClose,
+    tourIntroWait,
     aboutLabel,
     aboutP,
     musicLabel,
@@ -130,16 +134,22 @@ const HomePage = () => {
         onToggleMenu={toggleMenu}
       />
 
+      <TourIntro
+        titleLabel={tourIntroTitle}
+        closeLabel={tourIntroClose}
+        waitLabel={tourIntroWait}
+      />
+
       <main id="main">
         <Hero
           introLabel={heroIntro}
           ctaMusic={heroCtaMusic}
           ctaBooking={heroCtaBooking}
-          promoLabel={heroPromoLabel}
-          promoTitle={heroPromoTitle}
-          promoDate={heroPromoDate}
-          promoCta={heroPromoCta}
-          promoClose={heroPromoClose}
+          // promoLabel={heroPromoLabel}
+          // promoTitle={heroPromoTitle}
+          // promoDate={heroPromoDate}
+          // promoCta={heroPromoCta}
+          // promoClose={heroPromoClose}
         />
 
         <SectionAbout label={aboutLabel} body={aboutP} />
