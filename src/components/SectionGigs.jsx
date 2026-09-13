@@ -47,7 +47,7 @@ export const SectionGigs = ({ label, gigs = [], hint }) => {
                   </li>
                 ))}
               </ul>
-              <p className={styles.gigsTba}>{"& TBA"}</p>
+              <p className={styles.gigsTba}>{"& MORE TBA"}</p>
               {hint ? <p className={styles.gigsHint}>{hint}</p> : null}
             </div>
           </div>

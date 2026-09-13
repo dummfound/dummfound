@@ -7,7 +7,7 @@ import { SiteHeader } from "./SiteHeader";
 import { SkipLink } from "./SkipLink";
 import styles from "../styles.module.scss";
 
-const TOUR_BG = "/img/bratania-duo.jpg";
+const TOUR_BG = "/img/duocard.png";
 
 export const GigPage = ({
   gigs = [],
