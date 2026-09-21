@@ -55,28 +55,29 @@ export const Hero = ({
     if (!section) return undefined;
 
     const lockHeight = () => {
-      const raw = getComputedStyle(document.documentElement)
-        .getPropertyValue("--app-vh")
-        .trim();
-      const fromVar = Number.parseFloat(raw);
-      const h = Math.round(
-        Number.isFinite(fromVar) && fromVar > 0
-          ? fromVar
-          : window.visualViewport?.height || window.innerHeight || 0
-      );
+      // Never parseFloat CSS like "100svh" (→ 100px). Always measure px.
+      const vv = window.visualViewport?.height ?? 0;
+      const inner = window.innerHeight || 0;
+      const client = document.documentElement.clientHeight || 0;
+      const h = Math.round(Math.max(vv, inner, client));
       if (h > 0) {
         section.style.height = `${h}px`;
         section.style.minHeight = `${h}px`;
+        document.documentElement.style.setProperty("--app-vh", `${h}px`);
       }
+    };
+
+    const onOrientation = () => {
+      window.setTimeout(lockHeight, 250);
     };
 
     lockHeight();
     window.addEventListener("resize", lockHeight);
-    window.addEventListener("orientationchange", lockHeight);
+    window.addEventListener("orientationchange", onOrientation);
     window.visualViewport?.addEventListener("resize", lockHeight);
     return () => {
       window.removeEventListener("resize", lockHeight);
-      window.removeEventListener("orientationchange", lockHeight);
+      window.removeEventListener("orientationchange", onOrientation);
       window.visualViewport?.removeEventListener("resize", lockHeight);
       section.style.height = "";
       section.style.minHeight = "";

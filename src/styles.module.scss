@@ -97,39 +97,13 @@
   pointer-events: auto;
 }
 
-.chromeSafeTop {
-  display: flex;
-  width: 100%;
-  height: var(--chrome-safe-top);
-  min-height: var(--chrome-safe-top);
-  pointer-events: none;
-}
-
-.chromeSafeTopBrand {
-  flex: 0 0 auto;
-  min-width: var(--brand-col);
-  background: var(--c-brand);
-}
-
-.chromeSafeTopMenu {
-  flex: 0 0 auto;
-  min-width: var(--nav-col);
-  background: #b9bbbd;
-}
-
-.chromeSafeTopRest {
-  flex: 1 1 auto;
-  min-width: 0;
-  background: #0a0a0a;
-}
-
 .chromeBar {
   display: flex;
   align-items: stretch;
   width: 100%;
   box-sizing: border-box;
-  height: var(--chrome-h);
-  min-height: var(--chrome-h);
+  height: var(--chrome-offset);
+  min-height: var(--chrome-offset);
   padding-top: 0;
   font-family: var(--font-sans);
   font-size: 0.72rem;
@@ -144,8 +118,10 @@
   flex: 0 0 auto;
   display: inline-flex;
   align-items: center;
+  box-sizing: border-box;
   min-width: var(--brand-col);
-  padding: 0 0.85rem;
+  height: 100%;
+  padding: var(--chrome-safe-top) 0.85rem 0;
   background: var(--c-brand);
   color: #0a0a0a;
   text-decoration: none;
@@ -173,10 +149,12 @@
   outline: none;
   border-radius: 0;
   flex: 0 0 auto;
+  box-sizing: border-box;
   min-width: var(--nav-col);
+  height: 100%;
   align-items: center;
   justify-content: flex-start;
-  padding: 0 0.85rem;
+  padding: var(--chrome-safe-top) 0.85rem 0;
   background: #b9bbbd;
   color: #0a0a0a;
   cursor: pointer;
@@ -229,7 +207,7 @@
 
 .langSwitchBtn {
   margin: 0;
-  padding: 0 0.7rem;
+  padding: var(--chrome-safe-top) 0.7rem 0;
   border: none;
   outline: none;
   border-radius: 0;
@@ -261,8 +239,9 @@
 
 .radioTrigger {
   margin: 0;
-  padding: 0 0.95rem;
+  padding: var(--chrome-safe-top) 0.95rem 0;
   box-sizing: border-box;
+  height: 100%;
   border: none;
   outline: none;
   border-radius: 0;
@@ -306,28 +285,18 @@
 }
 
 @media (max-width: 768px) {
-  .chromeSafeTopBrand {
-    flex: 1 1 0;
-    min-width: 0;
-  }
-
-  .chromeSafeTopMenu {
-    flex: 1 1 0;
-    min-width: 0;
-  }
-
   .chromeBrand {
     min-width: 0;
     flex: 1 1 0;
     font-size: 0.78rem;
-    padding: 0 0.55rem;
+    padding: var(--chrome-safe-top) 0.55rem 0;
   }
 
   .chromeMenuBtn {
     flex: 1 1 0;
     min-width: 0;
     font-size: 0.72rem;
-    padding: 0 0.55rem;
+    padding: var(--chrome-safe-top) 0.55rem 0;
   }
 
   .langSwitch {
@@ -336,6 +305,10 @@
 
   .chromeSpacers {
     display: none;
+  }
+
+  .radioTrigger {
+    padding: var(--chrome-safe-top) 0.75rem 0;
   }
 }
 

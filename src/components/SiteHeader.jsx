@@ -54,11 +54,6 @@ export const SiteHeader = ({
 
   return (
     <header className={styles.siteHeader} data-accent={accent}>
-      <div className={styles.chromeSafeTop} aria-hidden="true">
-        <span className={styles.chromeSafeTopBrand} />
-        <span className={styles.chromeSafeTopMenu} />
-        <span className={styles.chromeSafeTopRest} />
-      </div>
       <div className={styles.chromeBar}>
         <Link
           className={styles.chromeBrand}

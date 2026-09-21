@@ -29,38 +29,28 @@ const measureEnvSafeTop = () => {
   return top;
 };
 
-const measureSvh = () => {
-  const probe = document.createElement("div");
-  probe.style.cssText =
-    "position:fixed;top:0;left:0;width:0;height:100vh;height:100svh;visibility:hidden;pointer-events:none";
-  document.documentElement.appendChild(probe);
-  const h = probe.offsetHeight || window.innerHeight || 0;
-  probe.remove();
-  return h;
-};
-
 const syncChromeSafeTop = () => {
   let top = measureEnvSafeTop();
-  const tallPhone = Math.max(screen.width, screen.height) >= 812;
-
-  // iPhone X+ / Dynamic Island: never trust a near-zero inset
-  if (isiPhone() && tallPhone) {
-    const floor = Math.max(screen.width, screen.height) >= 852 ? 59 : 47;
-    top = Math.max(top, floor);
+  // iPhone X+ sometimes reports 0 — keep Dynamic Island clear
+  if (isiPhone() && Math.max(screen.width, screen.height) >= 812 && top < 20) {
+    top = Math.max(screen.width, screen.height) >= 852 ? 59 : 47;
   }
-
   document.documentElement.style.setProperty("--chrome-safe-top", `${top}px`);
-  document.documentElement.classList.toggle("is-ios", isiPhone());
 };
 
-const syncAppVh = () => {
-  const svh = measureSvh();
+const readViewportHeight = () => {
   const vv = window.visualViewport?.height ?? 0;
   const inner = window.innerHeight || 0;
   const client = document.documentElement.clientHeight || 0;
-  // Prefer the largest reliable metric so the next section cannot peek
-  const h = Math.max(svh, vv, inner, client);
-  document.documentElement.style.setProperty("--app-vh", `${Math.round(h)}px`);
+  // Prefer the largest so the next section cannot peek under Safari chrome
+  return Math.round(Math.max(vv, inner, client));
+};
+
+const syncAppVh = () => {
+  const h = readViewportHeight();
+  if (h > 0) {
+    document.documentElement.style.setProperty("--app-vh", `${h}px`);
+  }
 };
 
 const syncViewportMetrics = () => {
