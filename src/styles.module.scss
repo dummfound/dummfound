@@ -104,6 +104,7 @@
   box-sizing: border-box;
   height: var(--chrome-offset);
   min-height: var(--chrome-offset);
+  padding-top: constant(safe-area-inset-top);
   padding-top: var(--chrome-safe-top);
   font-family: var(--font-sans);
   font-size: 0.72rem;
@@ -985,14 +986,17 @@
   position: relative;
   isolation: isolate;
   width: 100%;
-  height: var(--app-vh, 100dvh);
-  min-height: var(--app-vh, 100dvh);
+  box-sizing: border-box;
+  /* svh = full first screen with Safari chrome visible; never let About peek */
+  min-height: 100svh;
+  min-height: var(--app-vh, 100svh);
+  height: 100svh;
+  height: var(--app-vh, 100svh);
   border-bottom: none;
   overflow: hidden;
   display: flex;
   align-items: stretch;
   background: #0a0a0a;
-  box-sizing: border-box;
 }
 
 .heroBg {

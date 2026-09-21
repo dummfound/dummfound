@@ -17,14 +17,40 @@ import "./global.scss";
   link.href = href;
 }
 
+const syncChromeSafeTop = () => {
+  const probe = document.createElement("div");
+  probe.style.cssText =
+    "position:fixed;visibility:hidden;pointer-events:none;padding:env(safe-area-inset-top, 0px)";
+  document.documentElement.appendChild(probe);
+  let top = Number.parseFloat(getComputedStyle(probe).paddingTop) || 0;
+  probe.remove();
+
+  const isiPhone = /iPhone/.test(navigator.userAgent);
+  const tallPhone = Math.max(screen.width, screen.height) >= 812;
+  // iPhone X+ sometimes reports 0 without a reliable env() — keep island clear
+  if (isiPhone && tallPhone && top < 20) top = 47;
+
+  document.documentElement.style.setProperty("--chrome-safe-top", `${top}px`);
+};
+
 const syncAppVh = () => {
-  const h = window.visualViewport?.height ?? window.innerHeight;
+  const vv = window.visualViewport?.height ?? 0;
+  const inner = window.innerHeight || 0;
+  const client = document.documentElement.clientHeight || 0;
+  // Never undershoot: short hero lets the next section peek on iOS Safari
+  const h = Math.max(vv, inner, client);
   document.documentElement.style.setProperty("--app-vh", `${Math.round(h)}px`);
 };
-syncAppVh();
-window.addEventListener("resize", syncAppVh);
-window.addEventListener("orientationchange", syncAppVh);
-window.visualViewport?.addEventListener("resize", syncAppVh);
+
+const syncViewportMetrics = () => {
+  syncChromeSafeTop();
+  syncAppVh();
+};
+
+syncViewportMetrics();
+window.addEventListener("resize", syncViewportMetrics);
+window.addEventListener("orientationchange", syncViewportMetrics);
+window.visualViewport?.addEventListener("resize", syncViewportMetrics);
 window.visualViewport?.addEventListener("scroll", syncAppVh);
 
 try {
