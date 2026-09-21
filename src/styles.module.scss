@@ -89,7 +89,8 @@
   z-index: 200;
   min-width: 0;
   max-width: 100%;
-  background: transparent;
+  padding-top: var(--chrome-safe-top);
+  background: #0a0a0a;
   pointer-events: none;
 }
 
@@ -116,8 +117,8 @@
   align-items: stretch;
   width: 100%;
   box-sizing: border-box;
-  height: var(--chrome-offset);
-  min-height: var(--chrome-offset);
+  height: var(--chrome-h);
+  min-height: var(--chrome-h);
   padding-top: 0;
   font-family: var(--font-sans);
   font-size: 0.72rem;
@@ -135,7 +136,7 @@
   box-sizing: border-box;
   min-width: var(--brand-col);
   height: 100%;
-  padding: max(var(--chrome-safe-top), env(safe-area-inset-top, 0px)) 0.85rem 0;
+  padding: 0 0.85rem;
   background: var(--c-brand);
   color: #0a0a0a;
   text-decoration: none;
@@ -168,7 +169,7 @@
   height: 100%;
   align-items: center;
   justify-content: flex-start;
-  padding: max(var(--chrome-safe-top), env(safe-area-inset-top, 0px)) 0.85rem 0;
+  padding: 0 0.85rem;
   background: #b9bbbd;
   color: #0a0a0a;
   cursor: pointer;
@@ -221,7 +222,7 @@
 
 .langSwitchBtn {
   margin: 0;
-  padding: max(var(--chrome-safe-top), env(safe-area-inset-top, 0px)) 0.7rem 0;
+  padding: 0 0.7rem;
   border: none;
   outline: none;
   border-radius: 0;
@@ -253,7 +254,7 @@
 
 .radioTrigger {
   margin: 0;
-  padding: max(var(--chrome-safe-top), env(safe-area-inset-top, 0px)) 0.95rem 0;
+  padding: 0 0.95rem;
   box-sizing: border-box;
   height: 100%;
   border: none;
@@ -302,14 +303,14 @@
     min-width: 0;
     flex: 1 1 0;
     font-size: 0.78rem;
-    padding: max(var(--chrome-safe-top), env(safe-area-inset-top, 0px)) 0.55rem 0;
+    padding: 0 0.55rem;
   }
 
   .chromeMenuBtn {
     flex: 1 1 0;
     min-width: 0;
     font-size: 0.72rem;
-    padding: max(var(--chrome-safe-top), env(safe-area-inset-top, 0px)) 0.55rem 0;
+    padding: 0 0.55rem;
   }
 
   .langSwitch {
@@ -321,7 +322,7 @@
   }
 
   .radioTrigger {
-    padding: max(var(--chrome-safe-top), env(safe-area-inset-top, 0px)) 0.75rem 0;
+    padding: 0 0.75rem;
   }
 }
 
@@ -719,7 +720,7 @@
   display: flex;
   flex-direction: column;
   gap: 0;
-  flex: 1;
+  flex: 0 0 auto;
 }
 
 .navPanelLink,
@@ -730,11 +731,11 @@
   gap: 1rem;
   color: #0a0a0a;
   padding: 0 0.85rem;
-  min-height: 3.65rem;
-  flex: 1 1 0;
+  min-height: 4.25rem;
+  flex: 0 0 auto;
   border-bottom: none;
   text-decoration: none;
-  font-size: clamp(1.05rem, 4.8vw, 1.35rem);
+  font-size: clamp(1.15rem, 5.2vw, 1.45rem);
   letter-spacing: 0.06em;
   text-transform: uppercase;
   background: var(--bg);
@@ -773,7 +774,7 @@
   background: #0a0a0a;
   color: var(--bg);
   flex: 0 0 auto;
-  min-height: 3.65rem;
+  min-height: 4.25rem;
   margin-top: 0;
 }
 
@@ -810,7 +811,7 @@
 .navPanelLang {
   display: flex;
   flex: 0 0 auto;
-  min-height: 3.25rem;
+  min-height: 3.5rem;
 }
 
 .navPanelLangBtn {
@@ -928,7 +929,7 @@
   margin: 0;
   z-index: 45;
   box-sizing: border-box;
-  background: var(--bg);
+  background: #0a0a0a;
   border: none;
   border-radius: 0;
   box-shadow: none;
@@ -948,6 +949,7 @@
   padding-bottom: 0;
   display: flex;
   flex-direction: column;
+  justify-content: flex-start;
 }
 
 .navPanelOpen {
@@ -959,33 +961,55 @@
 }
 
 .navPanelNav {
-  flex: 1 1 auto;
-  min-height: 100%;
+  flex: 0 0 auto;
+  width: 100%;
   display: flex;
   flex-direction: column;
 }
 
 @media (max-width: 768px) {
+  .navPanelNav {
+    flex: 0 0 80%;
+    height: 80%;
+    max-height: 80%;
+    min-height: 0;
+  }
+
   .navPanelLink,
   .navPanelLinkExternal {
-    min-height: 4.15rem;
+    flex: 1 1 0;
+    min-height: 0;
+    font-size: 1.45rem;
   }
 
   .navPanelLang {
-    min-height: 3.5rem;
+    flex: 1 1 0;
+    min-height: 0;
   }
 }
 
 @media (min-width: 769px) {
+  .navPanelNav {
+    flex: 1 1 auto;
+    min-height: 0;
+    height: 100%;
+  }
+
   .navPanelLink,
   .navPanelLinkExternal {
-    min-height: 4.5rem;
-    font-size: 1.35rem;
+    flex: 1 1 0;
+    min-height: 0;
+    font-size: 1.45rem;
     padding: 0 1.25rem;
   }
 
+  .navPanelLinkExternal {
+    flex: 1 1 0;
+  }
+
   .navPanelLang {
-    min-height: 3.5rem;
+    flex: 1 1 0;
+    min-height: 0;
   }
 
   .navPanelLangBtn {
