@@ -5,7 +5,7 @@ import { BrandLoader } from "./BrandLoader";
 import { lockBodyScroll } from "../hooks/lockBodyScroll";
 import styles from "../styles.module.scss";
 
-const RADIO_VIDEOS = ["/video/g1.MOV", "/video/g2.MOV"];
+const RADIO_VIDEOS = ["/video/g1.mp4", "/video/g2.mp4"];
 /** Live HLS from The Lot Radio (Livepeer) — https://www.thelotradio.com/ */
 const LOT_STREAM_HLS =
   "https://livepeercdn.studio/hls/85c28sa2o8wppm58/index.m3u8";
