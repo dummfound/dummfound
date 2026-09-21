@@ -89,16 +89,14 @@
   z-index: 200;
   min-width: 0;
   max-width: 100%;
-  padding-top: var(--chrome-safe-top);
+  padding-top: 0;
   background: #0a0a0a;
   pointer-events: none;
-  /* Keep header on its own compositor layer above scroll content (iOS Safari) */
   transform: translate3d(0, 0, 0);
   -webkit-transform: translate3d(0, 0, 0);
   will-change: transform;
 }
 
-/* Cover iOS rubber-band overscroll above the chrome */
 .siteHeader::before {
   content: "";
   position: absolute;
@@ -123,9 +121,10 @@
   align-items: stretch;
   width: 100%;
   box-sizing: border-box;
-  height: var(--chrome-h);
-  min-height: var(--chrome-h);
-  padding-top: 0;
+  height: calc(var(--chrome-h) + var(--chrome-safe-top, 0px));
+  min-height: calc(var(--chrome-h) + var(--chrome-safe-top, 0px));
+  /* Safe-area on the bar: content row stays --chrome-h for clean flex centering */
+  padding-top: var(--chrome-safe-top, 0px);
   font-family: var(--font-sans);
   font-size: 0.72rem;
   font-weight: 700;
@@ -136,14 +135,24 @@
   isolation: isolate;
 }
 
+/* Pull colored cells into the safe-area so yellow/gray/black cover the island — not a black strip */
+@mixin chrome-cell-safe {
+  margin-top: calc(-1 * var(--chrome-safe-top, 0px));
+  height: calc(var(--chrome-h) + var(--chrome-safe-top, 0px));
+  min-height: calc(var(--chrome-h) + var(--chrome-safe-top, 0px));
+  padding-top: var(--chrome-safe-top, 0px);
+  box-sizing: border-box;
+}
+
 .chromeBrand {
   flex: 0 0 auto;
   display: inline-flex;
   align-items: center;
-  box-sizing: border-box;
+  @include chrome-cell-safe;
   min-width: var(--brand-col);
-  height: 100%;
-  padding: 0 0.85rem;
+  padding-right: 0.85rem;
+  padding-bottom: 0;
+  padding-left: 0.85rem;
   background: var(--c-brand);
   color: #0a0a0a;
   text-decoration: none;
@@ -171,12 +180,13 @@
   outline: none;
   border-radius: 0;
   flex: 0 0 auto;
-  box-sizing: border-box;
+  @include chrome-cell-safe;
   min-width: var(--nav-col);
-  height: 100%;
   align-items: center;
   justify-content: flex-start;
-  padding: 0 0.85rem;
+  padding-right: 0.85rem;
+  padding-bottom: 0;
+  padding-left: 0.85rem;
   background: #b9bbbd;
   color: #0a0a0a;
   cursor: pointer;
@@ -199,6 +209,7 @@
   display: flex;
   flex: 1 1 auto;
   min-width: 0;
+  @include chrome-cell-safe;
 }
 
 .chromeSpacer {
@@ -216,6 +227,7 @@
   align-items: stretch;
   flex-shrink: 0;
   margin-left: auto;
+  @include chrome-cell-safe;
 }
 
 .langSwitch {
@@ -229,7 +241,6 @@
 
 .langSwitchBtn {
   margin: 0;
-  padding: 0 0.7rem;
   border: none;
   outline: none;
   border-radius: 0;
@@ -241,6 +252,11 @@
   line-height: 1;
   box-shadow: none;
   filter: none;
+  display: inline-flex;
+  align-items: center;
+  height: 100%;
+  /* Trail already has chrome-cell-safe — only horizontal padding here */
+  padding: 0 0.7rem;
   @include hover-tint;
 }
 
@@ -261,9 +277,10 @@
 
 .radioTrigger {
   margin: 0;
+  /* Trail already has chrome-cell-safe — fill it, don't double-shift */
+  height: 100%;
   padding: 0 0.95rem;
   box-sizing: border-box;
-  height: 100%;
   border: none;
   outline: none;
   border-radius: 0;
@@ -310,14 +327,16 @@
     min-width: 0;
     flex: 1 1 0;
     font-size: 0.78rem;
-    padding: 0 0.55rem;
+    padding-right: 0.55rem;
+    padding-left: 0.55rem;
   }
 
   .chromeMenuBtn {
     flex: 1 1 0;
     min-width: 0;
     font-size: 0.72rem;
-    padding: 0 0.55rem;
+    padding-right: 0.55rem;
+    padding-left: 0.55rem;
   }
 
   .langSwitch {
@@ -329,7 +348,8 @@
   }
 
   .radioTrigger {
-    padding: 0 0.75rem;
+    padding-right: 0.75rem;
+    padding-left: 0.75rem;
   }
 }
 
