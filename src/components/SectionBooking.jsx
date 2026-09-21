@@ -13,7 +13,7 @@ export const SectionBooking = ({
   geoValue,
 }) => {
   return (
-    <section id="booking" className={styles.section}>
+    <section id="booking" className={styles.section} data-section="booking">
       <div className={styles.sectionInner}>
         <h2 className={styles.sectionLabel}>{label}</h2>
         <div className={`${styles.sectionBody} ${styles.prose}`}>

@@ -82,6 +82,8 @@ export const GigPage = ({
           />
         </div>
 
+        <div className={styles.gigPageSeam} aria-hidden="true" />
+
         <div className={styles.gigPageInner}>
           <Link className={styles.gigBack} to="/gigs">
             <IosBackIcon className={styles.gigBackIcon} />

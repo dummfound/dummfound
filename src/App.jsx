@@ -67,11 +67,8 @@ const HomePage = () => {
     heroIntro,
     heroCtaMusic,
     heroCtaBooking,
-    // heroPromoLabel,
-    // heroPromoTitle,
-    // heroPromoDate,
-    // heroPromoCta,
-    // heroPromoClose,
+    heroPromoTitle,
+    heroPromoClose,
     aboutLabel,
     aboutP,
     musicLabel,
@@ -135,11 +132,8 @@ const HomePage = () => {
           introLabel={heroIntro}
           ctaMusic={heroCtaMusic}
           ctaBooking={heroCtaBooking}
-          // promoLabel={heroPromoLabel}
-          // promoTitle={heroPromoTitle}
-          // promoDate={heroPromoDate}
-          // promoCta={heroPromoCta}
-          // promoClose={heroPromoClose}
+          promoTitle={heroPromoTitle}
+          promoClose={heroPromoClose}
         />
 
         <SectionAbout label={aboutLabel} body={aboutP} />

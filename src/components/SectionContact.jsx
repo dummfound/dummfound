@@ -1,4 +1,5 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useId, useState } from "react";
+import { createPortal } from "react-dom";
 import { ContactForm } from "./ContactForm";
 import { IosMailIcon } from "./IosMailIcon";
 import styles from "../styles.module.scss";
@@ -25,29 +26,104 @@ export const SectionContact = ({
   contactFormToggleOpen,
   contactFormToggleClose,
 }) => {
+  const titleId = useId();
   const [formOpen, setFormOpen] = useState(false);
-  const formPanelRef = useRef(null);
 
   useEffect(() => {
-    if (!formOpen || !formPanelRef.current) return undefined;
+    if (!formOpen) return undefined;
 
-    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    const id = window.setTimeout(
-      () => {
-        formPanelRef.current?.scrollIntoView({
-          behavior: reduced ? "auto" : "smooth",
-          block: "end",
-          inline: "nearest",
-        });
-      },
-      reduced ? 0 : 200
-    );
+    const prevOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
 
-    return () => window.clearTimeout(id);
+    const onKey = (event) => {
+      if (event.key === "Escape") setFormOpen(false);
+    };
+    document.addEventListener("keydown", onKey);
+
+    return () => {
+      document.body.style.overflow = prevOverflow;
+      document.removeEventListener("keydown", onKey);
+    };
   }, [formOpen]);
 
+  const drawer =
+    hasFormspree && formOpen && typeof document !== "undefined"
+      ? createPortal(
+          <div
+            className={`${styles.contactDrawerLayer} ${styles.contactDrawerLayerOpen}`}
+          >
+            <button
+              type="button"
+              className={`${styles.contactDrawerBackdrop} ${styles.isVisible}`}
+              aria-label={contactFormToggleClose}
+              onClick={() => setFormOpen(false)}
+            />
+            <div
+              id="contact-form-panel"
+              className={`${styles.contactDrawer} ${styles.contactDrawerOpen}`}
+              role="dialog"
+              aria-modal="true"
+              aria-labelledby={titleId}
+            >
+              <header className={styles.contactDrawerChrome}>
+                <h3 id={titleId} className={styles.contactDrawerTitle}>
+                  {contactFormToggleOpen}
+                </h3>
+                <button
+                  type="button"
+                  className={styles.contactDrawerClose}
+                  aria-label={contactFormToggleClose}
+                  onClick={() => setFormOpen(false)}
+                >
+                  <svg
+                    className={styles.contactDrawerCloseIcon}
+                    viewBox="0 0 16 16"
+                    aria-hidden="true"
+                    focusable="false"
+                  >
+                    <path
+                      d="M4 4l8 8M12 4L4 12"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="1.5"
+                      strokeLinecap="round"
+                    />
+                  </svg>
+                </button>
+              </header>
+              <div className={styles.contactDrawerBody}>
+                {contactFormIntro ? (
+                  <p className={styles.contactFormIntro}>{contactFormIntro}</p>
+                ) : null}
+                <ContactForm
+                  wide
+                  onSuccess={() => setFormOpen(false)}
+                  nameLabel={contactFormName}
+                  emailLabel={contactFormEmail}
+                  messageLabel={contactFormMessage}
+                  submitLabel={contactFormSubmit}
+                  sendingLabel={contactFormSending}
+                  successMessage={contactFormSuccess}
+                  errorMessage={contactFormError}
+                  helperText={contactFormHelper}
+                  validationSummary={contactFormValidationSummary}
+                  errorEmailRequired={contactFormErrorEmailRequired}
+                  errorEmailInvalid={contactFormErrorEmailInvalid}
+                  errorMessageRequired={contactFormErrorMessageRequired}
+                />
+              </div>
+            </div>
+          </div>,
+          document.body
+        )
+      : null;
+
   return (
-    <section id="contact" className={`${styles.section} ${styles.sectionContact}`}>
+    <section
+      id="contact"
+      className={`${styles.section} ${styles.sectionContact}`}
+      data-section="contact"
+    >
       <div className={styles.sectionInner}>
         <h2 className={styles.sectionLabel}>{label}</h2>
         <div className={styles.sectionBody}>
@@ -59,65 +135,18 @@ export const SectionContact = ({
             {hasFormspree ? (
               <button
                 type="button"
-                className={`${styles.contactFormToggle} ${formOpen ? styles.contactFormToggleOpen : ""}`}
+                className={styles.contactFormToggle}
                 aria-expanded={formOpen}
                 aria-controls="contact-form-panel"
-                onClick={() => setFormOpen((open) => !open)}
+                onClick={() => setFormOpen(true)}
               >
-                <span>
-                  {formOpen ? contactFormToggleClose : contactFormToggleOpen}
-                </span>
-                <svg
-                  className={styles.contactFormToggleIcon}
-                  viewBox="0 0 16 16"
-                  aria-hidden="true"
-                  focusable="false"
-                >
-                  <path
-                    d="M4 6l4 4 4-4"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="1.5"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  />
-                </svg>
+                <span>{contactFormToggleOpen}</span>
               </button>
             ) : null}
           </address>
-          {hasFormspree ? (
-            <div
-              ref={formPanelRef}
-              id="contact-form-panel"
-              className={`${styles.contactFormPanel} ${formOpen ? styles.contactFormPanelOpen : ""}`}
-              aria-hidden={!formOpen}
-              inert={!formOpen ? true : undefined}
-            >
-              <div className={styles.contactFormPanelClip}>
-                <div className={styles.contactFormPanelInner}>
-                  {contactFormIntro ? (
-                    <p className={styles.contactFormIntro}>{contactFormIntro}</p>
-                  ) : null}
-                  <ContactForm
-                    nameLabel={contactFormName}
-                    emailLabel={contactFormEmail}
-                    messageLabel={contactFormMessage}
-                    submitLabel={contactFormSubmit}
-                    sendingLabel={contactFormSending}
-                    successMessage={contactFormSuccess}
-                    errorMessage={contactFormError}
-                    helperText={contactFormHelper}
-                    validationSummary={contactFormValidationSummary}
-                    errorEmailRequired={contactFormErrorEmailRequired}
-                    errorEmailInvalid={contactFormErrorEmailInvalid}
-                    errorMessageRequired={contactFormErrorMessageRequired}
-                  />
-                </div>
-              </div>
-            </div>
-          ) : null}
         </div>
       </div>
+      {drawer}
     </section>
   );
 };

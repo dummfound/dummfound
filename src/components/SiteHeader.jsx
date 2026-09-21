@@ -1,5 +1,7 @@
 import { Link, useLocation } from "react-router-dom";
+import { OsAppIcon } from "./OsAppIcon";
 import { Radio } from "./Radio";
+import { ScrambleLink } from "./ScrambleLink";
 import styles from "../styles.module.scss";
 
 const scrollToTop = () => {
@@ -8,6 +10,16 @@ const scrollToTop = () => {
 };
 
 const TG_APP_HREF = "https://t.me/dummfoundOSbot/app";
+
+const pathAccent = (pathname) => {
+  if (pathname === "/") return "home";
+  if (pathname.startsWith("/about")) return "about";
+  if (pathname.startsWith("/music")) return "music";
+  if (pathname.startsWith("/booking")) return "booking";
+  if (pathname.startsWith("/gigs")) return "gigs";
+  if (pathname.startsWith("/contact")) return "contact";
+  return "home";
+};
 
 export const SiteHeader = ({
   logoAria,
@@ -30,37 +42,56 @@ export const SiteHeader = ({
   onToggleMenu,
 }) => {
   const location = useLocation();
+  const accent = pathAccent(location.pathname);
+  const isHome = location.pathname === "/";
 
   const handleLogoClick = () => {
     onCloseMenu();
-    if (location.pathname === "/") {
+    if (isHome) {
       scrollToTop();
     }
   };
 
   return (
-    <header className={styles.siteHeader}>
-      <div className={styles.headerInner}>
+    <header className={styles.siteHeader} data-accent={accent}>
+      <div className={styles.chromeBar}>
         <Link
-          className={styles.logo}
+          className={styles.chromeBrand}
           to="/"
           onClick={handleLogoClick}
           aria-label={logoAria}
         >
-          <h1 className={styles.logoWordmark}>DUMMFOUND</h1>
+          DUMMFOUND
         </Link>
-        <div className={styles.headerTrail}>
-          <nav className={styles.nav} aria-label={navAria}>
-            {navLinks.map(({ href, label }) => (
-              <Link key={href} to={href}>
-                {label}
-              </Link>
-            ))}
-          </nav>
-          <div className={styles.langSwitch} role="group" aria-label={langGroup}>
+
+        <button
+          type="button"
+          className={styles.chromeMenuBtn}
+          aria-expanded={menuOpen}
+          aria-controls="nav-panel"
+          aria-label={menuLabel}
+          onClick={onToggleMenu}
+        >
+          {menuLabel}
+        </button>
+
+        <div className={styles.chromeSpacers} aria-hidden="true">
+          <span className={styles.chromeSpacer} />
+          <span className={`${styles.chromeSpacer} ${styles.chromeSpacerDim}`} />
+          <span className={`${styles.chromeSpacer} ${styles.chromeSpacerDim}`} />
+        </div>
+
+        <div className={styles.chromeTrail}>
+          <div
+            className={styles.langSwitch}
+            role="group"
+            aria-label={langGroup}
+          >
             <button
               type="button"
-              className={`${styles.langSwitchBtn} ${lang === "ru" ? styles.isActive : ""}`}
+              className={`${styles.langSwitchBtn} ${
+                lang === "ru" ? styles.isActive : ""
+              }`}
               onClick={() => onSetLang("ru")}
               aria-pressed={lang === "ru"}
             >
@@ -68,7 +99,9 @@ export const SiteHeader = ({
             </button>
             <button
               type="button"
-              className={`${styles.langSwitchBtn} ${lang === "en" ? styles.isActive : ""}`}
+              className={`${styles.langSwitchBtn} ${
+                lang === "en" ? styles.isActive : ""
+              }`}
               onClick={() => onSetLang("en")}
               aria-pressed={lang === "en"}
             >
@@ -83,23 +116,14 @@ export const SiteHeader = ({
             pauseLabel={radioPause}
             volumeLabel={radioVolume}
           />
-          <button
-            type="button"
-            className={styles.navToggle}
-            aria-expanded={menuOpen}
-            aria-controls="nav-panel"
-            aria-label={menuLabel}
-            onClick={onToggleMenu}
-          >
-            <span className={styles.navToggleBar} />
-            <span className={styles.navToggleBar} />
-          </button>
         </div>
       </div>
 
       <button
         type="button"
-        className={`${styles.navDrawerBackdrop} ${menuOpen ? styles.isVisible : ""}`}
+        className={`${styles.navDrawerBackdrop} ${
+          menuOpen ? styles.isVisible : ""
+        }`}
         aria-label={drawerBackdropLabel}
         aria-hidden={!menuOpen}
         tabIndex={-1}
@@ -115,19 +139,57 @@ export const SiteHeader = ({
       >
         <nav className={styles.navPanelNav} aria-label={navAria}>
           {navLinks.map(({ href, label }) => (
-            <Link key={href} to={href} onClick={onCloseMenu}>
-              {label}
-            </Link>
+            <ScrambleLink
+              key={href}
+              text={label}
+              to={href}
+              className={styles.navPanelLink}
+              data-section={href === "/" ? "home" : href.slice(1)}
+              onClick={onCloseMenu}
+              end={
+                <span className={styles.navPanelArrow} aria-hidden="true">
+                  ↗
+                </span>
+              }
+            />
           ))}
+          <div className={styles.navPanelLang} role="group" aria-label={langGroup}>
+            <button
+              type="button"
+              className={`${styles.navPanelLangBtn} ${
+                lang === "ru" ? styles.isActive : ""
+              }`}
+              onClick={() => {
+                onSetLang("ru");
+              }}
+              aria-pressed={lang === "ru"}
+            >
+              RU
+            </button>
+            <button
+              type="button"
+              className={`${styles.navPanelLangBtn} ${
+                lang === "en" ? styles.isActive : ""
+              }`}
+              onClick={() => {
+                onSetLang("en");
+              }}
+              aria-pressed={lang === "en"}
+            >
+              EN
+            </button>
+          </div>
           {tgAppLabel ? (
-            <a
+            <ScrambleLink
+              external
+              text={tgAppLabel}
               href={TG_APP_HREF}
+              className={styles.navPanelLinkExternal}
               target="_blank"
               rel="noopener noreferrer"
               onClick={onCloseMenu}
-            >
-              {tgAppLabel}
-            </a>
+              end={<OsAppIcon className={styles.navPanelAppIcon} />}
+            />
           ) : null}
         </nav>
       </div>

@@ -22,7 +22,7 @@ try {
 } catch {
   /* ignore */
 }
-document.documentElement.dataset.theme = "dark";
+document.documentElement.dataset.theme = "light";
 
 const base = import.meta.env.BASE_URL;
 const routerBasename =

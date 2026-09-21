@@ -2,7 +2,7 @@ import styles from "../styles.module.scss";
 
 export const SectionAbout = ({ label, body }) => {
   return (
-    <section id="about" className={styles.section}>
+    <section id="about" className={styles.section} data-section="about">
       <div className={styles.sectionInner}>
         <h2 className={styles.sectionLabel}>{label}</h2>
         <div className={`${styles.sectionBody} ${styles.prose}`}>

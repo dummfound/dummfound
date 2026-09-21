@@ -28,8 +28,9 @@ export const useLanguage = () => {
   }, [lang]);
 
   const navLinks = useMemo(() => {
-    const { about, music, booking, contact, gigs } = t.nav;
+    const { home, about, music, booking, contact, gigs } = t.nav;
     return [
+      { href: "/", label: home },
       { href: "/about", label: about },
       { href: "/music", label: music },
       { href: "/booking", label: booking },

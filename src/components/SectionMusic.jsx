@@ -3,7 +3,7 @@ import styles from "../styles.module.scss";
 
 export const SectionMusic = ({ label, releases }) => {
   return (
-    <section id="music" className={styles.section}>
+    <section id="music" className={styles.section} data-section="music">
       <div className={styles.sectionInner}>
         <h2 className={styles.sectionLabel}>{label}</h2>
         <div className={styles.sectionBody}>

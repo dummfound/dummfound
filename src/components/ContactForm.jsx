@@ -7,6 +7,8 @@ const isValidEmail = (value) =>
   /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value.trim());
 
 export const ContactForm = ({
+  wide = false,
+  onSuccess,
   nameLabel,
   emailLabel,
   messageLabel,
@@ -92,6 +94,9 @@ export const ContactForm = ({
       if (res.ok) {
         setStatus("success");
         resetFormState();
+        window.setTimeout(() => {
+          onSuccess?.();
+        }, 5000);
       } else {
         setStatus("error");
       }
@@ -102,7 +107,7 @@ export const ContactForm = ({
 
   return (
     <form
-      className={styles.contactForm}
+      className={`${styles.contactForm}${wide ? ` ${styles.contactFormWide}` : ""}`}
       onSubmit={handleSubmit}
       noValidate
     >
@@ -110,103 +115,117 @@ export const ContactForm = ({
       {!isFormValid && status !== "success" ? (
         <p className={styles.contactFormHelper}>{helperText}</p>
       ) : null}
-      <div className={styles.contactField}>
-        <label className={styles.contactLabel} htmlFor="contact-name">
-          {nameLabel}
-        </label>
-        <input
-          id="contact-name"
-          className={styles.contactInput}
-          type="text"
-          name="name"
-          autoComplete="name"
-          value={name}
-          onChange={(e) => {
-            clearSubmitStatus();
-            setName(e.target.value);
-          }}
-        />
+
+      <div className={styles.contactFormWideLayout}>
+        <div className={styles.contactFormWideFields}>
+          <div className={styles.contactField}>
+            <label className={styles.contactLabel} htmlFor="contact-name">
+              {nameLabel}
+            </label>
+            <input
+              id="contact-name"
+              className={styles.contactInput}
+              type="text"
+              name="name"
+              autoComplete="name"
+              value={name}
+              onChange={(e) => {
+                clearSubmitStatus();
+                setName(e.target.value);
+              }}
+            />
+          </div>
+          <div className={styles.contactField}>
+            <label className={styles.contactLabel} htmlFor="contact-email">
+              {emailLabel}
+            </label>
+            <input
+              id="contact-email"
+              className={`${styles.contactInput} ${showEmailError ? styles.contactInputInvalid : ""}`}
+              type="email"
+              name="email"
+              autoComplete="email"
+              value={email}
+              onChange={(e) => {
+                clearSubmitStatus();
+                setEmail(e.target.value);
+              }}
+              onBlur={() => setEmailBlurred(true)}
+              aria-invalid={showEmailError}
+              aria-describedby={
+                showEmailError ? "contact-email-error" : undefined
+              }
+            />
+            {showEmailError ? (
+              <p id="contact-email-error" className={styles.contactFieldError}>
+                {!emailTrim ? errorEmailRequired : errorEmailInvalid}
+              </p>
+            ) : null}
+          </div>
+          <div
+            className={`${styles.contactField} ${styles.contactFieldMessage}`}
+          >
+            <label className={styles.contactLabel} htmlFor="contact-message">
+              {messageLabel}
+            </label>
+            <textarea
+              id="contact-message"
+              className={`${styles.contactTextarea} ${showMessageError ? styles.contactInputInvalid : ""}`}
+              name="message"
+              rows={wide ? 4 : 5}
+              value={message}
+              onChange={(e) => {
+                clearSubmitStatus();
+                setMessage(e.target.value);
+              }}
+              onBlur={() => setMessageBlurred(true)}
+              aria-invalid={showMessageError}
+              aria-describedby={
+                showMessageError ? "contact-message-error" : undefined
+              }
+            />
+            {showMessageError ? (
+              <p
+                id="contact-message-error"
+                className={styles.contactFieldError}
+              >
+                {errorMessageRequired}
+              </p>
+            ) : null}
+          </div>
+        </div>
+
+        <div className={styles.contactFormWideAside}>
+          <input
+            type="text"
+            name="_gotcha"
+            tabIndex={-1}
+            autoComplete="off"
+            className={styles.contactHoneypot}
+            aria-hidden="true"
+          />
+          {showSummary ? (
+            <p
+              className={styles.contactValidationSummary}
+              role="alert"
+              id="contact-form-summary"
+            >
+              {validationSummary}
+            </p>
+          ) : null}
+          <button
+            type="submit"
+            className={styles.contactSubmit}
+            disabled={status === "sending"}
+            aria-describedby={
+              !isFormValid && showSummary ? "contact-form-summary" : undefined
+            }
+          >
+            {status === "sending" ? sendingLabel : submitLabel}
+          </button>
+        </div>
       </div>
-      <div className={styles.contactField}>
-        <label className={styles.contactLabel} htmlFor="contact-email">
-          {emailLabel}
-        </label>
-        <input
-          id="contact-email"
-          className={`${styles.contactInput} ${showEmailError ? styles.contactInputInvalid : ""}`}
-          type="email"
-          name="email"
-          autoComplete="email"
-          value={email}
-          onChange={(e) => {
-            clearSubmitStatus();
-            setEmail(e.target.value);
-          }}
-          onBlur={() => setEmailBlurred(true)}
-          aria-invalid={showEmailError}
-          aria-describedby={
-            showEmailError ? "contact-email-error" : undefined
-          }
-        />
-        {showEmailError ? (
-          <p id="contact-email-error" className={styles.contactFieldError}>
-            {!emailTrim ? errorEmailRequired : errorEmailInvalid}
-          </p>
-        ) : null}
-      </div>
-      <div className={styles.contactField}>
-        <label className={styles.contactLabel} htmlFor="contact-message">
-          {messageLabel}
-        </label>
-        <textarea
-          id="contact-message"
-          className={`${styles.contactTextarea} ${showMessageError ? styles.contactInputInvalid : ""}`}
-          name="message"
-          rows={5}
-          value={message}
-          onChange={(e) => {
-            clearSubmitStatus();
-            setMessage(e.target.value);
-          }}
-          onBlur={() => setMessageBlurred(true)}
-          aria-invalid={showMessageError}
-          aria-describedby={
-            showMessageError ? "contact-message-error" : undefined
-          }
-        />
-        {showMessageError ? (
-          <p id="contact-message-error" className={styles.contactFieldError}>
-            {errorMessageRequired}
-          </p>
-        ) : null}
-      </div>
-      <input
-        type="text"
-        name="_gotcha"
-        tabIndex={-1}
-        autoComplete="off"
-        className={styles.contactHoneypot}
-        aria-hidden="true"
-      />
-      {showSummary ? (
-        <p
-          className={styles.contactValidationSummary}
-          role="alert"
-          id="contact-form-summary"
-        >
-          {validationSummary}
-        </p>
-      ) : null}
-      <button
-        type="submit"
-        className={styles.contactSubmit}
-        disabled={status === "sending"}
-        aria-describedby={
-          !isFormValid && showSummary ? "contact-form-summary" : undefined
-        }
-      >
-        {status === "sending" ? sendingLabel : submitLabel}
-      </button>
+
       {status === "success" || status === "error" ? (
         <p className={styles.gigsType} role="status" aria-live="polite">
           {status === "success" ? successMessage : errorMessage}
