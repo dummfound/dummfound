@@ -29,21 +29,33 @@ const measureEnvSafeTop = () => {
   return top;
 };
 
+/** Large viewport height — stays tall while Safari chrome is visible */
+const measureLvh = () => {
+  const probe = document.createElement("div");
+  probe.style.cssText =
+    "position:fixed;left:0;top:0;width:0;height:100vh;height:100dvh;height:100lvh;visibility:hidden;pointer-events:none";
+  document.documentElement.appendChild(probe);
+  const h = probe.offsetHeight || 0;
+  probe.remove();
+  return h;
+};
+
 const syncChromeSafeTop = () => {
   let top = measureEnvSafeTop();
-  // iPhone X+ sometimes reports 0 — keep Dynamic Island clear
-  if (isiPhone() && Math.max(screen.width, screen.height) >= 812 && top < 20) {
-    top = Math.max(screen.width, screen.height) >= 852 ? 59 : 47;
+  if (isiPhone() && Math.max(screen.width, screen.height) >= 812) {
+    const floor = Math.max(screen.width, screen.height) >= 852 ? 59 : 47;
+    top = Math.max(top, floor);
   }
   document.documentElement.style.setProperty("--chrome-safe-top", `${top}px`);
 };
 
 const readViewportHeight = () => {
+  const lvh = measureLvh();
   const vv = window.visualViewport?.height ?? 0;
   const inner = window.innerHeight || 0;
   const client = document.documentElement.clientHeight || 0;
-  // Prefer the largest so the next section cannot peek under Safari chrome
-  return Math.round(Math.max(vv, inner, client));
+  // Always prefer large viewport so About / drawer never peek under Safari UI
+  return Math.round(Math.max(lvh, vv, inner, client));
 };
 
 const syncAppVh = () => {
@@ -64,7 +76,6 @@ window.addEventListener("orientationchange", () => {
   window.setTimeout(syncViewportMetrics, 250);
 });
 window.visualViewport?.addEventListener("resize", syncViewportMetrics);
-window.visualViewport?.addEventListener("scroll", syncAppVh);
 
 try {
   localStorage.removeItem("dummfound-theme");

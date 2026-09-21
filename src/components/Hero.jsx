@@ -54,12 +54,22 @@ export const Hero = ({
     const section = sectionRef.current;
     if (!section) return undefined;
 
+    const measureLvh = () => {
+      const probe = document.createElement("div");
+      probe.style.cssText =
+        "position:fixed;left:0;top:0;width:0;height:100vh;height:100dvh;height:100lvh;visibility:hidden;pointer-events:none";
+      document.documentElement.appendChild(probe);
+      const h = probe.offsetHeight || 0;
+      probe.remove();
+      return h;
+    };
+
     const lockHeight = () => {
-      // Never parseFloat CSS like "100svh" (→ 100px). Always measure px.
+      const lvh = measureLvh();
       const vv = window.visualViewport?.height ?? 0;
       const inner = window.innerHeight || 0;
       const client = document.documentElement.clientHeight || 0;
-      const h = Math.round(Math.max(vv, inner, client));
+      const h = Math.round(Math.max(lvh, vv, inner, client));
       if (h > 0) {
         section.style.height = `${h}px`;
         section.style.minHeight = `${h}px`;

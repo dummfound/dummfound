@@ -47,7 +47,7 @@
   --chrome-h: 2.65rem;
   --chrome-safe-top: env(safe-area-inset-top, 0px);
   --chrome-offset: calc(var(--chrome-h) + var(--chrome-safe-top));
-  --app-vh: 100svh;
+  --app-vh: 100lvh;
   --brand-col: 9.5rem;
   --nav-col: 8.5rem;
   --space-xs: 0.5rem;
@@ -66,6 +66,16 @@
   }
 }
 
+/* iPhone / iOS Safari: never trust a zero inset before JS runs */
+@supports (-webkit-touch-callout: none) {
+  @media (max-width: 850px) {
+    :root {
+      --chrome-safe-top: max(47px, env(safe-area-inset-top, 0px));
+      --app-vh: 100lvh;
+    }
+  }
+}
+
 *,
 *::before,
 *::after {
@@ -75,6 +85,7 @@
 html {
   scroll-behavior: smooth;
   background: var(--bg);
+  overscroll-behavior-y: none;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -87,7 +98,7 @@ body {
   margin: 0;
   min-height: 100vh;
   min-height: 100svh;
-  min-height: var(--app-vh, 100svh);
+  min-height: var(--app-vh, 100lvh);
   background: var(--bg);
   color: var(--text);
   font-family: var(--font-sans);
@@ -97,6 +108,7 @@ body {
   letter-spacing: -0.01em;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  overscroll-behavior-y: none;
 }
 
 body::before {
