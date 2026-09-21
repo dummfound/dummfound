@@ -44,7 +44,7 @@
   --ios-highlight: transparent;
   --grain-opacity: 0.08;
 
-  --chrome-h: 2.65rem;
+  --chrome-h: 2.25rem;
   --chrome-safe-top: env(safe-area-inset-top, 0px);
   --chrome-offset: calc(var(--chrome-h) + var(--chrome-safe-top));
   --app-vh: 100lvh;
@@ -61,7 +61,7 @@
 
 @media (max-width: 768px) {
   :root {
-    --chrome-h: 2.35rem;
+    --chrome-h: 1.9rem;
     --brand-col: 0;
   }
 }
