@@ -133,6 +133,11 @@ body::after {
   min-width: 0;
 }
 
+main {
+  position: relative;
+  z-index: 1;
+}
+
 a {
   color: var(--text);
   text-decoration: none;
