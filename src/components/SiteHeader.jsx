@@ -37,7 +37,6 @@ export const SiteHeader = ({
   radioClose,
   radioPlay,
   radioPause,
-  radioVolume,
   menuOpen,
   onCloseMenu,
   onToggleMenu,
@@ -207,7 +206,6 @@ export const SiteHeader = ({
               closeLabel={radioClose}
               playLabel={radioPlay}
               pauseLabel={radioPause}
-              volumeLabel={radioVolume}
             />
           </div>
         </div>

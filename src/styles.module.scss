@@ -89,9 +89,9 @@
   z-index: 200;
   min-width: 0;
   max-width: 100%;
-  /* Safe-area stays black — colored chrome is only --chrome-h tall */
-  padding-top: var(--chrome-safe-top, 0px);
-  background: #0a0a0a;
+  /* DEX: fixed top-0 + h-16 — no safe-area padding pushing chrome down */
+  padding-top: 0;
+  background: transparent;
   pointer-events: none;
   transform: translate3d(0, 0, 0);
   -webkit-transform: translate3d(0, 0, 0);
@@ -383,6 +383,9 @@
   left: 0;
   right: 0;
   bottom: 0;
+  width: 100%;
+  height: var(--app-vh, 100lvh);
+  min-height: 100%;
   /* Above siteHeader (200) so radio fully covers chrome + Dynamic Island */
   z-index: 300;
   display: grid;
@@ -394,6 +397,7 @@
   transition:
     opacity 0.28s ease,
     visibility 0.28s ease;
+  background: #000;
 }
 
 .radioLayerOpen {
@@ -414,13 +418,15 @@
 }
 
 .radioWindow {
-  position: relative;
+  position: absolute;
+  inset: 0;
   z-index: 1;
   display: flex;
   flex-direction: column;
   width: 100%;
-  height: 100dvh;
-  max-height: 100dvh;
+  height: auto;
+  max-height: none;
+  min-height: 100%;
   /* Near-opaque so Safari composites under the notch (solid #000 clips) */
   background: rgba(0, 0, 0, 0.999);
   border: none;
@@ -432,8 +438,9 @@
     opacity 0.28s ease;
   backface-visibility: hidden;
   -webkit-backface-visibility: hidden;
-  /* Home Indicator safe zone on iPhone */
+  /* Home Indicator safe zone on iPhone — content inset, box still fills */
   padding-bottom: env(safe-area-inset-bottom, 0px);
+  box-sizing: border-box;
 }
 
 .radioLayerOpen .radioWindow {
@@ -518,9 +525,10 @@
   inset: 0;
   z-index: 2;
   display: flex;
+  flex-direction: column;
   align-items: flex-start;
-  justify-content: space-between;
-  gap: 1rem;
+  justify-content: flex-start;
+  gap: 0.75rem;
   padding: 1.35rem 1.25rem;
   background: linear-gradient(
     180deg,
@@ -538,28 +546,30 @@
 .radioInfo {
   display: flex;
   flex-direction: column;
-  gap: 0.45rem;
+  gap: 0.55rem;
   min-width: 0;
   max-width: min(100%, 28rem);
+  position: relative;
+  z-index: 1;
 }
 
 .radioLive {
   margin: 0;
   display: inline-flex;
   align-items: center;
-  gap: 0.4rem;
+  gap: 0.55rem;
   font-family: var(--font-sans);
-  font-size: 0.72rem;
-  font-weight: 600;
-  letter-spacing: 0.14em;
+  font-size: 1.15rem;
+  font-weight: 700;
+  letter-spacing: 0.16em;
   text-transform: uppercase;
   color: #fff;
   line-height: 1;
 }
 
 .radioLiveDot {
-  width: 0.42rem;
-  height: 0.42rem;
+  width: 0.7rem;
+  height: 0.7rem;
   border-radius: 50%;
   background: #e10600;
   flex-shrink: 0;
@@ -569,96 +579,32 @@
 .radioTime {
   margin: 0;
   font-family: var(--font-sans);
-  font-size: 0.62rem;
+  font-size: 0.72rem;
   font-weight: 500;
   letter-spacing: 0.08em;
   color: rgba(255, 255, 255, 0.62);
   font-variant-numeric: tabular-nums;
 }
 
-.radioVolume {
-  display: flex;
-  flex-direction: column;
-  gap: 0.28rem;
-  margin-top: 0.25rem;
-  max-width: 9rem;
-  position: relative;
-  z-index: 3;
-  touch-action: none;
-  -webkit-user-select: none;
-  user-select: none;
-}
-
-.radioVolumeLabel {
-  font-family: var(--font-sans);
-  font-size: 0.52rem;
-  font-weight: 600;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  color: rgba(255, 255, 255, 0.48);
-}
-
-/* Кастомный слайдер на @use-gesture/react (touch) — под iPhone */
-.radioVolumeSlider {
-  position: relative;
-  width: 100%;
-  height: 2rem;
-  margin: 0;
-  padding: 0.55rem 0;
-  box-sizing: border-box;
-  cursor: pointer;
-  touch-action: none;
-  outline: none;
-}
-
-.radioVolumeSlider:focus-visible .radioVolumeTrack {
-  border-color: #fff;
-}
-
-.radioVolumeTrack {
-  position: relative;
-  width: 100%;
-  height: 0.85rem;
-  border: 1px solid rgba(255, 255, 255, 0.55);
-  border-radius: 0;
-  background: transparent;
-  overflow: visible;
-}
-
-.radioVolumeFill {
-  position: absolute;
-  left: 0;
-  top: 0;
-  bottom: 0;
-  background: rgba(255, 255, 255, 0.22);
-  pointer-events: none;
-}
-
-.radioVolumeThumb {
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  width: 0.7rem;
-  background: #fff;
-  transform: translateX(-50%);
-  pointer-events: none;
-}
-
 .radioPlayBtn {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
   margin: 0;
   padding: 0;
-  width: 2.35rem;
-  height: 2.35rem;
+  width: 4.25rem;
+  height: 4.25rem;
   border: none;
   border-radius: 0;
   background: transparent;
   color: #fff;
   cursor: pointer;
   flex-shrink: 0;
-  align-self: flex-start;
   display: grid;
   place-items: center;
   box-sizing: border-box;
+  z-index: 2;
   @include hover-tint;
 }
 
@@ -674,20 +620,62 @@
 
 .radioPlayIcon {
   display: block;
-  width: 1.85rem;
-  height: 1.85rem;
+  width: 2.75rem;
+  height: 2.75rem;
+  transform-origin: center;
+  will-change: transform;
+  animation: radioPlayScale 2s ease-in-out infinite;
 }
 
 .radioPlayIconPlay {
   /* Треугольник визуально смещён влево — чуть двигаем к центру кнопки */
-  transform: translateX(0.08rem);
+  animation-name: radioPlayScaleShifted;
+}
+
+@keyframes radioPlayScale {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+
+  50% {
+    transform: scale(1.12);
+  }
+}
+
+@keyframes radioPlayScaleShifted {
+  0%,
+  100% {
+    transform: translateX(0.12rem) scale(1);
+  }
+
+  50% {
+    transform: translateX(0.12rem) scale(1.12);
+  }
+}
+
+.radioPlayBtn:active .radioPlayIcon {
+  animation: none;
+  transform: scale(0.88);
+  transition: transform 0.12s ease;
+}
+
+.radioPlayBtn:active .radioPlayIconPlay {
+  transform: translateX(0.12rem) scale(0.88);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .radioPlayBtn:hover .radioPlayIcon {
+    animation-duration: 1.35s;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
   .radioTriggerDot,
   .radioLiveDot,
   .radioLayer,
-  .radioWindow {
+  .radioWindow,
+  .radioPlayIcon {
     animation: none;
     transition: none;
   }
@@ -695,38 +683,59 @@
   .radioLayerOpen .radioWindow {
     transform: none;
   }
+
+  .radioPlayBtn:active .radioPlayIcon,
+  .radioPlayBtn:active .radioPlayIconPlay {
+    transform: none;
+  }
 }
 
 @media (max-width: 768px) {
   .radioWindow {
     width: 100%;
-    height: 100dvh;
-    max-height: 100dvh;
+    height: auto;
+    max-height: none;
+    min-height: 100%;
   }
 
   .radioStage {
     min-height: 0;
-    padding-bottom: env(safe-area-inset-bottom, 0px);
   }
 
   .radioLive {
-    font-size: 0.64rem;
+    font-size: 1.05rem;
   }
 
   .radioOverlay {
     padding: 1.25rem 1.2rem;
+  }
+
+  .radioPlayBtn {
+    width: 3.85rem;
+    height: 3.85rem;
+  }
+
+  .radioPlayIcon {
+    width: 2.45rem;
+    height: 2.45rem;
   }
 }
 
 @media (min-width: 769px) {
   .radioLayer {
     padding: 2rem;
+    height: 100%;
+    min-height: 0;
+    background: transparent;
   }
 
   .radioWindow {
+    position: relative;
+    inset: auto;
     width: min(52rem, 100%);
     height: auto;
     max-height: min(36rem, calc(100vh - 4rem));
+    min-height: 0;
     border: 1px solid rgba(255, 255, 255, 0.22);
     padding-bottom: 0;
   }

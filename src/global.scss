@@ -44,9 +44,11 @@
   --ios-highlight: transparent;
   --grain-opacity: 0.08;
 
-  --chrome-h: 2.25rem;
+  --chrome-h: 3.5rem;
   --chrome-safe-top: env(safe-area-inset-top, 0px);
-  --chrome-offset: calc(var(--chrome-h) + var(--chrome-safe-top));
+  /* DEX-style: bar from top:0, no separate safe-area slab */
+  --chrome-inset-top: 0px;
+  --chrome-offset: var(--chrome-h);
   --app-vh: 100lvh;
   --brand-col: 9.5rem;
   --nav-col: 8.5rem;
@@ -61,7 +63,10 @@
 
 @media (max-width: 768px) {
   :root {
-    --chrome-h: 1.9rem;
+    /* Match DEX nav: h-16 = 4rem from top:0 */
+    --chrome-h: 4rem;
+    --chrome-inset-top: 0px;
+    --chrome-offset: var(--chrome-h);
     --brand-col: 0;
   }
 }

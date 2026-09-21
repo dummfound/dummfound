@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useId, useRef, useState } from "react";
 import { createPortal } from "react-dom";
-import { useDrag } from "@use-gesture/react";
+import { lockBodyScroll } from "../hooks/lockBodyScroll";
 import styles from "../styles.module.scss";
 
 const RADIO_VIDEO = "/video/RADIO.MOV";
@@ -63,12 +63,9 @@ export const Radio = ({
   closeLabel,
   playLabel,
   pauseLabel,
-  volumeLabel,
 }) => {
   const titleId = useId();
-  const volumeLabelId = `${titleId}-vol`;
   const dialogRef = useRef(null);
-  const volumeTrackRef = useRef(null);
   const ctxRef = useRef(null);
   const gainRef = useRef(null);
   const bufferRef = useRef(null);
@@ -88,11 +85,9 @@ export const Radio = ({
   const [open, setOpen] = useState(false);
   const [playing, setPlaying] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [volume, setVolume] = useState(0.75);
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(NaN);
 
-  volumeRef.current = volume;
   playingRef.current = playing;
   playlistRef.current = playlist;
   trackIndexRef.current = trackIndex;
@@ -286,37 +281,6 @@ export const Radio = ({
     void startPlayback();
   };
 
-  const setVolumeFromClientX = useCallback(
-    (clientX) => {
-      const track = volumeTrackRef.current;
-      if (!track) return;
-      const rect = track.getBoundingClientRect();
-      if (rect.width <= 0) return;
-      const next = clamp01((clientX - rect.left) / rect.width);
-      volumeRef.current = next;
-      setVolume(next);
-      ensureContext();
-      applyVolume(next);
-    },
-    [applyVolume, ensureContext]
-  );
-
-  const bindVolume = useDrag(
-    ({ xy: [x], first, event }) => {
-      if (first) {
-        event?.preventDefault?.();
-        ensureContext();
-      }
-      setVolumeFromClientX(x);
-    },
-    {
-      axis: "x",
-      filterTaps: false,
-      pointer: { touch: true, capture: true },
-      eventOptions: { passive: false },
-    }
-  );
-
   useEffect(() => {
     let cancelled = false;
     fetch(`${audioBase()}music/tracks.json`)
@@ -370,8 +334,7 @@ export const Radio = ({
     };
     document.addEventListener("keydown", onKey);
 
-    const prevOverflow = document.body.style.overflow;
-    document.body.style.overflow = "hidden";
+    const unlockScroll = lockBodyScroll();
 
     const previouslyFocused = document.activeElement;
     const closeBtn = dialogRef.current?.querySelector(`[data-radio-close]`);
@@ -379,7 +342,7 @@ export const Radio = ({
 
     return () => {
       document.removeEventListener("keydown", onKey);
-      document.body.style.overflow = prevOverflow;
+      unlockScroll();
       if (
         previouslyFocused instanceof HTMLElement &&
         document.contains(previouslyFocused)
@@ -405,8 +368,6 @@ export const Radio = ({
 
   const openRadio = () => setOpen(true);
   const closeRadio = () => setOpen(false);
-
-  const volumePercent = `${Math.round(volume * 100)}%`;
 
   const windowNode =
     typeof document !== "undefined"
@@ -500,66 +461,6 @@ export const Radio = ({
                       <span aria-hidden="true"> / </span>
                       {formatTime(duration)}
                     </p>
-                    <div className={styles.radioVolume}>
-                      <span
-                        className={styles.radioVolumeLabel}
-                        id={volumeLabelId}
-                      >
-                        {volumeLabel}
-                      </span>
-                      <div
-                        ref={volumeTrackRef}
-                        className={styles.radioVolumeSlider}
-                        role="slider"
-                        tabIndex={0}
-                        aria-valuemin={0}
-                        aria-valuemax={100}
-                        aria-valuenow={Math.round(volume * 100)}
-                        aria-valuetext={volumePercent}
-                        aria-labelledby={volumeLabelId}
-                        style={{ touchAction: "none" }}
-                        {...bindVolume()}
-                        onKeyDown={(event) => {
-                          let next = volume;
-                          if (
-                            event.key === "ArrowRight" ||
-                            event.key === "ArrowUp"
-                          ) {
-                            next = clamp01(volume + 0.05);
-                          } else if (
-                            event.key === "ArrowLeft" ||
-                            event.key === "ArrowDown"
-                          ) {
-                            next = clamp01(volume - 0.05);
-                          } else if (event.key === "Home") {
-                            next = 0;
-                          } else if (event.key === "End") {
-                            next = 1;
-                          } else {
-                            return;
-                          }
-                          event.preventDefault();
-                          volumeRef.current = next;
-                          setVolume(next);
-                          ensureContext();
-                          applyVolume(next);
-                        }}
-                      >
-                        <div
-                          className={styles.radioVolumeTrack}
-                          aria-hidden="true"
-                        >
-                          <div
-                            className={styles.radioVolumeFill}
-                            style={{ width: volumePercent }}
-                          />
-                          <div
-                            className={styles.radioVolumeThumb}
-                            style={{ left: volumePercent }}
-                          />
-                        </div>
-                      </div>
-                    </div>
                   </div>
 
                   <button
