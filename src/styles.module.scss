@@ -449,42 +449,83 @@
 }
 
 .radioChrome {
-  display: grid;
-  grid-template-columns: 1fr auto;
-  align-items: center;
-  gap: 0.75rem;
-  padding: calc(env(safe-area-inset-top, 0px) + 1.15rem) 1.25rem 0.85rem;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.14);
+  display: flex;
+  align-items: stretch;
+  flex-shrink: 0;
+  gap: 0;
+  padding: env(safe-area-inset-top, 0px) 0 0;
+  border-bottom: none;
   background: #0a0a0a;
 }
 
 .radioChromeTitle {
   margin: 0;
-  font-family: var(--font-sans);
-  font-size: 0.68rem;
-  font-weight: 600;
-  letter-spacing: 0.16em;
+  flex: 1 1 auto;
+  min-width: 0;
+  min-height: 3.35rem;
+  display: inline-flex;
+  align-items: center;
+  padding: 0 1.25rem;
+  box-sizing: border-box;
+  font-family: var(--font-display);
+  font-size: clamp(0.95rem, 3.6vw, 1.2rem);
+  font-weight: 800;
+  letter-spacing: 0.06em;
   text-transform: uppercase;
-  color: var(--text-muted);
+  line-height: 1;
+  color: #0a0a0a;
+  background: var(--c-brand);
+}
+
+.radioOnAir {
+  margin: 0;
+  flex: 0 0 auto;
+  min-height: 3.35rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0 1.05rem;
+  box-sizing: border-box;
+  font-family: var(--font-sans);
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  line-height: 1;
+  color: #fff;
+  background: #e10600;
+}
+
+.radioLiveDot {
+  width: 0.55rem;
+  height: 0.55rem;
+  border-radius: 50%;
+  background: #fff;
+  flex-shrink: 0;
+  animation: radioLivePulse 1.8s ease-in-out infinite;
 }
 
 .radioClose {
   margin: 0;
-  padding: 0.4rem;
+  flex: 0 0 auto;
+  min-width: 3.35rem;
+  min-height: 3.35rem;
+  padding: 0 1.1rem;
   border: none;
   border-radius: 0;
-  background: transparent;
-  color: var(--text-muted);
+  background: #0a0a0a;
+  color: #f2f2f2;
   cursor: pointer;
   display: grid;
   place-items: center;
+  box-sizing: border-box;
   @include hover-tint;
 }
 
 .radioClose:hover {
-  color: var(--text);
-  background: transparent;
-  opacity: 0.8;
+  color: var(--c-brand);
+  background: #111;
+  opacity: 1;
 }
 
 .radioClose:focus-visible {
@@ -492,9 +533,17 @@
 }
 
 .radioCloseIcon {
-  width: 0.7rem;
-  height: 0.7rem;
+  width: 0.85rem;
+  height: 0.85rem;
   display: block;
+}
+
+.radioAudio {
+  position: absolute;
+  width: 0;
+  height: 0;
+  opacity: 0;
+  pointer-events: none;
 }
 
 .radioStage {
@@ -553,29 +602,6 @@
   z-index: 1;
 }
 
-.radioLive {
-  margin: 0;
-  display: inline-flex;
-  align-items: center;
-  gap: 0.55rem;
-  font-family: var(--font-sans);
-  font-size: 1.15rem;
-  font-weight: 700;
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
-  color: #fff;
-  line-height: 1;
-}
-
-.radioLiveDot {
-  width: 0.7rem;
-  height: 0.7rem;
-  border-radius: 50%;
-  background: #e10600;
-  flex-shrink: 0;
-  animation: radioLivePulse 1.8s ease-in-out infinite;
-}
-
 .radioTime {
   margin: 0;
   font-family: var(--font-sans);
@@ -593,8 +619,8 @@
   transform: translate(-50%, -50%);
   margin: 0;
   padding: 0;
-  width: 4.25rem;
-  height: 4.25rem;
+  width: 7.5rem;
+  height: 7.5rem;
   border: none;
   border-radius: 0;
   background: transparent;
@@ -620,8 +646,8 @@
 
 .radioPlayIcon {
   display: block;
-  width: 2.75rem;
-  height: 2.75rem;
+  width: 5rem;
+  height: 5rem;
   transform-origin: center;
   will-change: transform;
   animation: radioPlayScale 2s ease-in-out infinite;
@@ -639,29 +665,29 @@
   }
 
   50% {
-    transform: scale(1.12);
+    transform: scale(1.1);
   }
 }
 
 @keyframes radioPlayScaleShifted {
   0%,
   100% {
-    transform: translateX(0.12rem) scale(1);
+    transform: translateX(0.2rem) scale(1);
   }
 
   50% {
-    transform: translateX(0.12rem) scale(1.12);
+    transform: translateX(0.2rem) scale(1.1);
   }
 }
 
 .radioPlayBtn:active .radioPlayIcon {
   animation: none;
-  transform: scale(0.88);
+  transform: scale(0.9);
   transition: transform 0.12s ease;
 }
 
 .radioPlayBtn:active .radioPlayIconPlay {
-  transform: translateX(0.12rem) scale(0.88);
+  transform: translateX(0.2rem) scale(0.9);
 }
 
 @media (hover: hover) and (pointer: fine) {
@@ -702,8 +728,10 @@
     min-height: 0;
   }
 
-  .radioLive {
-    font-size: 1.05rem;
+  .radioOnAir {
+    min-height: 3.1rem;
+    font-size: 0.72rem;
+    padding: 0 0.85rem;
   }
 
   .radioOverlay {
@@ -711,13 +739,13 @@
   }
 
   .radioPlayBtn {
-    width: 3.85rem;
-    height: 3.85rem;
+    width: 6.5rem;
+    height: 6.5rem;
   }
 
   .radioPlayIcon {
-    width: 2.45rem;
-    height: 2.45rem;
+    width: 4.25rem;
+    height: 4.25rem;
   }
 }
 
@@ -741,7 +769,22 @@
   }
 
   .radioChrome {
-    padding: 0.85rem 1.25rem;
+    padding-top: 0;
+  }
+
+  .radioChromeTitle {
+    min-height: 3.1rem;
+    font-size: 1.05rem;
+    padding: 0 1.1rem;
+  }
+
+  .radioOnAir {
+    min-height: 3.1rem;
+  }
+
+  .radioClose {
+    min-width: 3.1rem;
+    min-height: 3.1rem;
   }
 
   .radioStage {
@@ -1126,6 +1169,23 @@
   opacity: 1;
 }
 
+.brandLoader {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1.1rem;
+}
+
+.brandLoaderText {
+  font-family: var(--font-sans);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--c-brand);
+}
+
 .heroLoader {
   position: absolute;
   inset: 0;
@@ -1134,55 +1194,19 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 1rem;
   background: #050505;
   pointer-events: none;
 }
 
-.heroLoaderSpinner {
+.radioLoader {
+  position: absolute;
+  inset: 0;
+  z-index: 5;
   display: flex;
-  align-items: flex-end;
+  align-items: center;
   justify-content: center;
-  gap: 0.35rem;
-  height: 2rem;
-}
-
-.heroLoaderSpinner span {
-  display: block;
-  width: 0.35rem;
-  height: 100%;
-  background: var(--c-brand);
-  transform-origin: center bottom;
-  animation: heroLoaderBeat 0.7s ease-in-out infinite;
-}
-
-.heroLoaderSpinner span:nth-child(2) {
-  animation-delay: 0.12s;
-}
-
-.heroLoaderSpinner span:nth-child(3) {
-  animation-delay: 0.24s;
-}
-
-.heroLoaderText {
-  font-family: var(--font-sans);
-  font-size: 0.68rem;
-  font-weight: 700;
-  letter-spacing: 0.22em;
-  text-transform: uppercase;
-  color: rgba(242, 242, 242, 0.72);
-}
-
-@keyframes heroLoaderBeat {
-  0%,
-  100% {
-    transform: scaleY(0.35);
-    opacity: 0.45;
-  }
-  50% {
-    transform: scaleY(1);
-    opacity: 1;
-  }
+  background: rgba(0, 0, 0, 0.55);
+  pointer-events: none;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -1190,12 +1214,6 @@
   .heroBgImg {
     opacity: 1;
     transition: none;
-  }
-
-  .heroLoaderSpinner span {
-    animation: none;
-    transform: scaleY(1);
-    opacity: 1;
   }
 }
 

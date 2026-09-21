@@ -1,60 +1,22 @@
-import { useCallback, useEffect, useId, useRef, useState } from "react";
+import { useEffect, useId, useRef, useState } from "react";
 import { createPortal } from "react-dom";
+import Hls from "hls.js";
+import { BrandLoader } from "./BrandLoader";
 import { lockBodyScroll } from "../hooks/lockBodyScroll";
 import styles from "../styles.module.scss";
 
-const RADIO_VIDEO = "/video/RADIO.MOV";
-const EXCLUDED_TRACK_FILES = new Set(["together.mp3"]);
-
-const audioBase = () => import.meta.env.BASE_URL.replace(/\/?$/, "/");
+const RADIO_VIDEOS = ["/video/g1.MOV", "/video/g2.MOV"];
+/** Live HLS from The Lot Radio (Livepeer) — https://www.thelotradio.com/ */
+const LOT_STREAM_HLS =
+  "https://livepeercdn.studio/hls/85c28sa2o8wppm58/index.m3u8";
+const RETRY_MS = 5000;
+const BUFFER_LOADER_MS = 2500;
 
 function formatTime(seconds) {
   if (!Number.isFinite(seconds) || seconds < 0) return "–:––";
   const m = Math.floor(seconds / 60);
   const s = Math.floor(seconds % 60);
   return `${m}:${String(s).padStart(2, "0")}`;
-}
-
-function clamp01(value) {
-  return Math.min(1, Math.max(0, value));
-}
-
-function normalizeTracks(data) {
-  if (!Array.isArray(data)) return [];
-  return data
-    .map((item) => {
-      if (typeof item === "string") {
-        const file = item.trim();
-        if (!file) return null;
-        return { file, title: file.replace(/\.mp3$/i, "") };
-      }
-      const file = item?.file || item?.src;
-      if (typeof file !== "string" || !file.trim()) return null;
-      const trimmed = file.trim();
-      const title =
-        typeof item?.title === "string" && item.title.trim()
-          ? item.title.trim()
-          : trimmed.replace(/\.mp3$/i, "");
-      return { file: trimmed, title };
-    })
-    .filter(
-      (track) =>
-        track && !EXCLUDED_TRACK_FILES.has(track.file.toLowerCase())
-    );
-}
-
-/** Fisher–Yates: новый порядок при каждой загрузке страницы */
-function shuffleTracks(tracks) {
-  const out = [...tracks];
-  for (let i = out.length - 1; i > 0; i -= 1) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [out[i], out[j]] = [out[j], out[i]];
-  }
-  return out;
-}
-
-function trackUrl(file) {
-  return `${audioBase()}music/${encodeURIComponent(file)}`;
 }
 
 export const Radio = ({
@@ -66,271 +28,256 @@ export const Radio = ({
 }) => {
   const titleId = useId();
   const dialogRef = useRef(null);
-  const ctxRef = useRef(null);
-  const gainRef = useRef(null);
-  const bufferRef = useRef(null);
-  const bufferFileRef = useRef(null);
-  const sourceRef = useRef(null);
-  const prefetchRef = useRef(null);
-  const prefetchFileRef = useRef(null);
-  const startedAtRef = useRef(0);
-  const rafRef = useRef(0);
-  const volumeRef = useRef(0.75);
+  const audioRef = useRef(null);
+  const hlsRef = useRef(null);
+  const retryRef = useRef(0);
+  const bufferLoaderRef = useRef(0);
+  const wantPlayRef = useRef(false);
   const playingRef = useRef(false);
-  const playlistRef = useRef([]);
-  const trackIndexRef = useRef(0);
-  const startPlaybackRef = useRef(null);
-  const [playlist, setPlaylist] = useState([]);
-  const [trackIndex, setTrackIndex] = useState(0);
   const [open, setOpen] = useState(false);
   const [playing, setPlaying] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [reconnecting, setReconnecting] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
-  const [duration, setDuration] = useState(NaN);
+  const [streamReady, setStreamReady] = useState(false);
+  const [bgIndex, setBgIndex] = useState(0);
 
   playingRef.current = playing;
-  playlistRef.current = playlist;
-  trackIndexRef.current = trackIndex;
 
-  const applyVolume = useCallback((value) => {
-    const gain = gainRef.current;
-    if (gain) gain.gain.value = clamp01(value);
-  }, []);
-
-  /*
-   * На iPhone MediaElementSource часто НЕ ведёт звук через Web Audio:
-   * GainNode крутится вхолостую, а играет сам <audio>.
-   * Поэтому играем через AudioBufferSourceNode + GainNode.
-   */
-  const ensureContext = useCallback(() => {
-    const AC = window.AudioContext || window.webkitAudioContext;
-    if (!AC) return null;
-
-    if (!ctxRef.current) {
-      const ctx = new AC();
-      const gain = ctx.createGain();
-      gain.gain.value = volumeRef.current;
-      gain.connect(ctx.destination);
-      ctxRef.current = ctx;
-      gainRef.current = gain;
+  const clearRetry = () => {
+    if (retryRef.current) {
+      window.clearTimeout(retryRef.current);
+      retryRef.current = 0;
     }
+  };
 
-    const ctx = ctxRef.current;
-    if (ctx.state === "suspended") {
-      void ctx.resume();
+  const clearBufferLoader = () => {
+    if (bufferLoaderRef.current) {
+      window.clearTimeout(bufferLoaderRef.current);
+      bufferLoaderRef.current = 0;
     }
-    return ctx;
-  }, []);
+  };
 
-  const stopSource = useCallback(() => {
-    const source = sourceRef.current;
-    if (!source) return;
-    try {
-      source.onended = null;
-      source.stop();
-    } catch {
-      /* уже остановлен */
+  const destroyHls = () => {
+    if (hlsRef.current) {
+      hlsRef.current.destroy();
+      hlsRef.current = null;
     }
-    try {
-      source.disconnect();
-    } catch {
-      /* ignore */
-    }
-    sourceRef.current = null;
-  }, []);
+  };
 
-  const stopClock = useCallback(() => {
-    if (rafRef.current) {
-      cancelAnimationFrame(rafRef.current);
-      rafRef.current = 0;
-    }
-  }, []);
-
-  const tick = useCallback(() => {
-    if (!playingRef.current) return;
-    const ctx = ctxRef.current;
-    const buffer = bufferRef.current;
-    if (ctx && buffer?.duration) {
-      const elapsed = Math.min(
-        buffer.duration,
-        Math.max(0, ctx.currentTime - startedAtRef.current)
-      );
-      setCurrentTime(elapsed);
-    }
-    rafRef.current = requestAnimationFrame(tick);
-  }, []);
-
-  const startClock = useCallback(() => {
-    stopClock();
-    rafRef.current = requestAnimationFrame(tick);
-  }, [stopClock, tick]);
-
-  const clearDecodedTrack = useCallback(() => {
-    bufferRef.current = null;
-    bufferFileRef.current = null;
-    prefetchRef.current = null;
-    prefetchFileRef.current = null;
-    setDuration(NaN);
-  }, []);
-
-  const loadBuffer = useCallback(async (file) => {
-    if (!file) throw new Error("no track file");
-    if (bufferRef.current && bufferFileRef.current === file) {
-      return bufferRef.current;
-    }
-
-    const ctx = ctxRef.current;
-    if (!ctx) throw new Error("no audio context");
-
-    if (!prefetchRef.current || prefetchFileRef.current !== file) {
-      prefetchFileRef.current = file;
-      prefetchRef.current = fetch(trackUrl(file)).then((res) => {
-        if (!res.ok) throw new Error("track fetch failed");
-        return res.arrayBuffer();
-      });
-    }
-
-    const bytes = await prefetchRef.current;
-    const buffer = await ctx.decodeAudioData(bytes.slice(0));
-    bufferRef.current = buffer;
-    bufferFileRef.current = file;
-    setDuration(buffer.duration);
-    return buffer;
-  }, []);
-
-  const playNextTrack = useCallback(() => {
-    const list = playlistRef.current;
-    if (!list.length) return;
-    const next = (trackIndexRef.current + 1) % list.length;
-    trackIndexRef.current = next;
-    setTrackIndex(next);
-    clearDecodedTrack();
-    void startPlaybackRef.current?.(list[next]?.file);
-  }, [clearDecodedTrack]);
-
-  const startSource = useCallback(() => {
-    const ctx = ctxRef.current;
-    const gain = gainRef.current;
-    const buffer = bufferRef.current;
-    if (!ctx || !gain || !buffer) return;
-
-    stopSource();
-    applyVolume(volumeRef.current);
-
-    const source = ctx.createBufferSource();
-    source.buffer = buffer;
-    source.loop = false;
-    source.connect(gain);
-    source.onended = () => {
-      if (!playingRef.current) return;
-      playNextTrack();
-    };
-    source.start(0);
-    startedAtRef.current = ctx.currentTime;
-    sourceRef.current = source;
-    setCurrentTime(0);
-    startClock();
-  }, [applyVolume, playNextTrack, startClock, stopSource]);
-
-  const stopPlayback = useCallback(() => {
-    stopClock();
-    stopSource();
-    setCurrentTime(0);
-    setPlaying(false);
-    playingRef.current = false;
-  }, [stopClock, stopSource]);
-
-  const startPlayback = useCallback(
-    async (fileOverride) => {
-      /* Контекст — синхронно в жесте, иначе iOS не unlock’нет звук. */
-      const ctx = ensureContext();
-      if (!ctx) return;
-
-      const file =
-        fileOverride ||
-        playlistRef.current[trackIndexRef.current]?.file;
-      if (!file) return;
-
-      setLoading(true);
-      try {
-        await loadBuffer(file);
-        if (ctx.state === "suspended") {
-          await ctx.resume();
-        }
-        startSource();
-        setPlaying(true);
-        playingRef.current = true;
-      } catch {
-        stopPlayback();
-      } finally {
-        setLoading(false);
-      }
-    },
-    [ensureContext, loadBuffer, startSource, stopPlayback]
-  );
-
-  startPlaybackRef.current = startPlayback;
-
-  const togglePlay = () => {
-    if (playing || loading) {
-      stopPlayback();
+  const scheduleReconnect = () => {
+    if (!wantPlayRef.current) {
       setLoading(false);
+      setReconnecting(false);
       return;
     }
-    if (!playlistRef.current.length) return;
+    clearRetry();
+    clearBufferLoader();
+    setReconnecting(true);
+    setLoading(true);
+    setPlaying(false);
+    playingRef.current = false;
+    retryRef.current = window.setTimeout(() => {
+      const audio = audioRef.current;
+      if (!audio || !wantPlayRef.current) return;
+      attachStream(audio);
+      void audio.play().catch(() => {
+        /* next retry / user */
+      });
+    }, RETRY_MS);
+  };
+
+  const attachStream = (media) => {
+    destroyHls();
+    setStreamReady(false);
+    setLoading(true);
+
+    if (media.canPlayType("application/vnd.apple.mpegurl")) {
+      media.onerror = () => {
+        if (wantPlayRef.current) scheduleReconnect();
+      };
+      media.src = LOT_STREAM_HLS;
+      const onReady = () => {
+        setStreamReady(true);
+        setReconnecting(false);
+        setLoading(false);
+      };
+      media.addEventListener("loadedmetadata", onReady, { once: true });
+      media.load();
+      return;
+    }
+
+    if (Hls.isSupported()) {
+      const hls = new Hls({
+        enableWorker: true,
+        lowLatencyMode: false,
+        backBufferLength: 30,
+        maxBufferLength: 45,
+        maxMaxBufferLength: 90,
+        manifestLoadingMaxRetry: 8,
+        levelLoadingMaxRetry: 8,
+        fragLoadingMaxRetry: 8,
+      });
+      hlsRef.current = hls;
+      hls.loadSource(LOT_STREAM_HLS);
+      hls.attachMedia(media);
+      hls.on(Hls.Events.MANIFEST_PARSED, () => {
+        setStreamReady(true);
+        setReconnecting(false);
+        setLoading(false);
+      });
+      hls.on(Hls.Events.ERROR, (_event, data) => {
+        if (!data.fatal) return;
+        if (data.type === Hls.ErrorTypes.NETWORK_ERROR) {
+          // Soft recover — no UI reconnect storm
+          hls.startLoad();
+          return;
+        }
+        if (data.type === Hls.ErrorTypes.MEDIA_ERROR) {
+          hls.recoverMediaError();
+          return;
+        }
+        destroyHls();
+        scheduleReconnect();
+      });
+      return;
+    }
+
+    setStreamReady(false);
+    scheduleReconnect();
+  };
+
+  const stopPlayback = () => {
+    wantPlayRef.current = false;
+    clearRetry();
+    clearBufferLoader();
+    const audio = audioRef.current;
+    if (audio) {
+      audio.pause();
+      audio.onerror = null;
+    }
+    setPlaying(false);
+    playingRef.current = false;
+    setLoading(false);
+    setReconnecting(false);
+  };
+
+  const startPlayback = async () => {
+    const audio = audioRef.current;
+    if (!audio) return;
+
+    wantPlayRef.current = true;
+    setLoading(true);
+    setReconnecting(false);
+    try {
+      if (!audio.src && !hlsRef.current) {
+        attachStream(audio);
+      }
+      await audio.play();
+      setPlaying(true);
+      playingRef.current = true;
+      setReconnecting(false);
+      setLoading(false);
+    } catch (err) {
+      // Abort/NotAllowed — not a dead stream
+      const name = err?.name || "";
+      if (name === "AbortError" || name === "NotAllowedError") {
+        setLoading(false);
+        return;
+      }
+      scheduleReconnect();
+    }
+  };
+
+  const togglePlay = () => {
+    if (playing || (loading && !reconnecting)) {
+      stopPlayback();
+      return;
+    }
     void startPlayback();
   };
 
+  const openRadio = () => {
+    setBgIndex(0);
+    setOpen(true);
+  };
+  const closeRadio = () => {
+    stopPlayback();
+    setOpen(false);
+  };
+
   useEffect(() => {
-    let cancelled = false;
-    fetch(`${audioBase()}music/tracks.json`)
-      .then((res) => (res.ok ? res.json() : []))
-      .then((data) => {
-        if (cancelled) return;
-        const list = normalizeTracks(data);
-        const ordered = list.length ? shuffleTracks(list) : list;
-        playlistRef.current = ordered;
-        trackIndexRef.current = 0;
-        setPlaylist(ordered);
-        setTrackIndex(0);
-      })
-      .catch(() => {
-        if (!cancelled) {
-          playlistRef.current = [];
-          setPlaylist([]);
-        }
-      });
+    if (!open) return undefined;
+    const audio = audioRef.current;
+    if (audio) attachStream(audio);
+
     return () => {
-      cancelled = true;
+      wantPlayRef.current = false;
+      clearRetry();
+      clearBufferLoader();
+      stopPlayback();
+      destroyHls();
+      if (audio) {
+        audio.removeAttribute("src");
+        audio.load();
+      }
+      setStreamReady(false);
+      setCurrentTime(0);
+      setReconnecting(false);
     };
-  }, []);
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- attach once per open
+  }, [open]);
 
-  /* Подгружаем текущий трек при открытии окна, чтобы play не ждал сеть. */
   useEffect(() => {
-    if (!open) return;
-    const file = playlist[trackIndex]?.file;
-    if (!file) return;
-    if (prefetchRef.current && prefetchFileRef.current === file) return;
+    const audio = audioRef.current;
+    if (!audio) return undefined;
 
-    prefetchFileRef.current = file;
-    prefetchRef.current = fetch(trackUrl(file))
-      .then((res) => {
-        if (!res.ok) throw new Error("track fetch failed");
-        return res.arrayBuffer();
-      })
-      .catch(() => {
-        if (prefetchFileRef.current === file) {
-          prefetchRef.current = null;
-          prefetchFileRef.current = null;
-        }
-      });
-  }, [open, playlist, trackIndex]);
+    const onTime = () => setCurrentTime(audio.currentTime || 0);
+    const onPlaying = () => {
+      clearBufferLoader();
+      setPlaying(true);
+      playingRef.current = true;
+      setLoading(false);
+      setReconnecting(false);
+    };
+    const onPause = () => {
+      setPlaying(false);
+      playingRef.current = false;
+    };
+    // Live HLS buffers often — only show loader after a long wait
+    const onWaiting = () => {
+      clearBufferLoader();
+      bufferLoaderRef.current = window.setTimeout(() => {
+        if (wantPlayRef.current) setLoading(true);
+      }, BUFFER_LOADER_MS);
+    };
+    const onCanPlay = () => {
+      clearBufferLoader();
+      setLoading(false);
+      setReconnecting(false);
+    };
+
+    audio.addEventListener("timeupdate", onTime);
+    audio.addEventListener("playing", onPlaying);
+    audio.addEventListener("pause", onPause);
+    audio.addEventListener("waiting", onWaiting);
+    audio.addEventListener("canplay", onCanPlay);
+
+    return () => {
+      clearBufferLoader();
+      audio.removeEventListener("timeupdate", onTime);
+      audio.removeEventListener("playing", onPlaying);
+      audio.removeEventListener("pause", onPause);
+      audio.removeEventListener("waiting", onWaiting);
+      audio.removeEventListener("canplay", onCanPlay);
+    };
+  }, [open]);
 
   useEffect(() => {
     if (!open) return undefined;
 
     const onKey = (event) => {
-      if (event.key === "Escape") setOpen(false);
+      if (event.key === "Escape") closeRadio();
     };
     document.addEventListener("keydown", onKey);
 
@@ -352,22 +299,9 @@ export const Radio = ({
     };
   }, [open]);
 
-  useEffect(
-    () => () => {
-      stopClock();
-      stopSource();
-      const ctx = ctxRef.current;
-      if (ctx) {
-        void ctx.close();
-        ctxRef.current = null;
-        gainRef.current = null;
-      }
-    },
-    [stopClock, stopSource]
-  );
-
-  const openRadio = () => setOpen(true);
-  const closeRadio = () => setOpen(false);
+  const showLoader =
+    open && (reconnecting || (loading && !playing) || (!streamReady && !playing));
+  const onAir = playing && streamReady && !reconnecting;
 
   const windowNode =
     typeof document !== "undefined"
@@ -398,6 +332,15 @@ export const Radio = ({
                 <h2 id={titleId} className={styles.radioChromeTitle}>
                   {titleLabel}
                 </h2>
+                {onAir ? (
+                  <p className={styles.radioOnAir}>
+                    <span
+                      className={styles.radioLiveDot}
+                      aria-hidden="true"
+                    />
+                    ON AIR
+                  </p>
+                ) : null}
                 <button
                   type="button"
                   className={styles.radioClose}
@@ -424,15 +367,17 @@ export const Radio = ({
                 <div className={styles.radioMedia} aria-hidden="true">
                   {open ? (
                     <video
-                      key={RADIO_VIDEO}
+                      key={RADIO_VIDEOS[bgIndex]}
                       className={styles.radioVideo}
-                      src={RADIO_VIDEO}
+                      src={RADIO_VIDEOS[bgIndex]}
                       muted
                       defaultMuted
-                      loop
                       playsInline
                       autoPlay
                       preload="metadata"
+                      onEnded={() =>
+                        setBgIndex((i) => (i + 1) % RADIO_VIDEOS.length)
+                      }
                       onLoadedMetadata={(event) => {
                         event.currentTarget.muted = true;
                         event.currentTarget.volume = 0;
@@ -445,55 +390,71 @@ export const Radio = ({
                   ) : null}
                 </div>
 
+                <audio
+                  ref={audioRef}
+                  className={styles.radioAudio}
+                  playsInline
+                  preload="none"
+                />
+
                 <div className={styles.radioOverlay}>
                   <div className={styles.radioInfo}>
-                    {playing ? (
-                      <p className={styles.radioLive}>
-                        <span
-                          className={styles.radioLiveDot}
-                          aria-hidden="true"
-                        />
-                        LIVE
-                      </p>
-                    ) : null}
                     <p className={styles.radioTime}>
-                      {formatTime(currentTime)}
-                      <span aria-hidden="true"> / </span>
-                      {formatTime(duration)}
+                      {playing || loading
+                        ? formatTime(currentTime)
+                        : streamReady
+                          ? "RADIO"
+                          : "…"}
                     </p>
                   </div>
 
-                  <button
-                    type="button"
-                    className={styles.radioPlayBtn}
-                    onClick={togglePlay}
-                    aria-label={
-                      loading ? playLabel : playing ? pauseLabel : playLabel
-                    }
-                    aria-busy={loading || undefined}
-                  >
-                    {playing ? (
-                      <svg
-                        className={styles.radioPlayIcon}
-                        viewBox="0 0 16 16"
-                        aria-hidden="true"
-                      >
-                        <rect x="1.5" y="1.5" width="13" height="13" fill="currentColor" />
-                      </svg>
-                    ) : (
-                      <svg
-                        className={`${styles.radioPlayIcon} ${styles.radioPlayIconPlay}`}
-                        viewBox="0 0 16 16"
-                        aria-hidden="true"
-                      >
-                        <path
-                          d="M2.2 1.2 L14.2 8 L2.2 14.8 Z"
-                          fill="currentColor"
-                        />
-                      </svg>
-                    )}
-                  </button>
+                  {!showLoader ? (
+                    <button
+                      type="button"
+                      className={styles.radioPlayBtn}
+                      onClick={togglePlay}
+                      aria-label={
+                        loading ? playLabel : playing ? pauseLabel : playLabel
+                      }
+                      aria-busy={loading || undefined}
+                    >
+                      {playing ? (
+                        <svg
+                          className={styles.radioPlayIcon}
+                          viewBox="0 0 16 16"
+                          aria-hidden="true"
+                        >
+                          <rect
+                            x="1.5"
+                            y="1.5"
+                            width="13"
+                            height="13"
+                            fill="currentColor"
+                          />
+                        </svg>
+                      ) : (
+                        <svg
+                          className={`${styles.radioPlayIcon} ${styles.radioPlayIconPlay}`}
+                          viewBox="0 0 16 16"
+                          aria-hidden="true"
+                        >
+                          <path
+                            d="M2.2 1.2 L14.2 8 L2.2 14.8 Z"
+                            fill="currentColor"
+                          />
+                        </svg>
+                      )}
+                    </button>
+                  ) : null}
                 </div>
+
+                {showLoader ? (
+                  <div className={styles.radioLoader}>
+                    <BrandLoader
+                      label={reconnecting ? "RECONNECTING" : "LOADING"}
+                    />
+                  </div>
+                ) : null}
               </div>
             </div>
           </div>,

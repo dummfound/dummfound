@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { BrandLoader } from "./BrandLoader";
 import { RevealText, REVEAL_EASE } from "./RevealText";
 import styles from "../styles.module.scss";
 
@@ -389,13 +390,8 @@ export const Hero = ({
       ) : null}
 
       {showLoader ? (
-        <div className={styles.heroLoader} role="status" aria-live="polite">
-          <div className={styles.heroLoaderSpinner} aria-hidden="true">
-            <span />
-            <span />
-            <span />
-          </div>
-          <span className={styles.heroLoaderText}>LOADING</span>
+        <div className={styles.heroLoader}>
+          <BrandLoader />
         </div>
       ) : null}
 
