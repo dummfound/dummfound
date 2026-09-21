@@ -17,28 +17,49 @@ import "./global.scss";
   link.href = href;
 }
 
-const syncChromeSafeTop = () => {
+const isiPhone = () => /iPhone|iPod/.test(navigator.userAgent);
+
+const measureEnvSafeTop = () => {
   const probe = document.createElement("div");
   probe.style.cssText =
-    "position:fixed;visibility:hidden;pointer-events:none;padding:env(safe-area-inset-top, 0px)";
+    "position:fixed;visibility:hidden;pointer-events:none;padding-top:constant(safe-area-inset-top);padding-top:env(safe-area-inset-top, 0px)";
   document.documentElement.appendChild(probe);
-  let top = Number.parseFloat(getComputedStyle(probe).paddingTop) || 0;
+  const top = Number.parseFloat(getComputedStyle(probe).paddingTop) || 0;
   probe.remove();
+  return top;
+};
 
-  const isiPhone = /iPhone/.test(navigator.userAgent);
+const measureSvh = () => {
+  const probe = document.createElement("div");
+  probe.style.cssText =
+    "position:fixed;top:0;left:0;width:0;height:100vh;height:100svh;visibility:hidden;pointer-events:none";
+  document.documentElement.appendChild(probe);
+  const h = probe.offsetHeight || window.innerHeight || 0;
+  probe.remove();
+  return h;
+};
+
+const syncChromeSafeTop = () => {
+  let top = measureEnvSafeTop();
   const tallPhone = Math.max(screen.width, screen.height) >= 812;
-  // iPhone X+ sometimes reports 0 without a reliable env() — keep island clear
-  if (isiPhone && tallPhone && top < 20) top = 47;
+
+  // iPhone X+ / Dynamic Island: never trust a near-zero inset
+  if (isiPhone() && tallPhone) {
+    const floor = Math.max(screen.width, screen.height) >= 852 ? 59 : 47;
+    top = Math.max(top, floor);
+  }
 
   document.documentElement.style.setProperty("--chrome-safe-top", `${top}px`);
+  document.documentElement.classList.toggle("is-ios", isiPhone());
 };
 
 const syncAppVh = () => {
+  const svh = measureSvh();
   const vv = window.visualViewport?.height ?? 0;
   const inner = window.innerHeight || 0;
   const client = document.documentElement.clientHeight || 0;
-  // Never undershoot: short hero lets the next section peek on iOS Safari
-  const h = Math.max(vv, inner, client);
+  // Prefer the largest reliable metric so the next section cannot peek
+  const h = Math.max(svh, vv, inner, client);
   document.documentElement.style.setProperty("--app-vh", `${Math.round(h)}px`);
 };
 
@@ -49,7 +70,9 @@ const syncViewportMetrics = () => {
 
 syncViewportMetrics();
 window.addEventListener("resize", syncViewportMetrics);
-window.addEventListener("orientationchange", syncViewportMetrics);
+window.addEventListener("orientationchange", () => {
+  window.setTimeout(syncViewportMetrics, 250);
+});
 window.visualViewport?.addEventListener("resize", syncViewportMetrics);
 window.visualViewport?.addEventListener("scroll", syncAppVh);
 

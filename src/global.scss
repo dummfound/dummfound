@@ -63,6 +63,8 @@
   :root {
     --chrome-h: 2.35rem;
     --brand-col: 0;
+    /* Floor until JS measures — prevents island overlap before hydrate */
+    --chrome-safe-top: max(47px, env(safe-area-inset-top, 0px));
   }
 }
 

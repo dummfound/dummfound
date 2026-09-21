@@ -14,6 +14,7 @@ const BRAND = "DUMMFOUND";
 const MOBILE_MQ = "(max-width: 768px)";
 const TOUR_POSTER = "/img/brataniya-tour-poster.jpg";
 const PROMO_SECONDS = 10;
+const VIDEO_LOAD_TIMEOUT_MS = 8000;
 
 export const Hero = ({
   introLabel,
@@ -28,11 +29,12 @@ export const Hero = ({
       ? window.matchMedia(MOBILE_MQ).matches
       : false
   );
-  const [mediaReady, setMediaReady] = useState(false);
   const [promoClosed, setPromoClosed] = useState(false);
   const [promoEntered, setPromoEntered] = useState(false);
   const [promoClosing, setPromoClosing] = useState(false);
   const [promoSeconds, setPromoSeconds] = useState(PROMO_SECONDS);
+  const [videoReady, setVideoReady] = useState(false);
+  const [loadTimedOut, setLoadTimedOut] = useState(false);
   const sectionRef = useRef(null);
   const bgRef = useRef(null);
   const fadeRef = useRef(null);
@@ -40,6 +42,46 @@ export const Hero = ({
   const ctasScrollRef = useRef(null);
   const ctasRef = useRef(null);
   const promoRef = useRef(null);
+  const videoRef = useRef(null);
+
+  const videoSrc = isMobile ? HERO_VIDEO_MOBILE : HERO_VIDEO;
+  const heroMediaReady = reduceMotion || videoReady || loadTimedOut;
+  const showPromo = !promoClosed;
+  const showLoader = promoClosed && !heroMediaReady;
+  const showHeroCopy = promoClosed && heroMediaReady;
+
+  useEffect(() => {
+    const section = sectionRef.current;
+    if (!section) return undefined;
+
+    const lockHeight = () => {
+      const raw = getComputedStyle(document.documentElement)
+        .getPropertyValue("--app-vh")
+        .trim();
+      const fromVar = Number.parseFloat(raw);
+      const h = Math.round(
+        Number.isFinite(fromVar) && fromVar > 0
+          ? fromVar
+          : window.visualViewport?.height || window.innerHeight || 0
+      );
+      if (h > 0) {
+        section.style.height = `${h}px`;
+        section.style.minHeight = `${h}px`;
+      }
+    };
+
+    lockHeight();
+    window.addEventListener("resize", lockHeight);
+    window.addEventListener("orientationchange", lockHeight);
+    window.visualViewport?.addEventListener("resize", lockHeight);
+    return () => {
+      window.removeEventListener("resize", lockHeight);
+      window.removeEventListener("orientationchange", lockHeight);
+      window.visualViewport?.removeEventListener("resize", lockHeight);
+      section.style.height = "";
+      section.style.minHeight = "";
+    };
+  }, []);
 
   useEffect(() => {
     const motionMq = window.matchMedia("(prefers-reduced-motion: reduce)");
@@ -48,7 +90,6 @@ export const Hero = ({
     const syncMobile = () => setIsMobile(mobileMq.matches);
     syncMotion();
     syncMobile();
-    setMediaReady(true);
     motionMq.addEventListener("change", syncMotion);
     mobileMq.addEventListener("change", syncMobile);
     return () => {
@@ -56,6 +97,47 @@ export const Hero = ({
       mobileMq.removeEventListener("change", syncMobile);
     };
   }, []);
+
+  // Preload hero video during promo so it is ready when poster closes
+  useEffect(() => {
+    if (reduceMotion) {
+      setVideoReady(true);
+      return undefined;
+    }
+
+    setVideoReady(false);
+    setLoadTimedOut(false);
+
+    const preload = document.createElement("video");
+    preload.muted = true;
+    preload.playsInline = true;
+    preload.preload = "auto";
+    preload.src = videoSrc;
+
+    let settled = false;
+    const markReady = () => {
+      if (settled) return;
+      settled = true;
+      setVideoReady(true);
+    };
+
+    preload.addEventListener("canplaythrough", markReady);
+    preload.addEventListener("loadeddata", markReady);
+    preload.load();
+
+    const timeoutId = window.setTimeout(() => {
+      setLoadTimedOut(true);
+    }, VIDEO_LOAD_TIMEOUT_MS);
+
+    return () => {
+      settled = true;
+      window.clearTimeout(timeoutId);
+      preload.removeEventListener("canplaythrough", markReady);
+      preload.removeEventListener("loadeddata", markReady);
+      preload.removeAttribute("src");
+      preload.load();
+    };
+  }, [videoSrc, reduceMotion]);
 
   useEffect(() => {
     if (promoClosed) return undefined;
@@ -103,7 +185,7 @@ export const Hero = ({
   }, [promoClosed, promoClosing, promoEntered, reduceMotion]);
 
   useEffect(() => {
-    if (reduceMotion || !promoClosed) return undefined;
+    if (reduceMotion || !showHeroCopy) return undefined;
 
     const section = sectionRef.current;
     if (!section) return undefined;
@@ -177,7 +259,17 @@ export const Hero = ({
     }, section);
 
     return () => ctx.revert();
-  }, [reduceMotion, promoClosed]);
+  }, [reduceMotion, showHeroCopy]);
+
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video || !showHeroCopy) return undefined;
+    const play = video.play();
+    if (play && typeof play.catch === "function") {
+      play.catch(() => {});
+    }
+    return undefined;
+  }, [showHeroCopy, videoSrc]);
 
   const dismissPromo = () => {
     if (promoClosing || promoClosed) return;
@@ -201,7 +293,9 @@ export const Hero = ({
     setPromoClosing(false);
   };
 
-  const showPromo = !promoClosed;
+  const handleVideoReady = () => {
+    setVideoReady(true);
+  };
 
   return (
     <section
@@ -209,10 +303,11 @@ export const Hero = ({
       ref={sectionRef}
       className={`${styles.hero}${reduceMotion ? ` ${styles.heroStatic}` : ""}${
         showPromo ? ` ${styles.heroPromoActive}` : ""
-      }`}
+      }${showLoader ? ` ${styles.heroLoading}` : ""}`}
       aria-label={introLabel}
+      aria-busy={showLoader || undefined}
     >
-      <div ref={bgRef} className={styles.heroBg} aria-hidden={!showPromo}>
+      <div ref={bgRef} className={styles.heroBg} aria-hidden={showPromo}>
         {showPromo ? (
           <div
             ref={promoRef}
@@ -234,17 +329,21 @@ export const Hero = ({
               <span className={styles.heroPromoSeamRight} aria-hidden="true" />
             </div>
           </div>
-        ) : mediaReady && !reduceMotion ? (
+        ) : !reduceMotion ? (
           <video
-            key={isMobile ? "mobile" : "desktop"}
+            key={videoSrc}
+            ref={videoRef}
             className={`${styles.heroBgVideo} ${
               isMobile ? styles.heroBgVideoMobile : styles.heroBgVideoDesktop
-            }`}
-            src={isMobile ? HERO_VIDEO_MOBILE : HERO_VIDEO}
-            autoPlay
+            }${heroMediaReady ? ` ${styles.heroBgVideoReady}` : ""}`}
+            src={videoSrc}
             muted
             loop
             playsInline
+            preload="auto"
+            onCanPlayThrough={handleVideoReady}
+            onLoadedData={handleVideoReady}
+            onPlaying={handleVideoReady}
           />
         ) : null}
       </div>
@@ -278,47 +377,56 @@ export const Hero = ({
         </div>
       ) : null}
 
+      {showLoader ? (
+        <div className={styles.heroLoader} role="status" aria-live="polite">
+          <div className={styles.heroLoaderSpinner} aria-hidden="true">
+            <span />
+            <span />
+            <span />
+          </div>
+          <span className={styles.heroLoaderText}>LOADING</span>
+        </div>
+      ) : null}
+
       <div className={styles.heroScrim} aria-hidden="true" />
       <div ref={fadeRef} className={styles.heroFade} aria-hidden="true" />
 
       <div
         className={styles.heroInner}
-        aria-hidden={showPromo || undefined}
+        aria-hidden={showPromo || showLoader || undefined}
       >
-        <div className={styles.heroCopy}>
+        {showHeroCopy ? (
+          <div className={styles.heroCopy}>
             <div ref={stampRef} className={styles.heroStamp}>
-              {promoClosed ? (
-                <RevealText
-                  text={BRAND}
-                  as="h1"
-                  className={styles.heroTitle}
-                  delay={0.1}
-                  stagger={0.04}
-                  duration={0.9}
-                  scrambleDuration={0.6}
-                />
-              ) : (
-                <h1 className={styles.heroTitle}>{BRAND}</h1>
-              )}
+              <RevealText
+                text={BRAND}
+                as="h1"
+                className={styles.heroTitle}
+                delay={0.1}
+                stagger={0.04}
+                duration={0.9}
+                scrambleDuration={0.6}
+              />
             </div>
 
-          <nav ref={ctasScrollRef} className={styles.heroCtasScroll}>
-            <div
-              ref={ctasRef}
-              className={styles.heroCtas}
-              style={reduceMotion ? undefined : { opacity: 0 }}
-            >
-              {[
-                { to: "/music", label: ctaMusic },
-                { to: "/booking", label: ctaBooking },
-              ].map(({ to, label }) => (
-                <Link key={to} className={styles.heroCtaBtn} to={to}>
-                  {label}
-                </Link>
-              ))}
-            </div>
-          </nav>
-        </div>
+            <nav ref={ctasScrollRef} className={styles.heroCtasScroll}>
+              <div
+                ref={ctasRef}
+                className={styles.heroCtas}
+                style={reduceMotion ? undefined : { opacity: 0 }}
+              >
+                {[
+                  { to: "/music", label: ctaMusic },
+                  { to: "/booking", label: ctaBooking },
+                ].map(({ to, label }) => (
+                  <Link key={to} className={styles.heroCtaBtn} to={to}>
+                    {label}
+                  </Link>
+                ))}
+              </div>
+            </nav>
+          </div>
+        ) : null}
       </div>
     </section>
   );
