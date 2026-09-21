@@ -200,9 +200,12 @@
   filter: none;
 }
 
-.chromeMenuBtn:hover {
-  filter: none;
-  background: var(--c-brand);
+/* Touch devices keep :hover sticky after tap — only paint hover on real pointers */
+@media (hover: hover) and (pointer: fine) {
+  .chromeMenuBtn:hover {
+    filter: none;
+    background: var(--c-brand);
+  }
 }
 
 .chromeSpacers {
@@ -887,31 +890,33 @@
   text-transform: uppercase;
 }
 
-.navPanelLangBtn:hover {
-  animation: menuGlitch 0.35s steps(1, end) both;
-}
-
 .navPanelLangBtn.isActive {
   background: #0a0a0a;
   color: var(--bg);
 }
 
-.navPanelLink:hover {
-  opacity: 1;
-  text-decoration: none;
-  transform: scaleY(1.08);
-  z-index: 1;
-}
+@media (hover: hover) and (pointer: fine) {
+  .navPanelLangBtn:hover {
+    animation: menuGlitch 0.35s steps(1, end) both;
+  }
 
-.navPanelLink:hover .navPanelArrow {
-  transform: scale(1.22);
-}
+  .navPanelLink:hover {
+    opacity: 1;
+    text-decoration: none;
+    transform: scaleY(1.08);
+    z-index: 1;
+  }
 
-.navPanelLinkExternal:hover {
-  opacity: 1;
-  text-decoration: none;
-  background: var(--c-brand);
-  color: #0a0a0a;
+  .navPanelLink:hover .navPanelArrow {
+    transform: scale(1.22);
+  }
+
+  .navPanelLinkExternal:hover {
+    opacity: 1;
+    text-decoration: none;
+    background: var(--c-brand);
+    color: #0a0a0a;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -922,26 +927,29 @@
     transition: none;
   }
 
-  .navPanelLink:hover,
-  .navPanelLinkExternal:hover,
-  .navPanelLangBtn:hover {
-    transform: none;
-  }
+  @media (hover: hover) and (pointer: fine) {
+    .navPanelLink:hover,
+    .navPanelLinkExternal:hover,
+    .navPanelLangBtn:hover {
+      transform: none;
+    }
 
-  .navPanelLink:hover .navPanelArrow {
-    transform: none;
-  }
+    .navPanelLink:hover .navPanelArrow {
+      transform: none;
+    }
 
-  .navPanelLink:hover {
-    background: #fff;
-    color: #0a0a0a;
-  }
+    .navPanelLink:hover {
+      background: #fff;
+      color: #0a0a0a;
+    }
 
-  .navPanelLinkExternal:hover {
-    background: var(--c-brand);
+    .navPanelLinkExternal:hover {
+      background: var(--c-brand);
+    }
   }
 }
 
+/* Portaled to body — under chrome (200), above page content */
 .navDrawerBackdrop {
   display: block;
   position: fixed;
@@ -949,7 +957,7 @@
   left: 0;
   right: 0;
   bottom: 0;
-  z-index: 40;
+  z-index: 180;
   border: none;
   padding: 0;
   margin: 0;
@@ -987,7 +995,7 @@
   min-height: var(--app-vh, 100dvh);
   max-height: none;
   margin: 0;
-  z-index: 45;
+  z-index: 190;
   box-sizing: border-box;
   background: #0a0a0a;
   border: none;
@@ -1007,6 +1015,8 @@
     visibility 0.45s;
   overflow-x: hidden;
   overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
   padding: 0;
   padding-top: var(--chrome-offset);
   padding-bottom: env(safe-area-inset-bottom, 0px);

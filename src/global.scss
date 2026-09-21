@@ -111,6 +111,12 @@ body {
   overscroll-behavior-y: none;
 }
 
+/* Body scroll lock while nav drawer is open (see useNavMenu) */
+html.nav-open,
+html.nav-open body {
+  overscroll-behavior: none;
+}
+
 body::before {
   display: none;
 }
