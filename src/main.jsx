@@ -17,6 +17,16 @@ import "./global.scss";
   link.href = href;
 }
 
+const syncAppVh = () => {
+  const h = window.visualViewport?.height ?? window.innerHeight;
+  document.documentElement.style.setProperty("--app-vh", `${Math.round(h)}px`);
+};
+syncAppVh();
+window.addEventListener("resize", syncAppVh);
+window.addEventListener("orientationchange", syncAppVh);
+window.visualViewport?.addEventListener("resize", syncAppVh);
+window.visualViewport?.addEventListener("scroll", syncAppVh);
+
 try {
   localStorage.removeItem("dummfound-theme");
 } catch {

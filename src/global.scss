@@ -45,6 +45,9 @@
   --grain-opacity: 0.08;
 
   --chrome-h: 2.65rem;
+  --chrome-safe-top: env(safe-area-inset-top, 0px);
+  --chrome-offset: calc(var(--chrome-h) + var(--chrome-safe-top));
+  --app-vh: 100dvh;
   --brand-col: 9.5rem;
   --nav-col: 8.5rem;
   --space-xs: 0.5rem;
@@ -83,6 +86,7 @@ html {
 body {
   margin: 0;
   min-height: 100vh;
+  min-height: var(--app-vh, 100dvh);
   background: var(--bg);
   color: var(--text);
   font-family: var(--font-sans);
