@@ -17,18 +17,6 @@ import "./global.scss";
   link.href = href;
 }
 
-const isiPhone = () => /iPhone|iPod/.test(navigator.userAgent);
-
-const measureEnvSafeTop = () => {
-  const probe = document.createElement("div");
-  probe.style.cssText =
-    "position:fixed;visibility:hidden;pointer-events:none;padding-top:constant(safe-area-inset-top);padding-top:env(safe-area-inset-top, 0px)";
-  document.documentElement.appendChild(probe);
-  const top = Number.parseFloat(getComputedStyle(probe).paddingTop) || 0;
-  probe.remove();
-  return top;
-};
-
 /** Large viewport height — stays tall while Safari chrome is visible */
 const measureLvh = () => {
   const probe = document.createElement("div");
@@ -38,15 +26,6 @@ const measureLvh = () => {
   const h = probe.offsetHeight || 0;
   probe.remove();
   return h;
-};
-
-const syncChromeSafeTop = () => {
-  let top = measureEnvSafeTop();
-  if (isiPhone() && Math.max(screen.width, screen.height) >= 812) {
-    const floor = Math.max(screen.width, screen.height) >= 852 ? 59 : 47;
-    top = Math.max(top, floor);
-  }
-  document.documentElement.style.setProperty("--chrome-safe-top", `${top}px`);
 };
 
 const readViewportHeight = () => {
@@ -66,7 +45,6 @@ const syncAppVh = () => {
 };
 
 const syncViewportMetrics = () => {
-  syncChromeSafeTop();
   syncAppVh();
 };
 

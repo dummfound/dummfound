@@ -155,7 +155,7 @@ export const COPY = {
     geoVal: "EU / СНГ — обсуждается индивидуально",
     contactLabel: "Контакты",
     contactFormIntro:
-      "Отправьте сообщение прямо с сайта — ответ придёт на указанную почту.",
+      "Можно написать прямо с сайта — ответим на указанную почту. Запросы на букинг, коллаборации и пресс-материалы тоже сюда.",
     contactFormName: "Имя",
     contactFormEmail: "Электронная почта",
     contactFormMessage: "Сообщение",
@@ -173,9 +173,11 @@ export const COPY = {
     contactFormErrorMessageRequired: "Напишите текст сообщения.",
     contactFormToggleOpen: "Написать",
     contactFormToggleClose: "Скрыть",
-    instagramSocialLabel: "Instagram",
+    instagramSocialLabel: "Instagram*",
+    socialFollowLabel: "Follow us",
+    footerLinksLabel: "Links",
     footerInstagramDisclaimer:
-      "*принадлежит Meta, признанной экстремистской и запрещенной на территории РФ",
+      "*принадлежит Meta, признанной экстремистской организацией и запрещённой на территории РФ",
   },
   en: {
     skip: "Skip to content",
@@ -333,7 +335,7 @@ export const COPY = {
     geoVal: "EU / CIS — discussed individually",
     contactLabel: "Contact",
     contactFormIntro:
-      "Send a message from the site — we’ll reply to the email you enter.",
+      "You can write from the site — we’ll reply to the email you leave. Booking, collabs and press materials go here too.",
     contactFormName: "Name",
     contactFormEmail: "Email",
     contactFormMessage: "Message",
@@ -351,8 +353,10 @@ export const COPY = {
     contactFormErrorMessageRequired: "Enter your message.",
     contactFormToggleOpen: "Write",
     contactFormToggleClose: "Hide",
-    instagramSocialLabel: "Instagram",
+    instagramSocialLabel: "Instagram*",
+    socialFollowLabel: "Follow us",
+    footerLinksLabel: "Links",
     footerInstagramDisclaimer:
-      "*принадлежит Meta, признанной экстремистской и запрещенной на территории РФ",
+      "*принадлежит Meta, признанной экстремистской организацией и запрещённой на территории РФ",
   },
 };

@@ -82,10 +82,10 @@ export const SectionContact = ({
                     focusable="false"
                   >
                     <path
-                      d="M4 4l8 8M12 4L4 12"
+                      d="M3.2 3.2l9.6 9.6M12.8 3.2L3.2 12.8"
                       fill="none"
                       stroke="currentColor"
-                      strokeWidth="1.5"
+                      strokeWidth="1.75"
                       strokeLinecap="round"
                     />
                   </svg>
@@ -124,14 +124,22 @@ export const SectionContact = ({
       className={`${styles.section} ${styles.sectionContact}`}
       data-section="contact"
     >
-      <div className={styles.sectionInner}>
-        <h2 className={styles.sectionLabel}>{label}</h2>
-        <div className={styles.sectionBody}>
-          <address className={styles.contactBlock}>
+      <div className={styles.contactLayout}>
+        <h2 className={styles.contactSectionLabel}>{label}</h2>
+        {/* Desktop: badge-height bridge glues label into the contact panel */}
+        <div className={styles.contactBridge} aria-hidden="true" />
+
+        <address className={styles.contactPanel}>
+          {contactFormIntro ? (
+            <p className={styles.contactLead}>{contactFormIntro}</p>
+          ) : null}
+
+          <div className={styles.contactActions}>
             <a className={styles.contactMail} href={`mailto:${MAIL}`}>
               <IosMailIcon className={styles.contactMailIcon} />
               <span className={styles.contactMailText}>{MAIL}</span>
             </a>
+
             {hasFormspree ? (
               <button
                 type="button"
@@ -143,8 +151,10 @@ export const SectionContact = ({
                 <span>{contactFormToggleOpen}</span>
               </button>
             ) : null}
-          </address>
-        </div>
+          </div>
+        </address>
+
+        <div className={styles.contactFill} aria-hidden="true" />
       </div>
       {drawer}
     </section>

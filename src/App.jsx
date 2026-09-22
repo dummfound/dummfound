@@ -96,7 +96,6 @@ const HomePage = () => {
     contactFormErrorMessageRequired,
     contactFormToggleOpen,
     contactFormToggleClose,
-    footerInstagramDisclaimer,
     gigsLabel,
     gigs,
     gigsHint,
@@ -173,7 +172,7 @@ const HomePage = () => {
       </main>
 
       <SiteFooter
-        instagramDisclaimer={footerInstagramDisclaimer}
+        instagramDisclaimer={t.footerInstagramDisclaimer}
         socialLinks={socialLinks}
       />
     </>
@@ -197,6 +196,8 @@ const GigPageRoute = () => {
       menuLabel={t.menu}
       drawerBackdropLabel={t.drawerBackdrop}
       navLinks={navLinks}
+      socialLinks={socialLinks}
+      instagramDisclaimer={t.footerInstagramDisclaimer}
       tgAppLabel={t.nav.app}
       lang={lang}
       onSetLang={setLang}
@@ -209,8 +210,6 @@ const GigPageRoute = () => {
       menuOpen={menuOpen}
       onCloseMenu={closeMenu}
       onToggleMenu={toggleMenu}
-      footerInstagramDisclaimer={t.footerInstagramDisclaimer}
-      socialLinks={socialLinks}
     />
   );
 };

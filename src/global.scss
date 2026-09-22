@@ -16,13 +16,13 @@
   --shadow: none;
   --shadow-ink: none;
 
-  /* Section neon tabs */
+  /* Section tabs — yellow / black / gray / red / purple / orange */
   --c-brand: #faff00;
   --c-about: #ff1c1f;
-  --c-music: #deff00;
+  --c-music: #bf7aff;
   --c-booking: #0a0a0a;
-  --c-gigs: #ff6a00;
-  --c-contact: #ff3b6b;
+  --c-gigs: #ff9300;
+  --c-contact: #faff00;
 
   --font-display: "Funnel Display", "Onest", "Helvetica Neue", Helvetica, Arial,
     sans-serif;
@@ -44,9 +44,10 @@
   --ios-highlight: transparent;
   --grain-opacity: 0.08;
 
-  --chrome-h: 3.5rem;
-  --chrome-safe-top: env(safe-area-inset-top, 0px);
-  /* DEX-style: bar from top:0, no separate safe-area slab */
+  --chrome-h: 2.75rem;
+  --badge-h: 1.5rem;
+  /* No viewport-fit=cover (DEX): status bar is theme-color, not page blur */
+  --chrome-safe-top: 0px;
   --chrome-inset-top: 0px;
   --chrome-offset: var(--chrome-h);
   --app-vh: 100lvh;
@@ -63,21 +64,11 @@
 
 @media (max-width: 768px) {
   :root {
-    /* Match DEX nav: h-16 = 4rem from top:0 */
-    --chrome-h: 4rem;
+    --chrome-h: 2.45rem;
+    --badge-h: 1.5rem;
     --chrome-inset-top: 0px;
     --chrome-offset: var(--chrome-h);
     --brand-col: 0;
-  }
-}
-
-/* iPhone / iOS Safari: never trust a zero inset before JS runs */
-@supports (-webkit-touch-callout: none) {
-  @media (max-width: 850px) {
-    :root {
-      --chrome-safe-top: max(47px, env(safe-area-inset-top, 0px));
-      --app-vh: 100lvh;
-    }
   }
 }
 

@@ -75,63 +75,71 @@ export const SiteHeader = ({
               aria-hidden={!menuOpen}
             >
               <nav className={styles.navPanelNav} aria-label={navAria}>
-                {navLinks.map(({ href, label }) => (
-                  <ScrambleLink
-                    key={href}
-                    text={label}
-                    to={href}
-                    className={styles.navPanelLink}
-                    data-section={href === "/" ? "home" : href.slice(1)}
-                    onClick={onCloseMenu}
-                    end={
-                      <span className={styles.navPanelArrow} aria-hidden="true">
-                        ↗
-                      </span>
-                    }
-                  />
-                ))}
-                <div
-                  className={styles.navPanelLang}
-                  role="group"
-                  aria-label={langGroup}
-                >
-                  <button
-                    type="button"
-                    className={`${styles.navPanelLangBtn} ${
-                      lang === "ru" ? styles.isActive : ""
-                    }`}
-                    onClick={() => {
-                      onSetLang("ru");
-                    }}
-                    aria-pressed={lang === "ru"}
-                  >
-                    RU
-                  </button>
-                  <button
-                    type="button"
-                    className={`${styles.navPanelLangBtn} ${
-                      lang === "en" ? styles.isActive : ""
-                    }`}
-                    onClick={() => {
-                      onSetLang("en");
-                    }}
-                    aria-pressed={lang === "en"}
-                  >
-                    EN
-                  </button>
+                <div className={styles.navPanelLinks}>
+                  {navLinks.map(({ href, label }) => (
+                    <ScrambleLink
+                      key={href}
+                      text={label}
+                      to={href}
+                      className={styles.navPanelLink}
+                      data-section={href === "/" ? "home" : href.slice(1)}
+                      onClick={onCloseMenu}
+                      end={
+                        <span
+                          className={styles.navPanelArrow}
+                          aria-hidden="true"
+                        >
+                          ↗
+                        </span>
+                      }
+                    />
+                  ))}
                 </div>
-                {tgAppLabel ? (
-                  <ScrambleLink
-                    external
-                    text={tgAppLabel}
-                    href={TG_APP_HREF}
-                    className={styles.navPanelLinkExternal}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    onClick={onCloseMenu}
-                    end={<OsAppIcon className={styles.navPanelAppIcon} />}
-                  />
-                ) : null}
+
+                <div className={styles.navPanelFooter}>
+                  <div
+                    className={styles.navPanelLang}
+                    role="group"
+                    aria-label={langGroup}
+                  >
+                    <button
+                      type="button"
+                      className={`${styles.navPanelLangBtn} ${
+                        lang === "ru" ? styles.isActive : ""
+                      }`}
+                      onClick={() => {
+                        onSetLang("ru");
+                      }}
+                      aria-pressed={lang === "ru"}
+                    >
+                      RU
+                    </button>
+                    <button
+                      type="button"
+                      className={`${styles.navPanelLangBtn} ${
+                        lang === "en" ? styles.isActive : ""
+                      }`}
+                      onClick={() => {
+                        onSetLang("en");
+                      }}
+                      aria-pressed={lang === "en"}
+                    >
+                      EN
+                    </button>
+                  </div>
+                  {tgAppLabel ? (
+                    <ScrambleLink
+                      external
+                      text={tgAppLabel}
+                      href={TG_APP_HREF}
+                      className={styles.navPanelLinkExternal}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      onClick={onCloseMenu}
+                      end={<OsAppIcon className={styles.navPanelAppIcon} />}
+                    />
+                  ) : null}
+                </div>
               </nav>
             </div>
           </>,

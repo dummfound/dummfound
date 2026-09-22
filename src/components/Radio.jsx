@@ -129,7 +129,6 @@ export const Radio = ({
       hls.on(Hls.Events.ERROR, (_event, data) => {
         if (!data.fatal) return;
         if (data.type === Hls.ErrorTypes.NETWORK_ERROR) {
-          // Soft recover — no UI reconnect storm
           hls.startLoad();
           return;
         }
@@ -179,7 +178,6 @@ export const Radio = ({
       setReconnecting(false);
       setLoading(false);
     } catch (err) {
-      // Abort/NotAllowed — not a dead stream
       const name = err?.name || "";
       if (name === "AbortError" || name === "NotAllowedError") {
         setLoading(false);
@@ -244,7 +242,6 @@ export const Radio = ({
       setPlaying(false);
       playingRef.current = false;
     };
-    // Live HLS buffers often — only show loader after a long wait
     const onWaiting = () => {
       clearBufferLoader();
       bufferLoaderRef.current = window.setTimeout(() => {

@@ -21,6 +21,8 @@ export const GigPage = ({
   menuLabel,
   drawerBackdropLabel,
   navLinks,
+  socialLinks = [],
+  instagramDisclaimer,
   tgAppLabel,
   lang,
   onSetLang,
@@ -29,12 +31,9 @@ export const GigPage = ({
   radioClose,
   radioPlay,
   radioPause,
-  radioVolume,
   menuOpen,
   onCloseMenu,
   onToggleMenu,
-  footerInstagramDisclaimer,
-  socialLinks,
 }) => {
   const { slug } = useParams();
   const gig = gigs.find((item) => item.slug === slug);
@@ -66,7 +65,6 @@ export const GigPage = ({
         radioClose={radioClose}
         radioPlay={radioPlay}
         radioPause={radioPause}
-        radioVolume={radioVolume}
         menuOpen={menuOpen}
         onCloseMenu={onCloseMenu}
         onToggleMenu={onToggleMenu}
@@ -123,7 +121,7 @@ export const GigPage = ({
       </main>
 
       <SiteFooter
-        instagramDisclaimer={footerInstagramDisclaimer}
+        instagramDisclaimer={instagramDisclaimer}
         socialLinks={socialLinks}
       />
     </>
