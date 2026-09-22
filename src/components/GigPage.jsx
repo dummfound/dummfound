@@ -21,6 +21,10 @@ export const GigPage = ({
   menuLabel,
   drawerBackdropLabel,
   navLinks,
+  socialLinks = [],
+  linksLabel,
+  followLabel,
+  rightsLabel,
   tgAppLabel,
   lang,
   onSetLang,
@@ -33,8 +37,6 @@ export const GigPage = ({
   menuOpen,
   onCloseMenu,
   onToggleMenu,
-  footerInstagramDisclaimer,
-  socialLinks,
 }) => {
   const { slug } = useParams();
   const gig = gigs.find((item) => item.slug === slug);
@@ -123,7 +125,10 @@ export const GigPage = ({
       </main>
 
       <SiteFooter
-        instagramDisclaimer={footerInstagramDisclaimer}
+        linksLabel={linksLabel}
+        followLabel={followLabel}
+        rightsLabel={rightsLabel}
+        links={navLinks.filter((item) => item.href !== "/")}
         socialLinks={socialLinks}
       />
     </>

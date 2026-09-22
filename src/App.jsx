@@ -150,10 +150,17 @@ const HomePage = () => {
           geoValue={geoVal}
         />
 
-        <SectionGigs label={gigsLabel} gigs={gigs} hint={gigsHint} />
+        <SectionGigs
+          label={gigsLabel}
+          gigs={gigs}
+          hint={gigsHint}
+        />
 
         <SectionContact
           label={contactLabel}
+          socialLabel={t.socialFollowLabel}
+          socialLinks={socialLinks}
+          instagramDisclaimer={footerInstagramDisclaimer}
           contactFormIntro={contactFormIntro}
           contactFormName={contactFormName}
           contactFormEmail={contactFormEmail}
@@ -173,7 +180,10 @@ const HomePage = () => {
       </main>
 
       <SiteFooter
-        instagramDisclaimer={footerInstagramDisclaimer}
+        linksLabel={t.footerLinksLabel}
+        followLabel={t.socialFollowLabel}
+        rightsLabel={t.footerRights}
+        links={navLinks.filter((item) => item.href !== "/")}
         socialLinks={socialLinks}
       />
     </>
@@ -197,6 +207,10 @@ const GigPageRoute = () => {
       menuLabel={t.menu}
       drawerBackdropLabel={t.drawerBackdrop}
       navLinks={navLinks}
+      socialLinks={socialLinks}
+      linksLabel={t.footerLinksLabel}
+      followLabel={t.socialFollowLabel}
+      rightsLabel={t.footerRights}
       tgAppLabel={t.nav.app}
       lang={lang}
       onSetLang={setLang}
@@ -209,8 +223,6 @@ const GigPageRoute = () => {
       menuOpen={menuOpen}
       onCloseMenu={closeMenu}
       onToggleMenu={toggleMenu}
-      footerInstagramDisclaimer={t.footerInstagramDisclaimer}
-      socialLinks={socialLinks}
     />
   );
 };

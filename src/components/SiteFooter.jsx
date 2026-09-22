@@ -1,43 +1,71 @@
+import { Link } from "react-router-dom";
 import styles from "../styles.module.scss";
 
 export const SiteFooter = ({
-  year = new Date().getFullYear(),
-  instagramDisclaimer,
+  linksLabel = "Links",
+  followLabel = "Follow us",
+  rightsLabel = "All Rights Reserved.",
+  links = [],
   socialLinks = [],
+  year = new Date().getFullYear(),
 }) => {
+  const hasLinks = links.length > 0;
+  const hasSocial = socialLinks.length > 0;
+
   return (
     <footer className={styles.siteFooter}>
-      <div className={styles.footerStrip}>
-        <div className={styles.footerStripLabel}>Follow</div>
-        <ul className={styles.footerStripLinks} role="list">
-          {socialLinks.map(({ key, label: socialLabel, href }) => (
-            <li key={key}>
-              <a
-                className={styles.footerStripLink}
-                href={href}
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                {socialLabel}
-                {key === "instagram" ? (
-                  <span className={styles.socialMetaAsterisk} aria-hidden="true">
-                    *
-                  </span>
-                ) : null}
-              </a>
-            </li>
-          ))}
-        </ul>
-      </div>
+      <div className={styles.footerGrid}>
+        {(hasLinks || hasSocial) && (
+          <div className={styles.footerNavLabels} aria-hidden="true">
+            {hasLinks ? (
+              <span className={styles.footerNavLabel}>{linksLabel}</span>
+            ) : null}
+            {hasSocial ? (
+              <span className={styles.footerNavLabel}>{followLabel}</span>
+            ) : null}
+          </div>
+        )}
 
-      {instagramDisclaimer ? (
-        <p className={styles.siteFooterDisclaimer}>{instagramDisclaimer}</p>
-      ) : null}
+        {(hasLinks || hasSocial) && (
+          <div className={styles.footerNavBody}>
+            {hasLinks ? (
+              <nav className={styles.footerNavRow} aria-label={linksLabel}>
+                <ul className={styles.footerNavList} role="list">
+                  {links.map(({ href, label }) => (
+                    <li key={href}>
+                      <Link className={styles.footerNavLink} to={href}>
+                        {label}
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+              </nav>
+            ) : null}
 
-      <div className={styles.footerMeta}>
-        <span className={styles.footerMetaBrand}>DUMMFOUND</span>
-        <span className={styles.footerMetaCopy}>© {year}</span>
-        <span className={styles.footerMetaFill} aria-hidden="true" />
+            {hasSocial ? (
+              <nav className={styles.footerNavRow} aria-label={followLabel}>
+                <ul className={styles.footerNavList} role="list">
+                  {socialLinks.map(({ key, label, href }) => (
+                    <li key={key}>
+                      <a
+                        className={styles.footerNavLink}
+                        href={href}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        {label}
+                      </a>
+                    </li>
+                  ))}
+                </ul>
+              </nav>
+            ) : null}
+          </div>
+        )}
+
+        <p className={styles.footerCopy}>
+          © {year} {rightsLabel}
+        </p>
       </div>
     </footer>
   );

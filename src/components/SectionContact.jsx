@@ -10,6 +10,9 @@ const hasFormspree = Boolean(import.meta.env.VITE_FORMSPREE_FORM_ID?.trim());
 
 export const SectionContact = ({
   label,
+  socialLabel = "Follow",
+  socialLinks = [],
+  instagramDisclaimer,
   contactFormName,
   contactFormEmail,
   contactFormMessage,
@@ -124,14 +127,20 @@ export const SectionContact = ({
       className={`${styles.section} ${styles.sectionContact}`}
       data-section="contact"
     >
-      <div className={styles.sectionInner}>
-        <h2 className={styles.sectionLabel}>{label}</h2>
-        <div className={styles.sectionBody}>
-          <address className={styles.contactBlock}>
+      <div className={styles.contactCompose}>
+        <div className={styles.contactUnit}>
+          <h2 className={styles.contactComposeLabel}>{label}</h2>
+
+          <div className={styles.contactPanel}>
+            {contactFormIntro ? (
+              <p className={styles.contactPanelLead}>{contactFormIntro}</p>
+            ) : null}
+
             <a className={styles.contactMail} href={`mailto:${MAIL}`}>
               <IosMailIcon className={styles.contactMailIcon} />
               <span className={styles.contactMailText}>{MAIL}</span>
             </a>
+
             {hasFormspree ? (
               <button
                 type="button"
@@ -143,8 +152,44 @@ export const SectionContact = ({
                 <span>{contactFormToggleOpen}</span>
               </button>
             ) : null}
-          </address>
+
+            {socialLinks.length > 0 ? (
+              <div className={styles.contactSocialGroup}>
+                <div className={styles.contactSocialLabel}>{socialLabel}</div>
+                <ul className={styles.contactSocialList} role="list">
+                  {socialLinks.map(({ key, label: socialItemLabel, href }) => (
+                    <li key={key}>
+                      <a
+                        className={styles.contactSocialLink}
+                        href={href}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        {socialItemLabel}
+                        {key === "instagram" ? (
+                          <span
+                            className={styles.socialMetaAsterisk}
+                            aria-hidden="true"
+                          >
+                            *
+                          </span>
+                        ) : null}
+                      </a>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ) : null}
+
+            {instagramDisclaimer ? (
+              <p className={styles.contactSocialDisclaimer}>
+                {instagramDisclaimer}
+              </p>
+            ) : null}
+          </div>
         </div>
+
+        <div className={styles.contactComposeFill} aria-hidden="true" />
       </div>
       {drawer}
     </section>

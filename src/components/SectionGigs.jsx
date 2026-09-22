@@ -1,57 +1,154 @@
+import { useCallback, useEffect, useState } from "react";
+import useEmblaCarousel from "embla-carousel-react";
 import { Link } from "react-router-dom";
 import styles from "../styles.module.scss";
 
-const PANEL_IMAGE = "/img/DSCF4120-2.jpg";
+const FALLBACK_POSTER = "/img/brataniya-tour-poster.jpg";
+const POSTER_POOL = [
+  "/img/brataniya-tour-poster.jpg",
+  "/img/duocard.png",
+  "/img/bratania-duo.jpg",
+  "/img/DSCF4120-2.jpg",
+];
 
-const formatGigLine = (date, title) => {
-  if (!date || date === "TBA") return `TBA  ${title}`;
-  const short = date.replace(/\.20\d{2}$/, ".");
-  return `${short}  ${title}`;
+const formatGigDate = (date) => {
+  if (!date || date === "TBA") return "TBA";
+  return date.replace(/\.20\d{2}$/, ".");
 };
+
+const posterFor = (gig, index) =>
+  gig.image || POSTER_POOL[index % POSTER_POOL.length] || FALLBACK_POSTER;
 
 export const SectionGigs = ({ label, gigs = [], hint }) => {
   const tourTitle = gigs[0]?.type ?? "";
   const tourNote = gigs[0]?.typeNote ?? "";
-  const panelImage = gigs.find((g) => g.image)?.image ?? PANEL_IMAGE;
+  const [emblaRef, emblaApi] = useEmblaCarousel({
+    align: "center",
+    containScroll: "trimSnaps",
+    slidesToScroll: 1,
+    duration: 25,
+  });
+  const [selected, setSelected] = useState(0);
+
+  const onSelect = useCallback((api) => {
+    setSelected(api.selectedScrollSnap());
+  }, []);
+
+  useEffect(() => {
+    if (!emblaApi) return undefined;
+
+    onSelect(emblaApi);
+    emblaApi.on("reInit", onSelect);
+    emblaApi.on("select", onSelect);
+
+    return () => {
+      emblaApi.off("reInit", onSelect);
+      emblaApi.off("select", onSelect);
+    };
+  }, [emblaApi, onSelect]);
+
+  const scrollTo = useCallback(
+    (index) => {
+      emblaApi?.scrollTo(index);
+    },
+    [emblaApi]
+  );
+
+  const onPosterLoad = useCallback(() => {
+    emblaApi?.reInit();
+  }, [emblaApi]);
 
   return (
-    <section id="gigs" className={styles.section}>
+    <section
+      id="gigs"
+      className={`${styles.section} ${styles.sectionGigs}`}
+      data-section="gigs"
+    >
       <div className={styles.sectionInner}>
-        <h2 className={styles.sectionLabel}>{label}</h2>
-        <div className={styles.sectionBody}>
-          <div className={styles.gigsPanel}>
-            <div className={styles.gigsPanelMedia} aria-hidden="true">
-              <img
-                src={panelImage}
-                alt=""
-                className={styles.gigsPanelImage}
-                loading="lazy"
-                decoding="async"
-              />
-            </div>
-            <div className={styles.gigsPanelContent}>
-              {tourTitle ? (
-                <h3 className={styles.gigsPanelTitle}>
-                  {tourTitle}
-                  {tourNote ? (
-                    <span className={styles.gigsTitleNote}> ({tourNote})</span>
-                  ) : null}
-                </h3>
-              ) : null}
-              <ul className={styles.gigsList} role="list">
-                {gigs.map(({ slug, title, date }) => (
-                  <li key={slug} className={styles.gigsItem}>
-                    <Link className={styles.gigsItemLink} to={`/gigs/${slug}`}>
-                      {formatGigLine(date, title)}
+        <div className={styles.gigsHead}>
+          <h2 className={styles.sectionLabel}>{label}</h2>
+        </div>
+
+        {tourTitle ? (
+          <p className={styles.gigsTourLine}>
+            <span className={styles.gigsTourMain}>{tourTitle}</span>
+            {tourNote ? (
+              <span className={styles.gigsTitleNote}>({tourNote})</span>
+            ) : null}
+          </p>
+        ) : null}
+
+        <div className={styles.gigsSlider}>
+          <div className={styles.gigsViewport} ref={emblaRef}>
+            <div className={styles.gigsTrack}>
+              {gigs.map((gig, index) => (
+                <div className={styles.gigsSlide} key={gig.slug}>
+                  <article className={styles.gigsCard}>
+                    <Link
+                      className={styles.gigsCardPoster}
+                      to={`/gigs/${gig.slug}`}
+                      draggable={false}
+                    >
+                      <img
+                        src={posterFor(gig, index)}
+                        alt=""
+                        className={styles.gigsCardImage}
+                        loading={index < 2 ? "eager" : "lazy"}
+                        decoding="async"
+                        draggable={false}
+                        onLoad={onPosterLoad}
+                      />
                     </Link>
-                  </li>
-                ))}
-              </ul>
-              <p className={styles.gigsTba}>{"& TBA"}</p>
-              {hint ? <p className={styles.gigsHint}>{hint}</p> : null}
+                    <div className={styles.gigsCardBody}>
+                      <p className={styles.gigsCardDate}>
+                        {formatGigDate(gig.date)}
+                      </p>
+                      <Link
+                        className={styles.gigsCardTitle}
+                        to={`/gigs/${gig.slug}`}
+                        draggable={false}
+                      >
+                        {gig.title}
+                      </Link>
+                      {gig.location ? (
+                        <p className={styles.gigsCardMeta}>{gig.location}</p>
+                      ) : null}
+                      <Link
+                        className={styles.gigsCardCta}
+                        to={`/gigs/${gig.slug}`}
+                        draggable={false}
+                      >
+                        {gig.linkLabel}
+                      </Link>
+                    </div>
+                  </article>
+                </div>
+              ))}
             </div>
           </div>
         </div>
+
+        {gigs.length > 1 ? (
+          <div className={styles.gigsDots} role="tablist" aria-label={label}>
+            {gigs.map((gig, index) => (
+              <button
+                key={gig.slug}
+                type="button"
+                role="tab"
+                aria-selected={selected === index}
+                aria-label={`${index + 1} / ${gigs.length}`}
+                className={
+                  selected === index
+                    ? `${styles.gigsDot} ${styles.gigsDotActive}`
+                    : styles.gigsDot
+                }
+                onClick={() => scrollTo(index)}
+              />
+            ))}
+          </div>
+        ) : null}
+
+        {hint ? <p className={styles.gigsHint}>{hint}</p> : null}
       </div>
     </section>
   );
