@@ -123,9 +123,15 @@ export const SectionContact = ({
       id="contact"
       className={`${styles.section} ${styles.sectionContact}`}
       data-section="contact"
+      data-theme="gray"
     >
       <div className={styles.contactLayout}>
-        <h2 className={styles.contactSectionLabel}>{label}</h2>
+        <div className={styles.sectionTop}>
+          <span className={styles.sectionSquare} aria-hidden="true" />
+          <h2 className={styles.contactSectionLabel}>
+            {label}
+          </h2>
+        </div>
         {/* Desktop: badge-height bridge glues label into the contact panel */}
         <div className={styles.contactBridge} aria-hidden="true" />
 

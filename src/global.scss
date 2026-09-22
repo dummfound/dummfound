@@ -1,34 +1,51 @@
+/* Onest: neo-grotesque like PK Diatype, with full Cyrillic (Diatype cut had Latin only) */
+@font-face {
+  font-family: "Onest";
+  src:
+    url("/fonts/Onest-Variable.woff2") format("woff2"),
+    url("/fonts/Onest-Variable.ttf") format("truetype");
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+
 :root {
-  /* Bicep-like hypercolor chrome on light technical canvas */
-  --bg: #d9d9d9;
-  --bg-elevated: #cecece;
-  --bg-panel: #c8c8c8;
-  --bg-invert: #0a0a0a;
-  --text: #0a0a0a;
-  --text-muted: #5a5a5a;
-  --text-on-invert: #d9d9d9;
-  --accent: #faff00;
-  --accent-hover: #e8ef00;
-  --accent-soft: #faff00;
-  --border: rgba(10, 10, 10, 0.22);
-  --line: rgba(10, 10, 10, 0.16);
-  --paper: #f2f2f2;
+  /* Real Paul Kalkbrenner tokens */
+  --color-dark: #000000;
+  --color-light: #ffffff;
+  --color-gray: #c5c5c5;
+  --color-orange: #ff6831;
+  --color-green: #a7ff9c;
+
+  --bg: var(--color-dark);
+  --bg-elevated: #111111;
+  --bg-panel: #161616;
+  --bg-deep: var(--color-dark);
+  --bg-invert: var(--color-light);
+  --bg-gray: var(--color-gray);
+  --text: var(--color-light);
+  --text-muted: rgba(255, 255, 255, 0.55);
+  --text-on-invert: var(--color-dark);
+  --text-on-gray: var(--color-dark);
+  --accent: var(--color-light);
+  --accent-hover: var(--color-gray);
+  --accent-soft: var(--color-light);
+  --border: rgba(255, 255, 255, 0.18);
+  --line: rgba(255, 255, 255, 0.12);
+  --paper: #111111;
   --shadow: none;
   --shadow-ink: none;
 
-  /* Section tabs — yellow / black / gray / red / purple / orange */
-  --c-brand: #faff00;
-  --c-about: #ff1c1f;
-  --c-music: #bf7aff;
-  --c-booking: #0a0a0a;
-  --c-gigs: #ff9300;
-  --c-contact: #faff00;
+  --c-brand: var(--color-light);
+  --c-about: var(--color-light);
+  --c-music: var(--color-light);
+  --c-booking: var(--color-light);
+  --c-gigs: var(--color-orange);
+  --c-contact: var(--color-light);
 
-  --font-display: "Funnel Display", "Onest", "Helvetica Neue", Helvetica, Arial,
-    sans-serif;
-  --font-sans: "Funnel Sans", "Onest", "Helvetica Neue", Helvetica, Arial,
-    sans-serif;
-  --font-mono: "Funnel Sans", "Onest", ui-monospace, monospace;
+  --font-display: "Onest", Arial, sans-serif;
+  --font-sans: "Onest", Arial, sans-serif;
+  --font-mono: "Onest", Arial, ui-monospace, monospace;
 
   --radius: 0;
   --radius-sm: 0;
@@ -44,15 +61,15 @@
   --ios-highlight: transparent;
   --grain-opacity: 0;
 
-  --chrome-h: 2.75rem;
+  --chrome-h: 4.25rem;
   --badge-h: 1.5rem;
-  /* DEX-style: no viewport-fit=cover — Safari theme-color owns the status bar */
   --chrome-safe-top: 0px;
   --chrome-inset-top: 0px;
   --chrome-offset: var(--chrome-h);
   --app-vh: 100lvh;
-  --brand-col: 9.5rem;
-  --nav-col: 8.5rem;
+  --brand-col: auto;
+  --nav-col: auto;
+  --page-pad: clamp(1.5rem, 5vw, 3.5rem);
   --space-xs: 0.5rem;
   --space-sm: 1rem;
   --space-md: 1.5rem;
@@ -60,15 +77,26 @@
   --space-xl: 4.5rem;
   --space-2xl: 7rem;
   --max-width: 100%;
+  --ease-pk: cubic-bezier(0.625, 0.05, 0, 1);
+  --anim-pk: 0.7s var(--ease-pk);
+}
+
+@media (min-width: 769px) {
+  :root {
+    --chrome-inset: 1.25rem;
+    --chrome-inset-top: var(--chrome-inset);
+    --chrome-pad-x: clamp(2.5rem, 5.5vw, 4.5rem);
+    --chrome-offset: calc(var(--chrome-h) + (var(--chrome-inset) * 2));
+  }
 }
 
 @media (max-width: 768px) {
   :root {
-    --chrome-h: 2.45rem;
-    --badge-h: 1.5rem;
+    --chrome-h: 3.35rem;
+    --badge-h: 1.35rem;
     --chrome-inset-top: 0px;
     --chrome-offset: var(--chrome-h);
-    --brand-col: 0;
+    --page-pad: 1.5rem;
   }
 }
 
@@ -79,8 +107,7 @@
 }
 
 html {
-  scroll-behavior: smooth;
-  background: #0a0a0a;
+  background: var(--color-dark);
   color-scheme: dark;
   overscroll-behavior-y: none;
 }
@@ -96,19 +123,21 @@ body {
   min-height: 100vh;
   min-height: 100svh;
   min-height: var(--app-vh, 100lvh);
-  background: #0a0a0a;
+  background: var(--color-dark);
   color: var(--text);
   font-family: var(--font-sans);
   font-size: 1.05rem;
+  /* PK body is 700 — intermediate weights look soft on variable TTF/Windows */
   font-weight: 700;
-  line-height: 1.45;
-  letter-spacing: -0.01em;
+  font-synthesis: none;
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+  text-rendering: geometricPrecision;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   overscroll-behavior-y: none;
 }
 
-/* Body scroll lock while nav drawer is open (see useNavMenu) */
 html.nav-open,
 html.nav-open body {
   overscroll-behavior: none;
@@ -119,16 +148,7 @@ body::before {
 }
 
 body::after {
-  content: "";
-  position: fixed;
-  inset: 0;
-  z-index: 9999;
-  pointer-events: none;
-  opacity: var(--grain-opacity);
-  mix-blend-mode: multiply;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.35' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='matrix' values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.55 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
-  background-repeat: repeat;
-  background-size: 110px 110px;
+  display: none;
 }
 
 #root {
@@ -142,7 +162,7 @@ main {
 }
 
 a {
-  color: var(--text);
+  color: inherit;
   text-decoration: none;
   border-bottom: none;
   transition: opacity 0.15s ease, color 0.15s ease, background 0.15s ease,
@@ -150,17 +170,17 @@ a {
 }
 
 a:hover {
-  opacity: 0.75;
+  opacity: 0.7;
 }
 
 a:focus-visible,
 button:focus-visible {
-  outline: 2px solid var(--text);
+  outline: 2px solid currentColor;
   outline-offset: 2px;
   box-shadow: none;
 }
 
 ::selection {
-  background: var(--accent);
-  color: #0a0a0a;
+  background: var(--color-light);
+  color: var(--color-dark);
 }

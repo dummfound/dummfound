@@ -1,8 +1,10 @@
+import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import gsap from "gsap";
+import { HoverSlideText } from "./HoverSlideText";
 import { OsAppIcon } from "./OsAppIcon";
 import { Radio } from "./Radio";
-import { ScrambleLink } from "./ScrambleLink";
 import styles from "../styles.module.scss";
 
 const scrollToTop = () => {
@@ -11,16 +13,9 @@ const scrollToTop = () => {
 };
 
 const TG_APP_HREF = "https://t.me/dummfoundOSbot/app";
-
-const pathAccent = (pathname) => {
-  if (pathname === "/") return "home";
-  if (pathname.startsWith("/about")) return "about";
-  if (pathname.startsWith("/music")) return "music";
-  if (pathname.startsWith("/booking")) return "booking";
-  if (pathname.startsWith("/gigs")) return "gigs";
-  if (pathname.startsWith("/contact")) return "contact";
-  return "home";
-};
+const MOBILE_MQ = "(max-width: 768px)";
+const SCROLL_SOLID_AT = 24;
+const MENU_CLOSE_MS = 480;
 
 export const SiteHeader = ({
   logoAria,
@@ -42,15 +37,169 @@ export const SiteHeader = ({
   onToggleMenu,
 }) => {
   const location = useLocation();
-  const accent = pathAccent(location.pathname);
+  const navigate = useNavigate();
   const isHome = location.pathname === "/";
+  const panelRef = useRef(null);
+  const menuBtnRef = useRef(null);
+  const linksRef = useRef(null);
+  const tlRef = useRef(null);
+  const openRef = useRef(false);
+  const [scrolled, setScrolled] = useState(false);
 
   const handleLogoClick = () => {
     onCloseMenu();
-    if (isHome) {
-      scrollToTop();
-    }
+    if (isHome) scrollToTop();
   };
+
+  const handleNavClick = (event, href) => {
+    event.preventDefault();
+    if (menuOpen) {
+      sessionStorage.setItem("df-nav-delay", String(MENU_CLOSE_MS));
+      onCloseMenu();
+      window.setTimeout(() => {
+        navigate(href);
+      }, MENU_CLOSE_MS);
+      return;
+    }
+    navigate(href);
+  };
+
+  useEffect(() => {
+    const sync = () => {
+      setScrolled((window.scrollY || window.pageYOffset || 0) > SCROLL_SOLID_AT);
+    };
+    sync();
+    window.addEventListener("scroll", sync, { passive: true });
+    return () => window.removeEventListener("scroll", sync);
+  }, [location.pathname]);
+
+  useEffect(() => {
+    document.documentElement.classList.toggle("nav-open", menuOpen);
+    document.body.setAttribute("data-menu-status", menuOpen ? "open" : "");
+  }, [menuOpen]);
+
+  useEffect(() => {
+    const panel = panelRef.current;
+    const linksRoot = linksRef.current;
+    if (!panel || !linksRoot) return undefined;
+
+    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const labels = linksRoot.querySelectorAll("[data-menu-label]");
+    const lines = linksRoot.querySelectorAll("[data-menu-line]");
+    const mm = gsap.matchMedia();
+
+    mm.add(MOBILE_MQ, () => {
+      const origin = "calc(100% - 1.55rem) 1.45rem";
+      gsap.set(panel, {
+        display: "flex",
+        autoAlpha: 1,
+        clipPath: `circle(0% at ${origin})`,
+        visibility: "hidden",
+        pointerEvents: "none",
+      });
+      gsap.set(labels, { yPercent: 110, x: 0, rotate: 0 });
+      gsap.set(lines, { scaleX: 0, transformOrigin: "0% 50%" });
+
+      const tl = gsap.timeline({
+        paused: true,
+        defaults: { ease: "power2.out" },
+        onComplete: () => {
+          gsap.set(labels, { yPercent: 0, x: 0, rotate: 0 });
+          gsap.set(lines, { scaleX: 1 });
+        },
+      });
+      tl.set(panel, { visibility: "visible", pointerEvents: "auto" }, 0);
+      tl.to(panel, { clipPath: `circle(150% at ${origin})`, duration: 0.5 }, 0);
+      tl.fromTo(
+        labels,
+        { yPercent: 110 },
+        { yPercent: 0, stagger: 0.035, duration: 0.42 },
+        0.06
+      );
+      tl.fromTo(
+        lines,
+        { scaleX: 0 },
+        { scaleX: 1, stagger: 0.035, duration: 0.3 },
+        0.14
+      );
+
+      tlRef.current = { tl, mode: "circle", reduced };
+      return () => {
+        tl.kill();
+        gsap.set([panel, labels, lines], { clearProps: "all" });
+        if (tlRef.current?.mode === "circle") tlRef.current = null;
+      };
+    });
+
+    mm.add("(min-width: 769px)", () => {
+      gsap.set(panel, {
+        clearProps: "clipPath",
+        xPercent: -105,
+        autoAlpha: 1,
+        visibility: "hidden",
+        pointerEvents: "none",
+      });
+      gsap.set(labels, { clearProps: "all" });
+      gsap.set(lines, { clearProps: "all" });
+
+      const tl = gsap.timeline({ paused: true });
+      tl.set(panel, { visibility: "visible", pointerEvents: "auto" }, 0);
+      tl.to(panel, { xPercent: 0, duration: 0.45, ease: "power2.out" }, 0);
+      tl.fromTo(
+        labels,
+        { yPercent: 110 },
+        { yPercent: 0, stagger: 0.03, duration: 0.4, ease: "power2.out" },
+        0.05
+      );
+
+      tlRef.current = { tl, mode: "slide", reduced };
+      return () => {
+        tl.kill();
+        gsap.set(panel, { clearProps: "all" });
+        if (tlRef.current?.mode === "slide") tlRef.current = null;
+      };
+    });
+
+    return () => {
+      mm.revert();
+      tlRef.current = null;
+    };
+  }, []);
+
+  useEffect(() => {
+    const entry = tlRef.current;
+    if (!entry) {
+      openRef.current = menuOpen;
+      return;
+    }
+    const { tl, reduced } = entry;
+    const panel = panelRef.current;
+
+    if (reduced) {
+      if (menuOpen) tl.progress(1).pause();
+      else {
+        tl.progress(0).pause();
+        if (panel) {
+          gsap.set(panel, { visibility: "hidden", pointerEvents: "none" });
+        }
+      }
+      openRef.current = menuOpen;
+      return;
+    }
+
+    if (menuOpen) {
+      tl.play();
+    } else if (openRef.current) {
+      tl.reverse();
+      tl.eventCallback("onReverseComplete", () => {
+        if (panel) {
+          gsap.set(panel, { visibility: "hidden", pointerEvents: "none" });
+        }
+        tl.eventCallback("onReverseComplete", null);
+      });
+    }
+    openRef.current = menuOpen;
+  }, [menuOpen]);
 
   const drawer =
     typeof document !== "undefined"
@@ -69,30 +218,30 @@ export const SiteHeader = ({
 
             <div
               id="nav-panel"
-              className={`${styles.navPanel} ${menuOpen ? styles.navPanelOpen : ""}`}
+              ref={panelRef}
+              className={styles.navPanel}
               role={menuOpen ? "dialog" : undefined}
               aria-modal={menuOpen ? true : undefined}
               aria-hidden={!menuOpen}
             >
               <nav className={styles.navPanelNav} aria-label={navAria}>
-                <div className={styles.navPanelLinks}>
+                <div className={styles.navPanelLinks} ref={linksRef}>
                   {navLinks.map(({ href, label }) => (
-                    <ScrambleLink
+                    <Link
                       key={href}
-                      text={label}
                       to={href}
                       className={styles.navPanelLink}
-                      data-section={href === "/" ? "home" : href.slice(1)}
-                      onClick={onCloseMenu}
-                      end={
-                        <span
-                          className={styles.navPanelArrow}
-                          aria-hidden="true"
-                        >
-                          ↗
-                        </span>
-                      }
-                    />
+                      onClick={(event) => handleNavClick(event, href)}
+                    >
+                      <span className={styles.navPanelLinkMask}>
+                        <HoverSlideText
+                          text={label}
+                          className={styles.navPanelLinkText}
+                          data-menu-label=""
+                        />
+                      </span>
+                      <span className={styles.navPanelUnderline} data-menu-line="" />
+                    </Link>
                   ))}
                 </div>
 
@@ -107,9 +256,7 @@ export const SiteHeader = ({
                       className={`${styles.navPanelLangBtn} ${
                         lang === "ru" ? styles.isActive : ""
                       }`}
-                      onClick={() => {
-                        onSetLang("ru");
-                      }}
+                      onClick={() => onSetLang("ru")}
                       aria-pressed={lang === "ru"}
                     >
                       RU
@@ -119,25 +266,23 @@ export const SiteHeader = ({
                       className={`${styles.navPanelLangBtn} ${
                         lang === "en" ? styles.isActive : ""
                       }`}
-                      onClick={() => {
-                        onSetLang("en");
-                      }}
+                      onClick={() => onSetLang("en")}
                       aria-pressed={lang === "en"}
                     >
                       EN
                     </button>
                   </div>
                   {tgAppLabel ? (
-                    <ScrambleLink
-                      external
-                      text={tgAppLabel}
+                    <a
+                      className={styles.navPanelApp}
                       href={TG_APP_HREF}
-                      className={styles.navPanelLinkExternal}
                       target="_blank"
                       rel="noopener noreferrer"
                       onClick={onCloseMenu}
-                      end={<OsAppIcon className={styles.navPanelAppIcon} />}
-                    />
+                    >
+                      <span>{tgAppLabel}</span>
+                      <OsAppIcon className={styles.navPanelAppIcon} />
+                    </a>
                   ) : null}
                 </div>
               </nav>
@@ -149,7 +294,11 @@ export const SiteHeader = ({
 
   return (
     <>
-      <header className={styles.siteHeader} data-accent={accent}>
+      <header
+        className={`${styles.siteHeader}${
+          scrolled || menuOpen ? ` ${styles.siteHeaderSolid}` : ""
+        }`}
+      >
         <div className={styles.chromeBar}>
           <Link
             className={styles.chromeBrand}
@@ -157,29 +306,10 @@ export const SiteHeader = ({
             onClick={handleLogoClick}
             aria-label={logoAria}
           >
-            DUMMFOUND
+            <span className={styles.chromeBrandBadge} aria-hidden="true">
+              df
+            </span>
           </Link>
-
-          <button
-            type="button"
-            className={styles.chromeMenuBtn}
-            aria-expanded={menuOpen}
-            aria-controls="nav-panel"
-            aria-label={menuLabel}
-            onClick={onToggleMenu}
-          >
-            {menuLabel}
-          </button>
-
-          <div className={styles.chromeSpacers} aria-hidden="true">
-            <span className={styles.chromeSpacer} />
-            <span
-              className={`${styles.chromeSpacer} ${styles.chromeSpacerDim}`}
-            />
-            <span
-              className={`${styles.chromeSpacer} ${styles.chromeSpacerDim}`}
-            />
-          </div>
 
           <div className={styles.chromeTrail}>
             <div
@@ -208,6 +338,24 @@ export const SiteHeader = ({
                 EN
               </button>
             </div>
+
+            <button
+              ref={menuBtnRef}
+              type="button"
+              className={`${styles.chromeMenuBtn} ${
+                menuOpen ? styles.chromeMenuBtnOpen : ""
+              }`}
+              aria-expanded={menuOpen}
+              aria-controls="nav-panel"
+              aria-label={menuOpen ? "Close menu" : menuLabel}
+              onClick={onToggleMenu}
+            >
+              <span className={styles.chromeMenuDot} aria-hidden="true" />
+              <span className={styles.chromeMenuText}>
+                {menuOpen ? "CLOSE" : menuLabel}
+              </span>
+            </button>
+
             <Radio
               openLabel={radioOpen}
               titleLabel={radioTitle}

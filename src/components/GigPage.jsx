@@ -23,6 +23,7 @@ export const GigPage = ({
   navLinks,
   socialLinks = [],
   instagramDisclaimer,
+  footerLabels = {},
   tgAppLabel,
   lang,
   onSetLang,
@@ -121,8 +122,10 @@ export const GigPage = ({
       </main>
 
       <SiteFooter
-        instagramDisclaimer={instagramDisclaimer}
+        navLinks={navLinks}
         socialLinks={socialLinks}
+        instagramDisclaimer={instagramDisclaimer}
+        labels={footerLabels}
       />
     </>
   );

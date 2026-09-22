@@ -11,6 +11,7 @@ import { SiteFooter } from "./components/SiteFooter";
 import { SiteHeader } from "./components/SiteHeader";
 import { SkipLink } from "./components/SkipLink";
 import { useLanguage } from "./hooks/useLanguage";
+import { useLenis } from "./hooks/useLenis";
 import { useNavMenu } from "./hooks/useNavMenu";
 
 const ALLOWED_PATHS = new Set([
@@ -25,23 +26,40 @@ const ALLOWED_PATHS = new Set([
 const useScrollToSection = (pathname, enabled) => {
   useLayoutEffect(() => {
     if (!enabled) return;
-    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)")
-      .matches;
-    const smooth = reduced ? "instant" : "smooth";
 
-    if (pathname === "/") {
-      window.scrollTo({ top: 0, behavior: reduced ? "auto" : "smooth" });
-      return;
+    // Wait for menu close animation before jumping (nav links set this).
+    const delay = Number(sessionStorage.getItem("df-nav-delay") || 0);
+    sessionStorage.removeItem("df-nav-delay");
+
+    const go = () => {
+      const reduced = window.matchMedia("(prefers-reduced-motion: reduce)")
+        .matches;
+      if (pathname === "/") {
+        window.scrollTo({ top: 0, behavior: reduced ? "auto" : "smooth" });
+        return;
+      }
+      const id = pathname.slice(1);
+      const el = document.getElementById(id);
+      if (!el) return;
+      el.scrollIntoView({
+        behavior: reduced ? "instant" : "smooth",
+        block: "start",
+      });
+    };
+
+    if (delay > 0) {
+      const id = window.setTimeout(go, delay);
+      return () => window.clearTimeout(id);
     }
-    const id = pathname.slice(1);
-    const el = document.getElementById(id);
-    if (el) el.scrollIntoView({ behavior: smooth, block: "start" });
+    go();
+    return undefined;
   }, [pathname, enabled]);
 };
 
 const HomePage = () => {
   const location = useLocation();
   const pathOk = ALLOWED_PATHS.has(location.pathname);
+  useLenis();
   useScrollToSection(location.pathname, pathOk);
 
   const { lang, setLang, t, navLinks, socialLinks } = useLanguage();
@@ -64,11 +82,8 @@ const HomePage = () => {
     radioPlay,
     radioPause,
     radioVolume,
-    heroIntro,
     heroCtaMusic,
     heroCtaBooking,
-    heroPromoTitle,
-    heroPromoClose,
     aboutLabel,
     aboutP,
     musicLabel,
@@ -127,13 +142,7 @@ const HomePage = () => {
       />
 
       <main id="main">
-        <Hero
-          introLabel={heroIntro}
-          ctaMusic={heroCtaMusic}
-          ctaBooking={heroCtaBooking}
-          promoTitle={heroPromoTitle}
-          promoClose={heroPromoClose}
-        />
+        <Hero ctaMusic={heroCtaMusic} ctaBooking={heroCtaBooking} />
 
         <SectionAbout label={aboutLabel} body={aboutP} />
 
@@ -172,8 +181,14 @@ const HomePage = () => {
       </main>
 
       <SiteFooter
-        instagramDisclaimer={t.footerInstagramDisclaimer}
+        navLinks={navLinks}
         socialLinks={socialLinks}
+        instagramDisclaimer={t.footerInstagramDisclaimer}
+        labels={{
+          colLinks: t.footerColLinks,
+          colFollow: t.footerColFollow,
+          rights: t.footerRights,
+        }}
       />
     </>
   );
@@ -182,6 +197,7 @@ const HomePage = () => {
 const GigPageRoute = () => {
   const { lang, setLang, t, navLinks, socialLinks } = useLanguage();
   const { menuOpen, closeMenu, toggleMenu } = useNavMenu();
+  useLenis();
 
   return (
     <GigPage
@@ -198,6 +214,11 @@ const GigPageRoute = () => {
       navLinks={navLinks}
       socialLinks={socialLinks}
       instagramDisclaimer={t.footerInstagramDisclaimer}
+      footerLabels={{
+        colLinks: t.footerColLinks,
+        colFollow: t.footerColFollow,
+        rights: t.footerRights,
+      }}
       tgAppLabel={t.nav.app}
       lang={lang}
       onSetLang={setLang}

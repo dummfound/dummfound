@@ -3,9 +3,19 @@ import styles from "../styles.module.scss";
 
 export const SectionMusic = ({ label, releases }) => {
   return (
-    <section id="music" className={styles.section} data-section="music">
+    <section
+      id="music"
+      className={styles.section}
+      data-section="music"
+      data-theme="dark"
+    >
       <div className={styles.sectionInner}>
-        <h2 className={styles.sectionLabel}>{label}</h2>
+        <div className={styles.sectionTop}>
+          <span className={styles.sectionSquare} aria-hidden="true" />
+          <h2 className={styles.sectionLabel}>
+            {label}
+          </h2>
+        </div>
         <div className={styles.sectionBody}>
           <ul className={styles.releaseList} role="list">
             {releases.map(({ title, meta, href, linkLabel }) => (

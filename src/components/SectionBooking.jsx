@@ -13,9 +13,19 @@ export const SectionBooking = ({
   geoValue,
 }) => {
   return (
-    <section id="booking" className={styles.section} data-section="booking">
+    <section
+      id="booking"
+      className={styles.section}
+      data-section="booking"
+      data-theme="gray"
+    >
       <div className={styles.sectionInner}>
-        <h2 className={styles.sectionLabel}>{label}</h2>
+        <div className={styles.sectionTop}>
+          <span className={styles.sectionSquare} aria-hidden="true" />
+          <h2 className={styles.sectionLabel}>
+            {label}
+          </h2>
+        </div>
         <div className={`${styles.sectionBody} ${styles.prose}`}>
           <p>{lead}</p>
           <dl className={styles.bookingFacts}>
@@ -37,9 +47,7 @@ export const SectionBooking = ({
             <span className={styles.bookingButtonText}>{ctaLabel}</span>
           </a>
         </div>
-        
       </div>
-     
     </section>
   );
 };

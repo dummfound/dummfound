@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { BrandLoader } from "./BrandLoader";
+import { HoverSlideText } from "./HoverSlideText";
 import { RevealText, REVEAL_EASE } from "./RevealText";
 import styles from "../styles.module.scss";
 
@@ -13,27 +14,15 @@ const HERO_VIDEO = "/video/IMG_6766.mov";
 const HERO_VIDEO_MOBILE = "/video/mobile.MOV";
 const BRAND = "DUMMFOUND";
 const MOBILE_MQ = "(max-width: 768px)";
-const TOUR_POSTER = "/img/brataniya-tour-poster.jpg";
-const PROMO_SECONDS = 10;
 const VIDEO_LOAD_TIMEOUT_MS = 8000;
 
-export const Hero = ({
-  introLabel,
-  ctaMusic,
-  ctaBooking,
-  promoTitle,
-  promoClose,
-}) => {
+export const Hero = ({ ctaMusic, ctaBooking }) => {
   const [reduceMotion, setReduceMotion] = useState(false);
   const [isMobile, setIsMobile] = useState(() =>
     typeof window !== "undefined"
       ? window.matchMedia(MOBILE_MQ).matches
       : false
   );
-  const [promoClosed, setPromoClosed] = useState(false);
-  const [promoEntered, setPromoEntered] = useState(false);
-  const [promoClosing, setPromoClosing] = useState(false);
-  const [promoSeconds, setPromoSeconds] = useState(PROMO_SECONDS);
   const [videoReady, setVideoReady] = useState(false);
   const [loadTimedOut, setLoadTimedOut] = useState(false);
   const sectionRef = useRef(null);
@@ -42,14 +31,12 @@ export const Hero = ({
   const stampRef = useRef(null);
   const ctasScrollRef = useRef(null);
   const ctasRef = useRef(null);
-  const promoRef = useRef(null);
   const videoRef = useRef(null);
 
   const videoSrc = isMobile ? HERO_VIDEO_MOBILE : HERO_VIDEO;
   const heroMediaReady = reduceMotion || videoReady || loadTimedOut;
-  const showPromo = !promoClosed;
-  const showLoader = promoClosed && !heroMediaReady;
-  const showHeroCopy = promoClosed && heroMediaReady;
+  const showLoader = !heroMediaReady;
+  const showHeroCopy = heroMediaReady;
 
   useEffect(() => {
     const section = sectionRef.current;
@@ -110,7 +97,6 @@ export const Hero = ({
     };
   }, []);
 
-  // Preload hero video during promo so it is ready when poster closes
   useEffect(() => {
     if (reduceMotion) {
       setVideoReady(true);
@@ -152,51 +138,6 @@ export const Hero = ({
   }, [videoSrc, reduceMotion]);
 
   useEffect(() => {
-    if (promoClosed) return undefined;
-    if (reduceMotion) {
-      setPromoEntered(true);
-      return undefined;
-    }
-
-    setPromoEntered(false);
-    let cancelled = false;
-    const id = window.requestAnimationFrame(() => {
-      window.requestAnimationFrame(() => {
-        if (!cancelled) setPromoEntered(true);
-      });
-    });
-
-    return () => {
-      cancelled = true;
-      window.cancelAnimationFrame(id);
-    };
-  }, [promoClosed, reduceMotion]);
-
-  useEffect(() => {
-    if (promoClosed || promoClosing || !promoEntered) return undefined;
-
-    setPromoSeconds(PROMO_SECONDS);
-    const started = Date.now();
-    const tick = window.setInterval(() => {
-      const left = Math.max(
-        0,
-        PROMO_SECONDS - Math.floor((Date.now() - started) / 1000)
-      );
-      setPromoSeconds(left);
-      if (left <= 0) {
-        window.clearInterval(tick);
-        if (reduceMotion) {
-          setPromoClosed(true);
-        } else {
-          setPromoClosing(true);
-        }
-      }
-    }, 250);
-
-    return () => window.clearInterval(tick);
-  }, [promoClosed, promoClosing, promoEntered, reduceMotion]);
-
-  useEffect(() => {
     if (reduceMotion || !showHeroCopy) return undefined;
 
     const section = sectionRef.current;
@@ -207,12 +148,24 @@ export const Hero = ({
       return bottom < window.innerHeight * 0.4;
     };
 
-    const ctaDelay = 0.1 + BRAND.length * 0.04 + 0.55;
+    const ctaDelay = 0.35 + BRAND.length * 0.04 + 0.4;
     const ctx = gsap.context(() => {
-      gsap.set(bgRef.current, { transformOrigin: "50% 30%", scale: 1 });
+      gsap.set(bgRef.current, { transformOrigin: "50% 30%", scale: 1.12 });
       gsap.set(fadeRef.current, { autoAlpha: 0 });
-      gsap.set(stampRef.current, { y: 0, scale: 1 });
+      gsap.set(stampRef.current, { y: 28, autoAlpha: 0 });
       gsap.set(ctasScrollRef.current, { autoAlpha: 1, y: 0 });
+
+      const intro = gsap.timeline({ defaults: { ease: REVEAL_EASE } });
+      intro.to(
+        bgRef.current,
+        { scale: 1, duration: 1.35 },
+        0
+      );
+      intro.to(
+        stampRef.current,
+        { y: 0, autoAlpha: 1, duration: 0.9 },
+        0.25
+      );
 
       if (ctasRef.current) {
         if (heroMostlyGone()) {
@@ -245,13 +198,13 @@ export const Hero = ({
         .fromTo(
           bgRef.current,
           { scale: 1 },
-          { scale: 1.18, ease: "none", duration: 1 },
+          { scale: 1.12, ease: "none", duration: 1 },
           0
         )
         .fromTo(
           fadeRef.current,
           { autoAlpha: 0 },
-          { autoAlpha: 0.92, ease: "none", duration: 1 },
+          { autoAlpha: 0.55, ease: "none", duration: 1 },
           0
         )
         .fromTo(
@@ -283,28 +236,6 @@ export const Hero = ({
     return undefined;
   }, [showHeroCopy, videoSrc]);
 
-  const dismissPromo = () => {
-    if (promoClosing || promoClosed) return;
-    if (reduceMotion) {
-      setPromoClosed(true);
-      return;
-    }
-    setPromoClosing(true);
-  };
-
-  const handlePromoTransitionEnd = (event) => {
-    if (!promoClosing) return;
-    if (event.target !== event.currentTarget) return;
-    if (
-      event.propertyName !== "opacity" &&
-      event.propertyName !== "transform"
-    ) {
-      return;
-    }
-    setPromoClosed(true);
-    setPromoClosing(false);
-  };
-
   const handleVideoReady = () => {
     setVideoReady(true);
   };
@@ -314,34 +245,13 @@ export const Hero = ({
       id="top"
       ref={sectionRef}
       className={`${styles.hero}${reduceMotion ? ` ${styles.heroStatic}` : ""}${
-        showPromo ? ` ${styles.heroPromoActive}` : ""
-      }${showLoader ? ` ${styles.heroLoading}` : ""}`}
-      aria-label={introLabel}
+        showLoader ? ` ${styles.heroLoading}` : ""
+      }`}
+      aria-label={BRAND}
       aria-busy={showLoader || undefined}
     >
-      <div ref={bgRef} className={styles.heroBg} aria-hidden={showPromo}>
-        {showPromo ? (
-          <div
-            ref={promoRef}
-            className={`${styles.heroPromo}${
-              promoEntered ? ` ${styles.heroPromoEntered}` : ""
-            }${promoClosing ? ` ${styles.heroPromoClosing}` : ""}`}
-            role="img"
-            aria-label={promoTitle}
-            onTransitionEnd={handlePromoTransitionEnd}
-          >
-            <div className={styles.heroPromoFrame}>
-              <span className={styles.heroPromoSeamLeft} aria-hidden="true" />
-              <img
-                className={styles.heroPromoPoster}
-                src={TOUR_POSTER}
-                alt=""
-                decoding="async"
-              />
-              <span className={styles.heroPromoSeamRight} aria-hidden="true" />
-            </div>
-          </div>
-        ) : !reduceMotion ? (
+      <div ref={bgRef} className={styles.heroBg}>
+        {!reduceMotion ? (
           <video
             key={videoSrc}
             ref={videoRef}
@@ -360,35 +270,6 @@ export const Hero = ({
         ) : null}
       </div>
 
-      {showPromo ? (
-        <div className={styles.heroPromoChrome}>
-          <span className={styles.heroPromoTimer} aria-hidden="true">
-            {promoSeconds}
-          </span>
-          <button
-            type="button"
-            className={styles.heroPromoClose}
-            aria-label={promoClose}
-            onClick={dismissPromo}
-          >
-            <svg
-              className={styles.heroPromoCloseIcon}
-              viewBox="0 0 16 16"
-              aria-hidden="true"
-              focusable="false"
-            >
-              <path
-                d="M4 4l8 8M12 4L4 12"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="1.5"
-                strokeLinecap="round"
-              />
-            </svg>
-          </button>
-        </div>
-      ) : null}
-
       {showLoader ? (
         <div className={styles.heroLoader}>
           <BrandLoader />
@@ -400,7 +281,7 @@ export const Hero = ({
 
       <div
         className={styles.heroInner}
-        aria-hidden={showPromo || showLoader || undefined}
+        aria-hidden={showLoader || undefined}
       >
         {showHeroCopy ? (
           <div className={styles.heroCopy}>
@@ -427,7 +308,7 @@ export const Hero = ({
                   { to: "/booking", label: ctaBooking },
                 ].map(({ to, label }) => (
                   <Link key={to} className={styles.heroCtaBtn} to={to}>
-                    {label}
+                    <HoverSlideText text={label} />
                   </Link>
                 ))}
               </div>

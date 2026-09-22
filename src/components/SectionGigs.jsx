@@ -56,9 +56,19 @@ export const SectionGigs = ({ label, gigs = [], hint }) => {
   }, [cityApi]);
 
   return (
-    <section id="gigs" className={styles.section} data-section="gigs">
+    <section
+      id="gigs"
+      className={styles.section}
+      data-section="gigs"
+      data-theme="orange"
+    >
       <div className={styles.sectionInner}>
-        <h2 className={styles.sectionLabel}>{label}</h2>
+        <div className={styles.sectionTop}>
+          <span className={styles.sectionSquare} aria-hidden="true" />
+          <h2 className={styles.sectionLabel}>
+            {label}
+          </h2>
+        </div>
         <div className={styles.sectionBody}>
           <div className={styles.gigsSplit}>
             <div className={styles.gigsPanel}>

@@ -55,7 +55,9 @@ try {
 } catch {
   /* ignore */
 }
-document.documentElement.dataset.theme = "light";
+document.documentElement.dataset.theme = "dark";
+document.documentElement.style.colorScheme = "dark";
+document.documentElement.style.background = "#000";
 
 const base = import.meta.env.BASE_URL;
 const routerBasename =

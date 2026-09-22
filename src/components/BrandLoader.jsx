@@ -1,9 +1,9 @@
 import { ScaleLoader } from "react-spinners";
 import styles from "../styles.module.scss";
 
-const BRAND = "#faff00";
+const BRAND = "#ffffff";
 
-/** Shared yellow ScaleLoader (react-spinners) — radio / hero */
+/** Shared accent ScaleLoader — radio / hero */
 export const BrandLoader = ({ label = "LOADING" }) => (
   <div className={styles.brandLoader} role="status" aria-live="polite">
     <ScaleLoader
