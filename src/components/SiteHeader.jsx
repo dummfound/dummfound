@@ -4,7 +4,7 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import gsap from "gsap";
 import { HoverSlideText } from "./HoverSlideText";
 import { OsAppIcon } from "./OsAppIcon";
-import { Radio } from "./Radio";
+import { RadioTrigger } from "./Radio";
 import styles from "../styles.module.scss";
 
 const scrollToTop = () => {
@@ -28,10 +28,6 @@ export const SiteHeader = ({
   lang,
   onSetLang,
   radioOpen,
-  radioTitle,
-  radioClose,
-  radioPlay,
-  radioPause,
   menuOpen,
   onCloseMenu,
   onToggleMenu,
@@ -44,7 +40,9 @@ export const SiteHeader = ({
   const linksRef = useRef(null);
   const tlRef = useRef(null);
   const openRef = useRef(false);
+  const lastScrollY = useRef(0);
   const [scrolled, setScrolled] = useState(false);
+  const [compact, setCompact] = useState(false);
 
   const handleLogoClick = () => {
     onCloseMenu();
@@ -65,9 +63,25 @@ export const SiteHeader = ({
   };
 
   useEffect(() => {
+    lastScrollY.current = window.scrollY || window.pageYOffset || 0;
+
     const sync = () => {
-      setScrolled((window.scrollY || window.pageYOffset || 0) > SCROLL_SOLID_AT);
+      const y = window.scrollY || window.pageYOffset || 0;
+      const prev = lastScrollY.current;
+      setScrolled(y > SCROLL_SOLID_AT);
+
+      // Scroll down → compact; scroll up (y decreases) → expand. At top → full.
+      if (y <= SCROLL_SOLID_AT) {
+        setCompact(false);
+      } else if (y > prev + 6) {
+        setCompact(true);
+      } else if (y < prev - 6) {
+        setCompact(false);
+      }
+
+      lastScrollY.current = y;
     };
+
     sync();
     window.addEventListener("scroll", sync, { passive: true });
     return () => window.removeEventListener("scroll", sync);
@@ -280,8 +294,8 @@ export const SiteHeader = ({
                       rel="noopener noreferrer"
                       onClick={onCloseMenu}
                     >
-                      <span>{tgAppLabel}</span>
                       <OsAppIcon className={styles.navPanelAppIcon} />
+                      <span className={styles.navPanelAppLabel}>{tgAppLabel}</span>
                     </a>
                   ) : null}
                 </div>
@@ -297,7 +311,7 @@ export const SiteHeader = ({
       <header
         className={`${styles.siteHeader}${
           scrolled || menuOpen ? ` ${styles.siteHeaderSolid}` : ""
-        }`}
+        }${compact && !menuOpen ? ` ${styles.siteHeaderCompact}` : ""}`}
       >
         <div className={styles.chromeBar}>
           <Link
@@ -356,13 +370,7 @@ export const SiteHeader = ({
               </span>
             </button>
 
-            <Radio
-              openLabel={radioOpen}
-              titleLabel={radioTitle}
-              closeLabel={radioClose}
-              playLabel={radioPlay}
-              pauseLabel={radioPause}
-            />
+            <RadioTrigger openLabel={radioOpen} />
           </div>
         </div>
       </header>

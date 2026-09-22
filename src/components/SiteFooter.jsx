@@ -41,21 +41,18 @@ export const SiteFooter = ({
           <div className={`${styles.footerCol} ${styles.footerColFollow}`}>
             <h2 className={styles.footerColTitle}>{colFollow}</h2>
             <ul className={styles.footerColList} role="list">
-              {socialLinks.map(({ key, label, href }) => {
-                const text = String(label).replace(/\*$/, "");
-                return (
-                  <li key={key}>
-                    <a
-                      className={styles.footerTextLink}
-                      href={href}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                    >
-                      <HoverSlideText text={text} />
-                    </a>
-                  </li>
-                );
-              })}
+              {socialLinks.map(({ key, label, href }) => (
+                <li key={key}>
+                  <a
+                    className={styles.footerTextLink}
+                    href={href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    <HoverSlideText text={String(label)} />
+                  </a>
+                </li>
+              ))}
             </ul>
           </div>
         </div>

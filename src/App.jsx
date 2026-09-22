@@ -2,6 +2,7 @@ import { useLayoutEffect } from "react";
 import { Navigate, Route, Routes, useLocation } from "react-router-dom";
 import { GigPage } from "./components/GigPage";
 import { Hero } from "./components/Hero";
+import { RadioOverlay } from "./components/Radio";
 import { SectionAbout } from "./components/SectionAbout";
 import { SectionBooking } from "./components/SectionBooking";
 import { SectionContact } from "./components/SectionContact";
@@ -10,6 +11,7 @@ import { SectionMusic } from "./components/SectionMusic";
 import { SiteFooter } from "./components/SiteFooter";
 import { SiteHeader } from "./components/SiteHeader";
 import { SkipLink } from "./components/SkipLink";
+import { RadioProvider } from "./hooks/RadioContext";
 import { useLanguage } from "./hooks/useLanguage";
 import { useLenis } from "./hooks/useLenis";
 import { useNavMenu } from "./hooks/useNavMenu";
@@ -27,7 +29,6 @@ const useScrollToSection = (pathname, enabled) => {
   useLayoutEffect(() => {
     if (!enabled) return;
 
-    // Wait for menu close animation before jumping (nav links set this).
     const delay = Number(sessionStorage.getItem("df-nav-delay") || 0);
     sessionStorage.removeItem("df-nav-delay");
 
@@ -77,11 +78,6 @@ const HomePage = () => {
     menu,
     drawerBackdrop,
     radioOpen,
-    radioTitle,
-    radioClose,
-    radioPlay,
-    radioPause,
-    radioVolume,
     heroCtaMusic,
     heroCtaBooking,
     aboutLabel,
@@ -131,11 +127,6 @@ const HomePage = () => {
         lang={lang}
         onSetLang={setLang}
         radioOpen={radioOpen}
-        radioTitle={radioTitle}
-        radioClose={radioClose}
-        radioPlay={radioPlay}
-        radioPause={radioPause}
-        radioVolume={radioVolume}
         menuOpen={menuOpen}
         onCloseMenu={closeMenu}
         onToggleMenu={toggleMenu}
@@ -223,11 +214,6 @@ const GigPageRoute = () => {
       lang={lang}
       onSetLang={setLang}
       radioOpen={t.radioOpen}
-      radioTitle={t.radioTitle}
-      radioClose={t.radioClose}
-      radioPlay={t.radioPlay}
-      radioPause={t.radioPause}
-      radioVolume={t.radioVolume}
       menuOpen={menuOpen}
       onCloseMenu={closeMenu}
       onToggleMenu={toggleMenu}
@@ -235,11 +221,25 @@ const GigPageRoute = () => {
   );
 };
 
-const App = () => (
-  <Routes>
-    <Route path="/gigs/:slug" element={<GigPageRoute />} />
-    <Route path="*" element={<HomePage />} />
-  </Routes>
-);
+const App = () => {
+  const { t } = useLanguage();
+
+  return (
+    <RadioProvider>
+      <Routes>
+        <Route path="/gigs/:slug" element={<GigPageRoute />} />
+        <Route path="*" element={<HomePage />} />
+      </Routes>
+
+      <RadioOverlay
+        titleLabel={t.radioTitle}
+        closeLabel={t.radioClose}
+        playLabel={t.radioPlay}
+        pauseLabel={t.radioPause}
+        minimizeLabel={t.radioMinimize}
+      />
+    </RadioProvider>
+  );
+};
 
 export default App;

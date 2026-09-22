@@ -6,15 +6,34 @@ import "./global.scss";
 
 {
   const base = import.meta.env.BASE_URL.replace(/\/?$/, "/");
-  const href = `${base}favicon.svg`;
-  let link = document.querySelector('link[rel="icon"][type="image/svg+xml"]');
-  if (!link) {
-    link = document.createElement("link");
-    link.rel = "icon";
-    link.type = "image/svg+xml";
-    document.head.appendChild(link);
+  const svgHref = `${base}favicon.svg`;
+  const pngHref = `${base}favicon.png`;
+
+  let svg = document.querySelector('link[rel="icon"][type="image/svg+xml"]');
+  if (!svg) {
+    svg = document.createElement("link");
+    svg.rel = "icon";
+    svg.type = "image/svg+xml";
+    document.head.appendChild(svg);
   }
-  link.href = href;
+  svg.href = svgHref;
+
+  let png = document.querySelector('link[rel="icon"][type="image/png"]');
+  if (!png) {
+    png = document.createElement("link");
+    png.rel = "icon";
+    png.type = "image/png";
+    document.head.appendChild(png);
+  }
+  png.href = pngHref;
+
+  let apple = document.querySelector('link[rel="apple-touch-icon"]');
+  if (!apple) {
+    apple = document.createElement("link");
+    apple.rel = "apple-touch-icon";
+    document.head.appendChild(apple);
+  }
+  apple.href = pngHref;
 }
 
 /** Large viewport height — stays tall while Safari chrome is visible */
