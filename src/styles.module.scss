@@ -1003,7 +1003,7 @@
   margin: 0;
   appearance: none;
   width: 100%;
-  height: var(--app-vh, 100lvh);
+  height: 100%;
   cursor: pointer;
   background: transparent;
   opacity: 0;
@@ -1023,7 +1023,8 @@
   inset: 0;
   z-index: 190;
   width: 100%;
-  height: var(--app-vh, 100dvh);
+  height: auto;
+  max-height: 100%;
   margin: 0;
   padding: 0;
   box-sizing: border-box;
@@ -1045,17 +1046,25 @@
   justify-content: center;
   min-height: 0;
   width: 100%;
-  padding: calc(var(--chrome-h) + 2rem) var(--page-pad) 2rem;
+  padding:
+    calc(var(--chrome-h) + clamp(0.75rem, 2.5vh, 2rem))
+    var(--page-pad)
+    clamp(0.85rem, 2.5vh, 2rem);
   box-sizing: border-box;
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior: contain;
 }
 
 .navPanelLinks {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  gap: 0.15rem;
+  gap: clamp(0rem, 0.4vh, 0.15rem);
   width: 100%;
   max-width: none;
+  flex: 0 1 auto;
+  min-height: 0;
 }
 
 .navPanelLink {
@@ -1063,7 +1072,7 @@
   display: block;
   width: fit-content;
   max-width: 100%;
-  padding: 0.12em 0 0.18em;
+  padding: 0.08em 0 0.12em;
   margin: 0;
   color: var(--color-light);
   text-decoration: none;
@@ -1072,8 +1081,9 @@
   overflow: visible;
   font-family: var(--font-display);
   font-weight: 700;
-  font-size: clamp(2.1rem, 10vw, 3.4rem);
-  line-height: 1.15;
+  /* Scale with the shorter viewport axis so Full HD / laptop DPI fits */
+  font-size: clamp(1.55rem, 7vmin, 3.4rem);
+  line-height: 1.12;
   letter-spacing: -0.03em;
   text-transform: uppercase;
   text-align: left;
@@ -1170,10 +1180,11 @@
 .navPanelFooter {
   display: flex;
   flex-direction: column;
-  gap: 1.25rem;
-  margin-top: 2.5rem;
+  gap: clamp(0.65rem, 1.8vh, 1.25rem);
+  margin-top: clamp(1rem, 4vh, 2.5rem);
   width: 100%;
   max-width: none;
+  flex-shrink: 0;
 }
 
 .navPanelLang {
@@ -1210,7 +1221,7 @@
   color: var(--color-light);
   text-decoration: none;
   font-family: var(--font-sans);
-  font-size: clamp(1.35rem, 3.2vw, 1.85rem);
+  font-size: clamp(1.05rem, 3.2vmin, 1.85rem);
   font-weight: 700;
   letter-spacing: 0.06em;
   line-height: 1;
@@ -1261,7 +1272,27 @@
   }
 
   .navPanelLink {
-    font-size: clamp(2rem, 3.8vw, 3.25rem);
+    font-size: clamp(1.65rem, 6.2vmin, 3.25rem);
+  }
+}
+
+@media (max-height: 820px) {
+  .navPanelNav {
+    justify-content: flex-start;
+    padding-top: calc(var(--chrome-h) + 0.65rem);
+    padding-bottom: 0.75rem;
+  }
+
+  .navPanelLink {
+    font-size: clamp(1.35rem, 5.2vmin, 2.35rem);
+  }
+
+  .navPanelFooter {
+    margin-top: 0.85rem;
+  }
+
+  .navPanelApp {
+    font-size: clamp(0.95rem, 2.8vmin, 1.35rem);
   }
 }
 
