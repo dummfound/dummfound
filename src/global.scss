@@ -42,11 +42,11 @@
   --ios-glass-strong: transparent;
   --ios-separator: var(--line);
   --ios-highlight: transparent;
-  --grain-opacity: 0.08;
+  --grain-opacity: 0;
 
   --chrome-h: 2.75rem;
   --badge-h: 1.5rem;
-  /* No viewport-fit=cover (DEX): status bar is theme-color, not page blur */
+  /* DEX-style: no viewport-fit=cover — Safari theme-color owns the status bar */
   --chrome-safe-top: 0px;
   --chrome-inset-top: 0px;
   --chrome-offset: var(--chrome-h);
@@ -80,7 +80,8 @@
 
 html {
   scroll-behavior: smooth;
-  background: var(--bg);
+  background: #0a0a0a;
+  color-scheme: dark;
   overscroll-behavior-y: none;
 }
 
@@ -95,7 +96,7 @@ body {
   min-height: 100vh;
   min-height: 100svh;
   min-height: var(--app-vh, 100lvh);
-  background: var(--bg);
+  background: #0a0a0a;
   color: var(--text);
   font-family: var(--font-sans);
   font-size: 1.05rem;

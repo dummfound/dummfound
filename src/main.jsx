@@ -33,7 +33,6 @@ const readViewportHeight = () => {
   const vv = window.visualViewport?.height ?? 0;
   const inner = window.innerHeight || 0;
   const client = document.documentElement.clientHeight || 0;
-  // Always prefer large viewport so About / drawer never peek under Safari UI
   return Math.round(Math.max(lvh, vv, inner, client));
 };
 
@@ -44,16 +43,12 @@ const syncAppVh = () => {
   }
 };
 
-const syncViewportMetrics = () => {
-  syncAppVh();
-};
-
-syncViewportMetrics();
-window.addEventListener("resize", syncViewportMetrics);
+syncAppVh();
+window.addEventListener("resize", syncAppVh);
 window.addEventListener("orientationchange", () => {
-  window.setTimeout(syncViewportMetrics, 250);
+  window.setTimeout(syncAppVh, 250);
 });
-window.visualViewport?.addEventListener("resize", syncViewportMetrics);
+window.visualViewport?.addEventListener("resize", syncAppVh);
 
 try {
   localStorage.removeItem("dummfound-theme");
