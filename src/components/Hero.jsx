@@ -52,13 +52,19 @@ export const Hero = ({ ctaMusic, ctaBooking }) => {
       return h;
     };
 
-    const lockHeight = () => {
+    // Lock to the tallest seen height so Safari chrome hide/show never
+    // shrinks the hero and lets About peek into the first viewport.
+    let locked = 0;
+
+    const lockHeight = ({ reset = false } = {}) => {
+      if (reset) locked = 0;
       const lvh = measureLvh();
       const vv = window.visualViewport?.height ?? 0;
       const inner = window.innerHeight || 0;
       const client = document.documentElement.clientHeight || 0;
-      const h = Math.round(Math.max(lvh, vv, inner, client));
+      const h = Math.round(Math.max(locked, lvh, vv, inner, client));
       if (h > 0) {
+        locked = h;
         section.style.height = `${h}px`;
         section.style.minHeight = `${h}px`;
         document.documentElement.style.setProperty("--app-vh", `${h}px`);
@@ -66,7 +72,7 @@ export const Hero = ({ ctaMusic, ctaBooking }) => {
     };
 
     const onOrientation = () => {
-      window.setTimeout(lockHeight, 250);
+      window.setTimeout(() => lockHeight({ reset: true }), 250);
     };
 
     lockHeight();

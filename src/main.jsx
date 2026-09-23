@@ -47,27 +47,32 @@ const measureLvh = () => {
   return h;
 };
 
-const readViewportHeight = () => {
+let lockedAppVh = 0;
+
+const readViewportHeight = ({ reset = false } = {}) => {
+  if (reset) lockedAppVh = 0;
   const lvh = measureLvh();
   const vv = window.visualViewport?.height ?? 0;
   const inner = window.innerHeight || 0;
   const client = document.documentElement.clientHeight || 0;
-  return Math.round(Math.max(lvh, vv, inner, client));
+  const h = Math.round(Math.max(lockedAppVh, lvh, vv, inner, client));
+  if (h > 0) lockedAppVh = h;
+  return h;
 };
 
-const syncAppVh = () => {
-  const h = readViewportHeight();
+const syncAppVh = (opts) => {
+  const h = readViewportHeight(opts);
   if (h > 0) {
     document.documentElement.style.setProperty("--app-vh", `${h}px`);
   }
 };
 
 syncAppVh();
-window.addEventListener("resize", syncAppVh);
+window.addEventListener("resize", () => syncAppVh());
 window.addEventListener("orientationchange", () => {
-  window.setTimeout(syncAppVh, 250);
+  window.setTimeout(() => syncAppVh({ reset: true }), 250);
 });
-window.visualViewport?.addEventListener("resize", syncAppVh);
+window.visualViewport?.addEventListener("resize", () => syncAppVh());
 
 try {
   localStorage.removeItem("dummfound-theme");

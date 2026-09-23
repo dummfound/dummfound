@@ -1310,10 +1310,13 @@
   isolation: isolate;
   width: 100%;
   box-sizing: border-box;
+  /* lvh: About cannot peek when Safari chrome collapses */
   min-height: 100svh;
-  min-height: var(--app-vh, 100svh);
+  min-height: 100lvh;
+  min-height: var(--app-vh, 100lvh);
   height: 100svh;
-  height: var(--app-vh, 100svh);
+  height: 100lvh;
+  height: var(--app-vh, 100lvh);
   border-bottom: none;
   overflow: hidden;
   display: flex;
@@ -1480,6 +1483,13 @@
   justify-content: center;
   align-items: center;
   text-align: center;
+}
+
+@media (max-width: 768px) {
+  .heroInner {
+    justify-content: flex-end;
+    padding-bottom: max(4.25rem, env(safe-area-inset-bottom, 0px) + 3rem);
+  }
 }
 
 .heroCopy {
