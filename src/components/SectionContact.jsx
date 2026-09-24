@@ -91,7 +91,7 @@ export const SectionContact = ({
                   </svg>
                 </button>
               </header>
-              <div className={styles.contactDrawerBody}>
+              <div className={styles.contactDrawerBody} data-lenis-prevent="">
                 {contactFormIntro ? (
                   <p className={styles.contactFormIntro}>{contactFormIntro}</p>
                 ) : null}

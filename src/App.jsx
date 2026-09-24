@@ -13,7 +13,7 @@ import { SiteHeader } from "./components/SiteHeader";
 import { SkipLink } from "./components/SkipLink";
 import { RadioProvider } from "./hooks/RadioContext";
 import { useLanguage } from "./hooks/useLanguage";
-import { useLenis } from "./hooks/useLenis";
+import { scrollTo, useLenis } from "./hooks/useLenis";
 import { useNavMenu } from "./hooks/useNavMenu";
 
 const ALLOWED_PATHS = new Set([
@@ -35,15 +35,13 @@ const readRootPx = (cssValue) => {
   return px;
 };
 
-/** Scroll so the section's outer top edge sits under the compact chrome.
- *  Full --chrome-offset leaves a gap once the bar shrinks on scroll-down. */
-const scrollToSectionEdge = (el, behavior) => {
+/** Scroll so the section's outer top edge sits under the compact chrome. */
+const scrollToSectionEdge = (el, immediate) => {
   const chrome =
     readRootPx("var(--chrome-offset-compact)") ||
     readRootPx("var(--chrome-offset)") ||
     0;
-  const top = el.getBoundingClientRect().top + window.scrollY - chrome;
-  window.scrollTo({ top: Math.max(0, top), behavior });
+  scrollTo(el, { immediate, offset: -chrome });
 };
 
 const useScrollToSection = (pathname, enabled) => {
@@ -56,15 +54,14 @@ const useScrollToSection = (pathname, enabled) => {
     const go = () => {
       const reduced = window.matchMedia("(prefers-reduced-motion: reduce)")
         .matches;
-      const behavior = reduced ? "auto" : "smooth";
       if (pathname === "/") {
-        window.scrollTo({ top: 0, behavior });
+        scrollTo(0, { immediate: reduced });
         return;
       }
       const id = pathname.slice(1);
       const el = document.getElementById(id);
       if (!el) return;
-      scrollToSectionEdge(el, behavior);
+      scrollToSectionEdge(el, reduced);
     };
 
     if (delay > 0) {
@@ -79,7 +76,6 @@ const useScrollToSection = (pathname, enabled) => {
 const HomePage = () => {
   const location = useLocation();
   const pathOk = ALLOWED_PATHS.has(location.pathname);
-  useLenis();
   useScrollToSection(location.pathname, pathOk);
 
   const { lang, setLang, t, navLinks, socialLinks } = useLanguage();
@@ -207,7 +203,6 @@ const HomePage = () => {
 const GigPageRoute = () => {
   const { lang, setLang, t, navLinks, socialLinks } = useLanguage();
   const { menuOpen, closeMenu, toggleMenu } = useNavMenu();
-  useLenis();
 
   return (
     <GigPage
@@ -242,6 +237,7 @@ const GigPageRoute = () => {
 
 const App = () => {
   const { t } = useLanguage();
+  useLenis();
 
   return (
     <RadioProvider>

@@ -5,11 +5,12 @@ import gsap from "gsap";
 import { HoverSlideText } from "./HoverSlideText";
 import { OsAppIcon } from "./OsAppIcon";
 import { RadioTrigger } from "./Radio";
+import { scrollTo } from "../hooks/useLenis";
 import styles from "../styles.module.scss";
 
 const scrollToTop = () => {
   const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-  window.scrollTo({ top: 0, behavior: reduced ? "auto" : "smooth" });
+  scrollTo(0, { immediate: reduced });
 };
 
 const TG_APP_HREF = "https://t.me/dummfoundOSbot/app";
@@ -248,7 +249,11 @@ export const SiteHeader = ({
               aria-modal={menuOpen ? true : undefined}
               aria-hidden={!menuOpen}
             >
-              <nav className={styles.navPanelNav} aria-label={navAria}>
+              <nav
+                className={styles.navPanelNav}
+                aria-label={navAria}
+                data-lenis-prevent=""
+              >
                 <div className={styles.navPanelLinks} ref={linksRef}>
                   {navLinks.map(({ href, label }) => (
                     <Link

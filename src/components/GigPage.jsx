@@ -5,6 +5,7 @@ import { IosLinkIcon } from "./IosLinkIcon";
 import { SiteFooter } from "./SiteFooter";
 import { SiteHeader } from "./SiteHeader";
 import { SkipLink } from "./SkipLink";
+import { scrollTo } from "../hooks/useLenis";
 import styles from "../styles.module.scss";
 
 const TOUR_BG = "/img/duocard.png";
@@ -36,7 +37,7 @@ export const GigPage = ({
   const gig = gigs.find((item) => item.slug === slug);
 
   useLayoutEffect(() => {
-    window.scrollTo({ top: 0, behavior: "auto" });
+    scrollTo(0, { immediate: true });
   }, [slug]);
 
   if (!gig) {

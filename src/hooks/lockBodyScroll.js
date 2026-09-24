@@ -2,9 +2,12 @@
  * iOS Safari ignores overflow:hidden on body while the page can still rubber-band.
  * Lock with position:fixed + restore scrollY (same idea as react-remove-scroll / dexclub).
  */
+import { getLenis, pauseLenis, resumeLenis } from "./useLenis";
+
 export const lockBodyScroll = () => {
   const { body, documentElement } = document;
-  const scrollY = window.scrollY;
+  const lenis = getLenis();
+  const scrollY = lenis?.scroll ?? window.scrollY;
   const prev = {
     bodyOverflow: body.style.overflow,
     bodyPosition: body.style.position,
@@ -16,6 +19,7 @@ export const lockBodyScroll = () => {
     htmlOverscroll: documentElement.style.overscrollBehavior,
   };
 
+  pauseLenis();
   body.classList.add("nav-open");
   documentElement.classList.add("nav-open");
   documentElement.style.overflow = "hidden";
@@ -38,6 +42,12 @@ export const lockBodyScroll = () => {
     body.style.width = prev.bodyWidth;
     documentElement.style.overflow = prev.htmlOverflow;
     documentElement.style.overscrollBehavior = prev.htmlOverscroll;
-    window.scrollTo(0, scrollY);
+    resumeLenis();
+    const live = getLenis();
+    if (live) {
+      live.scrollTo(scrollY, { immediate: true, force: true });
+    } else {
+      window.scrollTo(0, scrollY);
+    }
   };
 };
