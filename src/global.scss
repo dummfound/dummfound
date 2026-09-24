@@ -160,11 +160,13 @@ body::after {
 #root {
   min-height: 100vh;
   min-width: 0;
+  background: #000;
 }
 
 main {
   position: relative;
   z-index: 1;
+  background: #000;
 }
 
 a {
