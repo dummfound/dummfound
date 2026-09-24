@@ -65,14 +65,24 @@ export const SiteHeader = ({
   useEffect(() => {
     lastScrollY.current = window.scrollY || window.pageYOffset || 0;
 
+    const onSectionRoute = location.pathname !== "/";
+    // Section routes land below the fold → compact bar from the start so
+    // scroll offset matches the shrunk height (no gray gap under chrome).
+    if (onSectionRoute) {
+      setCompact(true);
+      setScrolled(true);
+    }
+
     const sync = () => {
       const y = window.scrollY || window.pageYOffset || 0;
       const prev = lastScrollY.current;
-      setScrolled(y > SCROLL_SOLID_AT);
+      setScrolled(y > SCROLL_SOLID_AT || onSectionRoute);
 
-      // Scroll down → compact; scroll up (y decreases) → expand. At top → full.
+      // Scroll down → compact; scroll up → expand. At top on home → full.
+      // Stay compact on section routes even while scrollY is still near 0
+      // (nav scroll hasn't moved yet).
       if (y <= SCROLL_SOLID_AT) {
-        setCompact(false);
+        setCompact(onSectionRoute);
       } else if (y > prev + 6) {
         setCompact(true);
       } else if (y < prev - 6) {

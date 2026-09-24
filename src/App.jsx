@@ -25,6 +25,27 @@ const ALLOWED_PATHS = new Set([
   "/contact",
 ]);
 
+/** Resolve a CSS length (e.g. var(--chrome-offset) → px) against :root */
+const readRootPx = (cssValue) => {
+  const probe = document.createElement("div");
+  probe.style.cssText = `position:absolute;left:0;top:0;height:${cssValue};visibility:hidden;pointer-events:none`;
+  document.documentElement.appendChild(probe);
+  const px = probe.getBoundingClientRect().height || 0;
+  probe.remove();
+  return px;
+};
+
+/** Scroll so the section's outer top edge sits under the compact chrome.
+ *  Full --chrome-offset leaves a gap once the bar shrinks on scroll-down. */
+const scrollToSectionEdge = (el, behavior) => {
+  const chrome =
+    readRootPx("var(--chrome-offset-compact)") ||
+    readRootPx("var(--chrome-offset)") ||
+    0;
+  const top = el.getBoundingClientRect().top + window.scrollY - chrome;
+  window.scrollTo({ top: Math.max(0, top), behavior });
+};
+
 const useScrollToSection = (pathname, enabled) => {
   useLayoutEffect(() => {
     if (!enabled) return;
@@ -35,17 +56,15 @@ const useScrollToSection = (pathname, enabled) => {
     const go = () => {
       const reduced = window.matchMedia("(prefers-reduced-motion: reduce)")
         .matches;
+      const behavior = reduced ? "auto" : "smooth";
       if (pathname === "/") {
-        window.scrollTo({ top: 0, behavior: reduced ? "auto" : "smooth" });
+        window.scrollTo({ top: 0, behavior });
         return;
       }
       const id = pathname.slice(1);
       const el = document.getElementById(id);
       if (!el) return;
-      el.scrollIntoView({
-        behavior: reduced ? "instant" : "smooth",
-        block: "start",
-      });
+      scrollToSectionEdge(el, behavior);
     };
 
     if (delay > 0) {

@@ -37,12 +37,17 @@ import "./global.scss";
 }
 
 /** Large viewport height — stays tall while Safari chrome is visible */
+const isAppleTouch =
+  typeof navigator !== "undefined" &&
+  (/iP(hone|od|ad)/.test(navigator.userAgent) ||
+    (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1));
+
 const measureLvh = () => {
   const probe = document.createElement("div");
   probe.style.cssText =
-    "position:fixed;left:0;top:0;width:0;height:100vh;height:100dvh;height:100lvh;visibility:hidden;pointer-events:none";
+    "position:fixed;left:0;top:0;width:1px;height:100vh;height:100lvh;visibility:hidden;pointer-events:none";
   document.documentElement.appendChild(probe);
-  const h = probe.offsetHeight || 0;
+  const h = probe.getBoundingClientRect().height || probe.offsetHeight || 0;
   probe.remove();
   return h;
 };
@@ -55,9 +60,15 @@ const readViewportHeight = ({ reset = false } = {}) => {
   const vv = window.visualViewport?.height ?? 0;
   const inner = window.innerHeight || 0;
   const client = document.documentElement.clientHeight || 0;
-  const h = Math.round(Math.max(lockedAppVh, lvh, vv, inner, client));
-  if (h > 0) lockedAppVh = h;
-  return h;
+  // iOS Safari: lvh alone still undershoots (toolbar / Liquid Glass).
+  // screen.height is the reliable full-device CSS-px floor.
+  const screenH = isAppleTouch ? window.screen?.height ?? 0 : 0;
+  const buffer = isAppleTouch ? 64 : 0;
+  const base = Math.round(
+    Math.max(lockedAppVh, lvh, vv, inner, client, screenH)
+  );
+  if (base > 0) lockedAppVh = base;
+  return base > 0 ? base + buffer : 0;
 };
 
 const syncAppVh = (opts) => {
@@ -73,6 +84,9 @@ window.addEventListener("orientationchange", () => {
   window.setTimeout(() => syncAppVh({ reset: true }), 250);
 });
 window.visualViewport?.addEventListener("resize", () => syncAppVh());
+document.addEventListener("visibilitychange", () => {
+  if (document.visibilityState === "visible") syncAppVh();
+});
 
 try {
   localStorage.removeItem("dummfound-theme");

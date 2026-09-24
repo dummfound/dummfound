@@ -62,10 +62,13 @@
   --grain-opacity: 0;
 
   --chrome-h: 4.25rem;
+  --chrome-h-compact: 2.15rem;
   --badge-h: 1.5rem;
   --chrome-safe-top: 0px;
   --chrome-inset-top: 0px;
   --chrome-offset: var(--chrome-h);
+  /* After scroll-down the bar shrinks — nav scroll targets this height */
+  --chrome-offset-compact: var(--chrome-h-compact);
   --app-vh: 100lvh;
   --brand-col: auto;
   --nav-col: auto;
@@ -87,6 +90,8 @@
     --chrome-inset-top: var(--chrome-inset);
     --chrome-pad-x: clamp(2.5rem, 5.5vw, 4.5rem);
     --chrome-offset: calc(var(--chrome-h) + (var(--chrome-inset) * 2));
+    /* compact bar + padding-block 0.25rem × 2 */
+    --chrome-offset-compact: calc(var(--chrome-h-compact) + 0.5rem);
   }
 }
 
@@ -110,6 +115,7 @@ html {
   background: var(--color-dark);
   color-scheme: dark;
   overscroll-behavior-y: none;
+  height: -webkit-fill-available;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -122,7 +128,7 @@ body {
   margin: 0;
   min-height: 100vh;
   min-height: 100svh;
-  min-height: var(--app-vh, 100lvh);
+  min-height: max(100lvh, var(--app-vh, 0px));
   background: var(--color-dark);
   color: var(--text);
   font-family: var(--font-sans);

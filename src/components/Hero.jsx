@@ -42,12 +42,16 @@ export const Hero = ({ ctaMusic, ctaBooking }) => {
     const section = sectionRef.current;
     if (!section) return undefined;
 
+    const isAppleTouch =
+      /iP(hone|od|ad)/.test(navigator.userAgent) ||
+      (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+
     const measureLvh = () => {
       const probe = document.createElement("div");
       probe.style.cssText =
-        "position:fixed;left:0;top:0;width:0;height:100vh;height:100dvh;height:100lvh;visibility:hidden;pointer-events:none";
+        "position:fixed;left:0;top:0;width:1px;height:100vh;height:100lvh;visibility:hidden;pointer-events:none";
       document.documentElement.appendChild(probe);
-      const h = probe.offsetHeight || 0;
+      const h = probe.getBoundingClientRect().height || probe.offsetHeight || 0;
       probe.remove();
       return h;
     };
@@ -62,13 +66,19 @@ export const Hero = ({ ctaMusic, ctaBooking }) => {
       const vv = window.visualViewport?.height ?? 0;
       const inner = window.innerHeight || 0;
       const client = document.documentElement.clientHeight || 0;
-      const h = Math.round(Math.max(locked, lvh, vv, inner, client));
-      if (h > 0) {
-        locked = h;
-        section.style.height = `${h}px`;
-        section.style.minHeight = `${h}px`;
-        document.documentElement.style.setProperty("--app-vh", `${h}px`);
-      }
+      const screenH = isAppleTouch ? window.screen?.height ?? 0 : 0;
+      // Extra toolbar buffer — 100lvh still undershoots on iPhone / iOS 26.
+      const buffer = isAppleTouch ? 64 : 0;
+      const base = Math.round(
+        Math.max(locked, lvh, vv, inner, client, screenH)
+      );
+      if (base <= 0) return;
+      locked = base;
+      const h = base + buffer;
+      document.documentElement.style.setProperty("--app-vh", `${h}px`);
+      // Inline px beats flaky lvh on iOS Safari.
+      section.style.setProperty("height", `${h}px`);
+      section.style.setProperty("min-height", `${h}px`);
     };
 
     const onOrientation = () => {
@@ -79,12 +89,17 @@ export const Hero = ({ ctaMusic, ctaBooking }) => {
     window.addEventListener("resize", lockHeight);
     window.addEventListener("orientationchange", onOrientation);
     window.visualViewport?.addEventListener("resize", lockHeight);
+    const onVisible = () => {
+      if (document.visibilityState === "visible") lockHeight();
+    };
+    document.addEventListener("visibilitychange", onVisible);
     return () => {
       window.removeEventListener("resize", lockHeight);
       window.removeEventListener("orientationchange", onOrientation);
       window.visualViewport?.removeEventListener("resize", lockHeight);
-      section.style.height = "";
-      section.style.minHeight = "";
+      document.removeEventListener("visibilitychange", onVisible);
+      section.style.removeProperty("height");
+      section.style.removeProperty("min-height");
     };
   }, []);
 
