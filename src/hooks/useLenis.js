@@ -10,6 +10,19 @@ ScrollTrigger.config({ ignoreMobileResize: true });
 let lenisInstance = null;
 let lockCount = 0;
 
+/** iPhone / touch: Lenis kills native inertia — keep native scroll there. */
+const shouldUseLenis = () => {
+  if (typeof window === "undefined") return false;
+  if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+    return false;
+  }
+  // Fine pointer + hover ≈ desktop mouse/trackpad
+  if (window.matchMedia("(hover: hover) and (pointer: fine)").matches) {
+    return true;
+  }
+  return false;
+};
+
 export const getLenis = () => lenisInstance;
 
 /**
@@ -61,12 +74,16 @@ export const resumeLenis = () => {
 };
 
 /**
- * Document-level Lenis driven by GSAP ticker; ScrollTrigger updates on Lenis scroll.
- * Mount once near the app root.
+ * Document-level Lenis driven by GSAP ticker (desktop only).
+ * iOS / touch keeps native inertia; ScrollTrigger still works on window scroll.
  */
 export const useLenis = () => {
   useEffect(() => {
     if (typeof window === "undefined") return undefined;
+    if (!shouldUseLenis()) {
+      requestAnimationFrame(() => ScrollTrigger.refresh());
+      return undefined;
+    }
 
     const lenis = new Lenis({
       autoRaf: false,
