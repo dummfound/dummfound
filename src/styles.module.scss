@@ -1527,13 +1527,13 @@
 @media (max-width: 768px) {
   .heroInner {
     justify-content: flex-end;
-    /* Lift title + CTAs out of the bottom edge */
-    padding-bottom: max(7.5rem, env(safe-area-inset-bottom, 0px) + 6.25rem);
+    /* ~30% viewport lift above Safari chrome / bottom edge */
+    padding-bottom: calc(30vh + env(safe-area-inset-bottom, 0px) + 1.5rem);
   }
 
   .heroCopy {
     gap: 1rem;
-    margin-bottom: clamp(1.25rem, 4vh, 2.75rem);
+    margin-bottom: 0;
   }
 }
 
