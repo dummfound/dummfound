@@ -1297,16 +1297,23 @@
     right: auto;
   }
 
+  /* Always clear the fixed header — centered list hid HOME under chrome on 13" */
+  .navPanelNav {
+    justify-content: flex-start;
+    padding-top: calc(var(--chrome-h) + 2.75rem);
+    padding-bottom: 2rem;
+  }
+
   .navPanelLink {
     font-size: clamp(1.65rem, 6.2vmin, 3.25rem);
   }
 }
 
 /* Short desktop / laptop viewports only — don't shrink mobile menu type */
-@media (max-height: 820px) and (min-width: 769px) {
+@media (max-height: 900px) and (min-width: 769px) {
   .navPanelNav {
     justify-content: flex-start;
-    padding-top: calc(var(--chrome-h) + 0.65rem);
+    padding-top: calc(var(--chrome-h) + 1.25rem);
     padding-bottom: 0.75rem;
   }
 

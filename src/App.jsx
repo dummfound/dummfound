@@ -13,7 +13,7 @@ import { SiteHeader } from "./components/SiteHeader";
 import { SkipLink } from "./components/SkipLink";
 import { RadioProvider } from "./hooks/RadioContext";
 import { useLanguage } from "./hooks/useLanguage";
-import { scrollTo, useLenis } from "./hooks/useLenis";
+import { scrollTo, useLenis, getLenis } from "./hooks/useLenis";
 import { useNavMenu } from "./hooks/useNavMenu";
 
 const ALLOWED_PATHS = new Set([
@@ -41,7 +41,11 @@ const scrollToSectionEdge = (el, immediate) => {
     readRootPx("var(--chrome-offset-compact)") ||
     readRootPx("var(--chrome-offset)") ||
     0;
-  scrollTo(el, { immediate, offset: -chrome });
+  // Resize first — after GigPage → Home the document height changed
+  getLenis()?.resize();
+  const y = getLenis()?.scroll ?? window.scrollY ?? 0;
+  const top = el.getBoundingClientRect().top + y - chrome;
+  scrollTo(Math.max(0, top), { immediate });
 };
 
 const useScrollToSection = (pathname, enabled) => {
@@ -55,6 +59,7 @@ const useScrollToSection = (pathname, enabled) => {
       const reduced = window.matchMedia("(prefers-reduced-motion: reduce)")
         .matches;
       if (pathname === "/") {
+        getLenis()?.resize();
         scrollTo(0, { immediate: reduced });
         return;
       }
@@ -64,11 +69,18 @@ const useScrollToSection = (pathname, enabled) => {
       scrollToSectionEdge(el, reduced);
     };
 
+    // Wait for layout after route swap (e.g. /gigs/:slug → /gigs)
+    const run = () => {
+      requestAnimationFrame(() => {
+        requestAnimationFrame(go);
+      });
+    };
+
     if (delay > 0) {
-      const id = window.setTimeout(go, delay);
+      const id = window.setTimeout(run, delay);
       return () => window.clearTimeout(id);
     }
-    go();
+    run();
     return undefined;
   }, [pathname, enabled]);
 };
