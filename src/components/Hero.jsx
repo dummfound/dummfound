@@ -10,20 +10,19 @@ import styles from "../styles.module.scss";
 gsap.registerPlugin(ScrollTrigger);
 ScrollTrigger.config({ ignoreMobileResize: true });
 
-const HERO_VIDEO = "/video/IMG_6766.mov";
-const HERO_VIDEO_MOBILE = "/video/mobile.MOV";
+const HERO_IMAGE = "/img/mainhero2.jpg";
 const BRAND = "DUMMFOUND";
-const MOBILE_MQ = "(max-width: 768px)";
-const VIDEO_LOAD_TIMEOUT_MS = 8000;
+const IMAGE_LOAD_TIMEOUT_MS = 8000;
+const DESKTOP_MQ = "(min-width: 769px)";
 
 export const Hero = ({ ctaMusic, ctaBooking }) => {
   const [reduceMotion, setReduceMotion] = useState(false);
-  const [isMobile, setIsMobile] = useState(() =>
+  const [isDesktop, setIsDesktop] = useState(() =>
     typeof window !== "undefined"
-      ? window.matchMedia(MOBILE_MQ).matches
-      : false
+      ? window.matchMedia(DESKTOP_MQ).matches
+      : true
   );
-  const [videoReady, setVideoReady] = useState(false);
+  const [imageReady, setImageReady] = useState(false);
   const [loadTimedOut, setLoadTimedOut] = useState(false);
   const sectionRef = useRef(null);
   const bgRef = useRef(null);
@@ -31,10 +30,8 @@ export const Hero = ({ ctaMusic, ctaBooking }) => {
   const stampRef = useRef(null);
   const ctasScrollRef = useRef(null);
   const ctasRef = useRef(null);
-  const videoRef = useRef(null);
 
-  const videoSrc = isMobile ? HERO_VIDEO_MOBILE : HERO_VIDEO;
-  const heroMediaReady = reduceMotion || videoReady || loadTimedOut;
+  const heroMediaReady = reduceMotion || imageReady || loadTimedOut;
   const showLoader = !heroMediaReady;
   const showHeroCopy = heroMediaReady;
 
@@ -56,8 +53,6 @@ export const Hero = ({ ctaMusic, ctaBooking }) => {
       return h;
     };
 
-    // Lock to the tallest seen height so Safari chrome hide/show never
-    // shrinks the hero and lets About peek into the first viewport.
     let locked = 0;
 
     const lockHeight = ({ reset = false } = {}) => {
@@ -67,7 +62,6 @@ export const Hero = ({ ctaMusic, ctaBooking }) => {
       const inner = window.innerHeight || 0;
       const client = document.documentElement.clientHeight || 0;
       const screenH = isAppleTouch ? window.screen?.height ?? 0 : 0;
-      // Extra toolbar buffer — 100lvh still undershoots on iPhone / iOS 26.
       const buffer = isAppleTouch ? 64 : 0;
       const base = Math.round(
         Math.max(locked, lvh, vv, inner, client, screenH)
@@ -76,7 +70,6 @@ export const Hero = ({ ctaMusic, ctaBooking }) => {
       locked = base;
       const h = base + buffer;
       document.documentElement.style.setProperty("--app-vh", `${h}px`);
-      // Inline px beats flaky lvh on iOS Safari.
       section.style.setProperty("height", `${h}px`);
       section.style.setProperty("min-height", `${h}px`);
     };
@@ -105,58 +98,52 @@ export const Hero = ({ ctaMusic, ctaBooking }) => {
 
   useEffect(() => {
     const motionMq = window.matchMedia("(prefers-reduced-motion: reduce)");
-    const mobileMq = window.matchMedia(MOBILE_MQ);
+    const desktopMq = window.matchMedia(DESKTOP_MQ);
     const syncMotion = () => setReduceMotion(motionMq.matches);
-    const syncMobile = () => setIsMobile(mobileMq.matches);
+    const syncDesktop = () => setIsDesktop(desktopMq.matches);
     syncMotion();
-    syncMobile();
+    syncDesktop();
     motionMq.addEventListener("change", syncMotion);
-    mobileMq.addEventListener("change", syncMobile);
+    desktopMq.addEventListener("change", syncDesktop);
     return () => {
       motionMq.removeEventListener("change", syncMotion);
-      mobileMq.removeEventListener("change", syncMobile);
+      desktopMq.removeEventListener("change", syncDesktop);
     };
   }, []);
 
   useEffect(() => {
     if (reduceMotion) {
-      setVideoReady(true);
+      setImageReady(true);
       return undefined;
     }
 
-    setVideoReady(false);
+    setImageReady(false);
     setLoadTimedOut(false);
 
-    const preload = document.createElement("video");
-    preload.muted = true;
-    preload.playsInline = true;
-    preload.preload = "auto";
-    preload.src = videoSrc;
-
+    const preload = new Image();
     let settled = false;
     const markReady = () => {
       if (settled) return;
       settled = true;
-      setVideoReady(true);
+      setImageReady(true);
     };
 
-    preload.addEventListener("canplaythrough", markReady);
-    preload.addEventListener("loadeddata", markReady);
-    preload.load();
+    preload.addEventListener("load", markReady);
+    preload.addEventListener("error", markReady);
+    preload.src = HERO_IMAGE;
+    if (preload.complete) markReady();
 
     const timeoutId = window.setTimeout(() => {
       setLoadTimedOut(true);
-    }, VIDEO_LOAD_TIMEOUT_MS);
+    }, IMAGE_LOAD_TIMEOUT_MS);
 
     return () => {
       settled = true;
       window.clearTimeout(timeoutId);
-      preload.removeEventListener("canplaythrough", markReady);
-      preload.removeEventListener("loadeddata", markReady);
-      preload.removeAttribute("src");
-      preload.load();
+      preload.removeEventListener("load", markReady);
+      preload.removeEventListener("error", markReady);
     };
-  }, [videoSrc, reduceMotion]);
+  }, [reduceMotion]);
 
   useEffect(() => {
     if (reduceMotion || !showHeroCopy) return undefined;
@@ -170,18 +157,16 @@ export const Hero = ({ ctaMusic, ctaBooking }) => {
     };
 
     const ctaDelay = 0.35 + BRAND.length * 0.04 + 0.4;
+    const bgScale = isDesktop ? 1.025 : 1.05;
+
     const ctx = gsap.context(() => {
-      gsap.set(bgRef.current, { transformOrigin: "50% 30%", scale: 1.12 });
+      gsap.set(bgRef.current, { transformOrigin: "70% 40%", scale: bgScale });
       gsap.set(fadeRef.current, { autoAlpha: 0 });
       gsap.set(stampRef.current, { y: 28, autoAlpha: 0 });
       gsap.set(ctasScrollRef.current, { autoAlpha: 1, y: 0 });
 
       const introTl = gsap.timeline({ defaults: { ease: REVEAL_EASE } });
-      introTl.to(
-        bgRef.current,
-        { scale: 1, duration: 1.35 },
-        0
-      );
+      introTl.to(bgRef.current, { scale: 1, duration: 1.4 }, 0);
       introTl.to(
         stampRef.current,
         { y: 0, autoAlpha: 1, duration: 0.9 },
@@ -219,13 +204,13 @@ export const Hero = ({ ctaMusic, ctaBooking }) => {
         .fromTo(
           bgRef.current,
           { scale: 1 },
-          { scale: 1.12, ease: "none", duration: 1 },
+          { scale: bgScale, ease: "none", duration: 1 },
           0
         )
         .fromTo(
           fadeRef.current,
           { autoAlpha: 0 },
-          { autoAlpha: 0.55, ease: "none", duration: 1 },
+          { autoAlpha: 0.35, ease: "none", duration: 1 },
           0
         )
         .fromTo(
@@ -245,21 +230,7 @@ export const Hero = ({ ctaMusic, ctaBooking }) => {
     }, section);
 
     return () => ctx.revert();
-  }, [reduceMotion, showHeroCopy]);
-
-  useEffect(() => {
-    const video = videoRef.current;
-    if (!video || !showHeroCopy) return undefined;
-    const play = video.play();
-    if (play && typeof play.catch === "function") {
-      play.catch(() => {});
-    }
-    return undefined;
-  }, [showHeroCopy, videoSrc]);
-
-  const handleVideoReady = () => {
-    setVideoReady(true);
-  };
+  }, [reduceMotion, showHeroCopy, isDesktop]);
 
   return (
     <section
@@ -271,24 +242,21 @@ export const Hero = ({ ctaMusic, ctaBooking }) => {
       aria-label={BRAND}
       aria-busy={showLoader || undefined}
     >
-      <div ref={bgRef} className={styles.heroBg}>
-        {!reduceMotion ? (
-          <video
-            key={videoSrc}
-            ref={videoRef}
-            className={`${styles.heroBgVideo} ${
-              isMobile ? styles.heroBgVideoMobile : styles.heroBgVideoDesktop
-            }${heroMediaReady ? ` ${styles.heroBgVideoReady}` : ""}`}
-            src={videoSrc}
-            muted
-            loop
-            playsInline
-            preload="auto"
-            onCanPlayThrough={handleVideoReady}
-            onLoadedData={handleVideoReady}
-            onPlaying={handleVideoReady}
-          />
-        ) : null}
+      <div
+        ref={bgRef}
+        className={`${styles.heroBg}${
+          heroMediaReady ? ` ${styles.heroBgReady}` : ""
+        }`}
+        aria-hidden="true"
+      >
+        <img
+          className={styles.heroPhoto}
+          src={HERO_IMAGE}
+          alt=""
+          decoding="async"
+          fetchPriority="high"
+          onLoad={() => setImageReady(true)}
+        />
       </div>
 
       {showLoader ? (

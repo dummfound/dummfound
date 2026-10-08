@@ -2,7 +2,6 @@ import { useLayoutEffect } from "react";
 import { Navigate, Route, Routes, useLocation } from "react-router-dom";
 import { GigPage } from "./components/GigPage";
 import { Hero } from "./components/Hero";
-import { RadioOverlay } from "./components/Radio";
 import { SectionAbout } from "./components/SectionAbout";
 import { SectionBooking } from "./components/SectionBooking";
 import { SectionContact } from "./components/SectionContact";
@@ -104,7 +103,8 @@ const HomePage = () => {
     langGroup,
     menu,
     drawerBackdrop,
-    radioOpen,
+    radioPlay,
+    radioPause,
     heroCtaMusic,
     heroCtaBooking,
     aboutLabel,
@@ -153,7 +153,8 @@ const HomePage = () => {
         tgAppLabel={t.nav.app}
         lang={lang}
         onSetLang={setLang}
-        radioOpen={radioOpen}
+        radioPlay={radioPlay}
+        radioPause={radioPause}
         menuOpen={menuOpen}
         onCloseMenu={closeMenu}
         onToggleMenu={toggleMenu}
@@ -239,7 +240,8 @@ const GigPageRoute = () => {
       tgAppLabel={t.nav.app}
       lang={lang}
       onSetLang={setLang}
-      radioOpen={t.radioOpen}
+      radioPlay={t.radioPlay}
+      radioPause={t.radioPause}
       menuOpen={menuOpen}
       onCloseMenu={closeMenu}
       onToggleMenu={toggleMenu}
@@ -248,7 +250,6 @@ const GigPageRoute = () => {
 };
 
 const App = () => {
-  const { t } = useLanguage();
   useLenis();
 
   return (
@@ -257,14 +258,6 @@ const App = () => {
         <Route path="/gigs/:slug" element={<GigPageRoute />} />
         <Route path="*" element={<HomePage />} />
       </Routes>
-
-      <RadioOverlay
-        titleLabel={t.radioTitle}
-        closeLabel={t.radioClose}
-        playLabel={t.radioPlay}
-        pauseLabel={t.radioPause}
-        minimizeLabel={t.radioMinimize}
-      />
     </RadioProvider>
   );
 };

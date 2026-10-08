@@ -28,7 +28,8 @@ export const SiteHeader = ({
   tgAppLabel,
   lang,
   onSetLang,
-  radioOpen,
+  radioPlay,
+  radioPause,
   menuOpen,
   onCloseMenu,
   onToggleMenu,
@@ -368,6 +369,8 @@ export const SiteHeader = ({
               </button>
             </div>
 
+            <RadioTrigger playLabel={radioPlay} pauseLabel={radioPause} />
+
             <button
               ref={menuBtnRef}
               type="button"
@@ -384,8 +387,6 @@ export const SiteHeader = ({
                 {menuOpen ? "CLOSE" : menuLabel}
               </span>
             </button>
-
-            <RadioTrigger openLabel={radioOpen} />
           </div>
         </div>
       </header>

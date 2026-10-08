@@ -97,22 +97,10 @@
   transition: background-color 0.25s ease;
 }
 
-/* Cover Lenis subpixel hairline under the fixed chrome */
-.siteHeaderSolid::after,
-.siteHeaderCompact::after {
-  content: "";
-  position: absolute;
-  left: 0;
-  right: 0;
-  top: 100%;
-  height: 8px;
-  background: #000;
-  pointer-events: none;
-  z-index: 1;
-}
-
 .siteHeaderSolid {
   background: #000;
+  /* 1px seam cover — no extra black bulk under the bar */
+  box-shadow: 0 1px 0 #000;
 }
 
 .siteHeaderSolid .chromeBar {
@@ -121,6 +109,7 @@
 
 .siteHeaderCompact {
   background: #000;
+  box-shadow: 0 1px 0 #000;
   backdrop-filter: none;
   -webkit-backdrop-filter: none;
 }
@@ -149,6 +138,16 @@
     width 0.28s var(--ease-pk),
     height 0.28s var(--ease-pk),
     font-size 0.28s var(--ease-pk);
+}
+
+.siteHeaderCompact .chromeMenuBtn,
+.siteHeaderCompact .langSwitch,
+.siteHeaderCompact .radioTrigger {
+  height: 1.4rem;
+}
+
+.siteHeaderCompact .radioTrigger {
+  width: 1.4rem;
 }
 
 .siteHeader:not(.siteHeaderCompact) .chromeBar,
@@ -182,12 +181,6 @@
   pointer-events: auto;
 }
 
-/* Radio overlay sits above chrome — hide header so it can't bleed through */
-:global(html[data-radio-open]) .siteHeader {
-  visibility: hidden;
-  pointer-events: none;
-}
-
 .chromeBar {
   position: relative;
   z-index: 60;
@@ -210,11 +203,12 @@
 
 .chromeBrand {
   flex: 0 0 auto;
+  align-self: center;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   box-sizing: border-box;
-  height: 100%;
+  height: auto;
   padding: 0;
   margin: 0;
   background: transparent;
@@ -263,8 +257,9 @@
   outline: none;
   border-radius: 0;
   flex: 0 0 auto;
+  align-self: center;
   box-sizing: border-box;
-  height: 100%;
+  height: 2.35rem;
   align-items: center;
   justify-content: center;
   gap: 0.35rem;
@@ -293,6 +288,8 @@
 .chromeMenuText {
   display: inline-block;
   line-height: 1;
+  /* Optical vertical center for caps */
+  transform: translateY(-0.04em);
 }
 
 .chromeMenuBtnOpen {
@@ -324,9 +321,11 @@
 .chromeTrail {
   display: flex;
   align-items: center;
+  justify-content: flex-end;
   flex-shrink: 0;
+  align-self: center;
   margin-left: auto;
-  height: 100%;
+  height: auto;
   gap: 1.15rem;
 }
 
@@ -348,10 +347,6 @@
     padding-inline: 0.2rem;
   }
 
-  .radioTrigger {
-    padding: 0;
-  }
-
   .chromeMenuBtn {
     padding: 0;
     gap: 0.45rem;
@@ -360,7 +355,9 @@
 
 .langSwitch {
   display: inline-flex;
-  height: 100%;
+  align-items: center;
+  align-self: center;
+  height: 2.35rem;
   font-family: var(--font-sans);
   font-size: 0.85em;
   font-weight: 700;
@@ -410,8 +407,11 @@
 
 .radioTrigger {
   margin: 0;
-  height: 100%;
-  padding: 0 0.1rem 0 0.55rem;
+  flex: 0 0 auto;
+  align-self: center;
+  width: 2.35rem;
+  height: 2.35rem;
+  padding: 0;
   box-sizing: border-box;
   border: none;
   outline: none;
@@ -419,19 +419,13 @@
   background: transparent;
   color: #f2f2f2;
   cursor: pointer;
-  display: inline-flex;
-  align-items: center;
-  gap: 0.3rem;
-  flex-shrink: 0;
-  font-family: var(--font-sans);
-  font-size: inherit;
-  font-weight: 700;
-  letter-spacing: inherit;
-  text-transform: uppercase;
-  line-height: 1;
-  text-decoration: none;
+  display: inline-grid;
+  place-items: center;
+  position: relative;
+  isolation: isolate;
   box-shadow: none;
   filter: none;
+  transition: color 0.3s ease;
   @include hover-tint;
 }
 
@@ -455,6 +449,30 @@
   opacity: 1;
 }
 
+.radioTriggerLive::after {
+  content: "";
+  position: absolute;
+  inset: 0.15rem;
+  border: 1.5px solid currentColor;
+  border-radius: 50%;
+  animation: radioTogglePulse 2s ease-in-out infinite;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.radioTriggerIcon {
+  width: 1rem;
+  height: 1rem;
+  display: block;
+  position: relative;
+  z-index: 1;
+}
+
+.radioTriggerIconPlay {
+  /* Optical center for a right-weighted triangle */
+  transform: translateX(0.08rem);
+}
+
 @media (max-width: 768px) {
   .chromeBrand {
     min-width: 0;
@@ -472,6 +490,7 @@
   .chromeMenuBtn {
     flex: 0 0 auto;
     min-width: 0;
+    height: 2.1rem;
     font-size: inherit;
     padding: 0 0.55rem;
   }
@@ -485,512 +504,28 @@
   }
 
   .radioTrigger {
-    padding: 0 0 0 0.55rem;
-    font-size: inherit;
+    width: 2.1rem;
+    height: 2.1rem;
   }
 }
 
-.radioTriggerLabel {
-  display: block;
-  font: inherit;
-  letter-spacing: inherit;
-  text-transform: inherit;
-  line-height: inherit;
-}
-
-.radioTriggerDot {
-  width: 0.28rem;
-  height: 0.28rem;
-  border-radius: 50%;
-  background: currentColor;
-  flex-shrink: 0;
-  animation: radioLivePulse 1.8s ease-in-out infinite;
-}
-
-@keyframes radioLivePulse {
+@keyframes radioTogglePulse {
   0%,
   100% {
-    opacity: 0.35;
-  }
-
-  50% {
     opacity: 1;
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .radioTriggerDot,
-  .radioLiveDot {
-    animation: none;
-    opacity: 1;
-  }
-}
-
-.radioLayer {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  width: 100%;
-  height: var(--app-vh, 100lvh);
-  min-height: 100%;
-  /* Above siteHeader (200) so radio fully covers chrome + Dynamic Island */
-  z-index: 300;
-  display: grid;
-  place-items: center;
-  padding: 0;
-  pointer-events: none;
-  visibility: hidden;
-  opacity: 0;
-  transition:
-    opacity 0.28s ease,
-    visibility 0.28s ease;
-  background: #000;
-  isolation: isolate;
-}
-
-.radioLayerOpen {
-  pointer-events: auto;
-  visibility: visible;
-  opacity: 1;
-}
-
-.radioBackdrop {
-  position: absolute;
-  inset: 0;
-  margin: 0;
-  padding: 0;
-  border: none;
-  border-radius: 0;
-  background: #000;
-  cursor: pointer;
-}
-
-.radioWindow {
-  position: absolute;
-  inset: 0;
-  z-index: 1;
-  display: flex;
-  flex-direction: column;
-  width: 100%;
-  height: auto;
-  max-height: none;
-  min-height: 100%;
-  background: #000;
-  border: none;
-  color: var(--text);
-  transform: translate3d(0, 0.6rem, 0);
-  opacity: 0;
-  transition:
-    transform 0.35s cubic-bezier(0.22, 1, 0.36, 1),
-    opacity 0.28s ease;
-  backface-visibility: hidden;
-  -webkit-backface-visibility: hidden;
-  /* Home Indicator safe zone on iPhone — content inset, box still fills */
-  padding-bottom: env(safe-area-inset-bottom, 0px);
-  box-sizing: border-box;
-  overflow: hidden;
-}
-
-.radioLayerOpen .radioWindow {
-  transform: translate3d(0, 0, 0);
-  opacity: 1;
-}
-
-.radioChrome {
-  display: flex;
-  align-items: stretch;
-  flex-shrink: 0;
-  gap: 0;
-  padding: 0;
-  border: none;
-  border-bottom: none;
-  background: #000;
-  overflow: hidden;
-  isolation: isolate;
-}
-
-.radioChromeTitle {
-  margin: 0;
-  flex: 1 1 auto;
-  min-width: 0;
-  min-height: 3.35rem;
-  display: inline-flex;
-  align-items: center;
-  padding: 0 1.25rem;
-  box-sizing: border-box;
-  font-family: var(--font-display);
-  font-size: clamp(0.95rem, 3.6vw, 1.2rem);
-  font-weight: 800;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  line-height: 1;
-  color: var(--text-on-invert);
-  background: var(--c-brand);
-  border: none;
-  outline: none;
-  box-shadow: none;
-}
-
-.radioOnAir {
-  margin: 0;
-  display: inline-flex;
-  align-items: center;
-  gap: 0.45rem;
-  padding: 0.55rem 0.85rem;
-  box-sizing: border-box;
-  font-family: var(--font-sans);
-  font-size: 0.78rem;
-  font-weight: 800;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  line-height: 1;
-  color: #fff;
-  background: #e10600;
-  white-space: nowrap;
-}
-
-.radioLiveDot {
-  width: 0.55rem;
-  height: 0.55rem;
-  border-radius: 50%;
-  background: #fff;
-  flex-shrink: 0;
-  animation: radioLivePulse 1.8s ease-in-out infinite;
-}
-
-.radioClose {
-  margin: 0;
-  flex: 0 0 auto;
-  min-width: 3.35rem;
-  min-height: 3.35rem;
-  padding: 0 1.1rem;
-  border: none;
-  border-radius: 0;
-  background: #000;
-  color: #f2f2f2;
-  cursor: pointer;
-  display: grid;
-  place-items: center;
-  box-sizing: border-box;
-  box-shadow: none;
-  outline: none;
-  @include hover-tint;
-}
-
-.radioMinimize {
-  margin: 0;
-  flex: 0 0 auto;
-  min-width: 3.35rem;
-  min-height: 3.35rem;
-  padding: 0 1.1rem;
-  border: none;
-  border-radius: 0;
-  background: #1a1a1a;
-  color: #f2f2f2;
-  cursor: pointer;
-  display: grid;
-  place-items: center;
-  box-sizing: border-box;
-  box-shadow: none;
-  outline: none;
-  @include hover-tint;
-}
-
-.radioMinimize:hover,
-.radioClose:hover {
-  color: var(--c-brand);
-  background: var(--bg-elevated);
-  opacity: 1;
-}
-
-.radioMinimize:focus-visible,
-.radioClose:focus-visible {
-  @include focus-inset;
-}
-
-.radioMinimizeIcon,
-.radioCloseIcon {
-  width: 0.85rem;
-  height: 0.85rem;
-  display: block;
-}
-
-.radioAudio {
-  position: absolute;
-  width: 0;
-  height: 0;
-  opacity: 0;
-  pointer-events: none;
-}
-
-.radioStage {
-  position: relative;
-  flex: 1 1 auto;
-  min-height: min(28rem, 58dvh);
-  overflow: hidden;
-  background: #000;
-}
-
-.radioMedia {
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-}
-
-.radioVideo {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  object-position: center;
-  filter: grayscale(1) contrast(1.05);
-  pointer-events: none;
-}
-
-.radioOverlay {
-  position: absolute;
-  inset: 0;
-  z-index: 2;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 1.35rem 1.25rem;
-  background: rgba(0, 0, 0, 0.45);
-  pointer-events: none;
-}
-
-.radioOverlay > * {
-  pointer-events: auto;
-}
-
-.radioTime {
-  margin: 0;
-  font-family: var(--font-sans);
-  font-size: 0.72rem;
-  font-weight: 500;
-  letter-spacing: 0.08em;
-  color: rgba(255, 255, 255, 0.72);
-  font-variant-numeric: tabular-nums;
-  text-align: center;
-}
-
-.radioPlayBtn {
-  position: relative;
-  margin: 0;
-  padding: 0;
-  width: 7.5rem;
-  height: 7.5rem;
-  border: none;
-  border-radius: 0;
-  background: transparent;
-  color: #fff;
-  cursor: pointer;
-  flex-shrink: 0;
-  display: grid;
-  place-items: center;
-  box-sizing: border-box;
-  z-index: 2;
-  @include hover-tint;
-}
-
-.radioControls {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0;
-  z-index: 2;
-  pointer-events: none;
-  transition: gap 0.45s ease;
-}
-
-.radioControlsLive {
-  gap: 1rem;
-}
-
-.radioControls > * {
-  pointer-events: auto;
-}
-
-.radioMeta {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 0.45rem;
-  max-width: 0;
-  opacity: 0;
-  overflow: hidden;
-  transform: translateX(0.45rem);
-  pointer-events: none;
-  transition:
-    opacity 0.45s ease,
-    transform 0.45s ease,
-    max-width 0.45s ease;
-}
-
-.radioMetaVisible {
-  max-width: 10rem;
-  opacity: 1;
-  transform: translateX(0);
-}
-
-.radioPlayBtn:hover {
-  background: rgba(255, 255, 255, 0.08);
-  opacity: 1;
-}
-
-.radioPlayBtn:focus-visible {
-  outline: 1px solid #fff;
-  outline-offset: 3px;
-}
-
-.radioPlayIcon {
-  display: block;
-  width: 5rem;
-  height: 5rem;
-  transform-origin: center;
-  will-change: transform;
-  animation: radioPlayScale 2s ease-in-out infinite;
-}
-
-.radioPlayIconPlay {
-  /* ??????????? ????????? ?????? ????? ? ???? ??????? ? ?????? ?????? */
-  animation-name: radioPlayScaleShifted;
-}
-
-@keyframes radioPlayScale {
-  0%,
-  100% {
     transform: scale(1);
   }
 
   50% {
-    transform: scale(1.1);
-  }
-}
-
-@keyframes radioPlayScaleShifted {
-  0%,
-  100% {
-    transform: translateX(0.2rem) scale(1);
-  }
-
-  50% {
-    transform: translateX(0.2rem) scale(1.1);
-  }
-}
-
-.radioPlayBtn:active .radioPlayIcon {
-  animation: none;
-  transform: scale(0.9);
-  transition: transform 0.12s ease;
-}
-
-.radioPlayBtn:active .radioPlayIconPlay {
-  transform: translateX(0.2rem) scale(0.9);
-}
-
-@media (hover: hover) and (pointer: fine) {
-  .radioPlayBtn:hover .radioPlayIcon {
-    animation-duration: 1.35s;
+    opacity: 0.45;
+    transform: scale(1.18);
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .radioTriggerDot,
-  .radioLiveDot,
-  .radioLayer,
-  .radioWindow,
-  .radioPlayIcon,
-  .radioOnAir,
-  .radioMeta,
-  .radioControls {
+  .radioTriggerLive::after {
     animation: none;
-    transition: none;
-  }
-
-  .radioLayerOpen .radioWindow {
-    transform: none;
-  }
-
-  .radioPlayBtn:active .radioPlayIcon,
-  .radioPlayBtn:active .radioPlayIconPlay {
-    transform: none;
-  }
-}
-
-@media (max-width: 768px) {
-  .radioWindow {
-    width: 100%;
-    height: auto;
-    max-height: none;
-    min-height: 100%;
-  }
-
-  .radioStage {
-    min-height: 0;
-  }
-
-  .radioOnAir {
-    font-size: 0.72rem;
-    padding: 0.5rem 0.75rem;
-  }
-
-  .radioControlsLive {
-    gap: 0.75rem;
-  }
-
-  .radioOverlay {
-    padding: 1.25rem 1.2rem;
-  }
-
-  .radioPlayBtn {
-    width: 6.5rem;
-    height: 6.5rem;
-  }
-
-  .radioPlayIcon {
-    width: 4.25rem;
-    height: 4.25rem;
-  }
-}
-
-@media (min-width: 769px) {
-  .radioLayer {
-    padding: 2rem;
-    height: 100%;
-    min-height: 0;
-    background: transparent;
-  }
-
-  .radioWindow {
-    position: relative;
-    inset: auto;
-    width: min(52rem, 100%);
-    height: auto;
-    max-height: min(36rem, calc(100vh - 4rem));
-    min-height: 0;
-    border: 1px solid rgba(242, 242, 242, 0.12);
-    padding-bottom: 0;
-  }
-
-  .radioChrome {
-    padding-top: 0;
-  }
-
-  .radioChromeTitle {
-    min-height: 3.1rem;
-    font-size: 1.05rem;
-    padding: 0 1.1rem;
-  }
-
-  .radioClose {
-    min-width: 3.1rem;
-    min-height: 3.1rem;
-  }
-
-  .radioStage {
-    min-height: min(28rem, 58dvh);
+    opacity: 1;
   }
 }
 
@@ -1393,24 +928,70 @@
   position: absolute;
   inset: 0;
   z-index: 0;
-  transform-origin: 50% 40%;
+  overflow: hidden;
+  /* Matches mainhero2 black field — seamless with photo edges */
+  background: #050505;
+  opacity: 0;
+  transition: opacity 0.5s ease;
   will-change: transform;
 }
 
-.heroBgVideo,
-.heroBgImg {
+.heroBgReady {
+  opacity: 1;
+}
+
+.heroPhoto {
+  position: absolute;
+  inset: 0;
   width: 100%;
   height: 100%;
   object-fit: cover;
-  object-position: center 35%;
+  object-position: center 42%;
   display: block;
-  filter: grayscale(1) contrast(1.05) brightness(0.55);
-  opacity: 0;
-  transition: opacity 0.45s ease;
+  /* Light touch — keep silhouette readable */
+  filter: grayscale(1) contrast(1.04) brightness(0.92);
 }
 
-.heroBgVideoReady {
-  opacity: 1;
+@media (min-width: 769px) {
+  .heroPhoto {
+    inset: auto;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: auto;
+    width: auto;
+    height: 100%;
+    max-width: min(58vw, 46rem);
+    object-fit: cover;
+    object-position: 55% 45%;
+    /* Soft left dissolve into matching field color */
+    -webkit-mask-image: linear-gradient(
+      90deg,
+      transparent 0%,
+      rgba(0, 0, 0, 0.35) 12%,
+      rgba(0, 0, 0, 0.85) 28%,
+      #000 42%,
+      #000 100%
+    );
+    mask-image: linear-gradient(
+      90deg,
+      transparent 0%,
+      rgba(0, 0, 0, 0.35) 12%,
+      rgba(0, 0, 0, 0.85) 28%,
+      #000 42%,
+      #000 100%
+    );
+    -webkit-mask-size: 100% 100%;
+    mask-size: 100% 100%;
+    -webkit-mask-repeat: no-repeat;
+    mask-repeat: no-repeat;
+  }
+}
+
+@media (min-width: 1200px) {
+  .heroPhoto {
+    max-width: min(52vw, 44rem);
+  }
 }
 
 .brandLoader {
@@ -1479,27 +1060,13 @@
   pointer-events: none;
 }
 
-.radioLoader {
-  position: absolute;
-  inset: 0;
-  z-index: 5;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: rgba(0, 0, 0, 0.55);
-  pointer-events: none;
-}
-
 @media (prefers-reduced-motion: reduce) {
-  .heroBgVideo,
-  .heroBgImg {
+  .heroBg {
     opacity: 1;
     transition: none;
+    will-change: auto;
+    transform: none;
   }
-}
-
-.heroBgVideoMobile {
-  object-position: center 35%;
 }
 
 .heroScrim {
@@ -1507,7 +1074,22 @@
   inset: 0;
   z-index: 1;
   pointer-events: none;
-  background: rgba(0, 0, 0, 0.28);
+  /* Light center veil for type — keep photo highlights */
+  background: radial-gradient(
+    ellipse 55% 45% at 42% 48%,
+    rgba(0, 0, 0, 0.22) 0%,
+    transparent 70%
+  );
+}
+
+@media (max-width: 768px) {
+  .heroScrim {
+    background: radial-gradient(
+      ellipse 70% 50% at 50% 48%,
+      rgba(0, 0, 0, 0.2) 0%,
+      transparent 72%
+    );
+  }
 }
 
 .heroFade {
@@ -1633,7 +1215,6 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .heroBg,
   .heroStamp {
     will-change: auto;
     transform: none;
@@ -3483,10 +3064,7 @@
 
 .contactDrawer {
   position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
+  inset: 0;
   z-index: 47;
   box-sizing: border-box;
   width: 100%;
@@ -3494,10 +3072,9 @@
   min-height: var(--app-vh, 100lvh);
   max-height: none;
   margin: 0;
-  padding-top: var(--chrome-offset);
+  padding: 0;
   background: var(--bg-deep);
   border: none;
-  border-bottom: none;
   color: #f2f2f2;
   clip-path: inset(0 0 100% 0);
   visibility: hidden;
@@ -3509,6 +3086,8 @@
   overflow-y: auto;
   display: flex;
   flex-direction: column;
+  align-items: center;
+  justify-content: center;
   -webkit-overflow-scrolling: touch;
 }
 
@@ -3516,17 +3095,6 @@
   clip-path: inset(0 0 0 0);
   visibility: visible;
   pointer-events: auto;
-}
-
-.contactDrawerChrome {
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
-  gap: 1rem;
-  flex-shrink: 0;
-  padding: 0.65rem max(0.85rem, env(safe-area-inset-right))
-    0.65rem max(0.85rem, env(safe-area-inset-left));
-  border-bottom: 1px solid rgba(242, 242, 242, 0.12);
 }
 
 .contactDrawerTitle {
@@ -3542,10 +3110,14 @@
 }
 
 .contactDrawerClose {
+  position: absolute;
+  top: 0.35rem;
+  right: 0;
+  z-index: 2;
   margin: 0;
   padding: 0;
-  width: 3.25rem;
-  height: 3.25rem;
+  width: 2.75rem;
+  height: 2.75rem;
   border: none;
   border-radius: 0;
   background: transparent;
@@ -3563,22 +3135,24 @@
 
 .contactDrawerCloseIcon {
   display: block;
-  width: 1.55rem;
-  height: 1.55rem;
+  width: 1.35rem;
+  height: 1.35rem;
 }
 
 .contactDrawerBody {
-  flex: 1;
+  position: relative;
+  flex: 0 1 auto;
+  width: 100%;
+  max-width: min(40rem, 100%);
   min-height: 0;
+  margin: 0 auto;
   padding: 1.15rem max(1.15rem, env(safe-area-inset-right))
     max(1.35rem, env(safe-area-inset-bottom))
     max(1.15rem, env(safe-area-inset-left));
+  /* Room for the close control in the top-right */
+  padding-top: 3.35rem;
   box-sizing: border-box;
-  width: 100%;
-  max-width: 72rem;
-  margin: 0 auto;
-  overflow-x: hidden;
-  overflow-y: auto;
+  overflow: visible;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -3736,16 +3310,8 @@
 }
 
 @media (min-width: 769px) {
-  .contactDrawer {
-    bottom: auto;
-    max-height: min(70dvh, 34rem);
-    border-bottom: 1px solid rgba(242, 242, 242, 0.14);
-  }
-
   .contactDrawerBody {
-    max-width: 58rem;
-    flex: none;
-    overflow: visible;
+    max-width: min(42rem, 92vw);
   }
 
   .contactFormWide .contactFormWideLayout {
@@ -3789,9 +3355,8 @@
 }
 
 @media (max-width: 768px) {
-  .contactDrawer {
-    bottom: 0;
-    max-height: none;
+  .contactDrawerBody {
+    max-width: min(28rem, 100%);
   }
 }
 

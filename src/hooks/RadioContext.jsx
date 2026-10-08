@@ -33,14 +33,12 @@ export const RadioProvider = ({ children }) => {
   const bufferLoaderRef = useRef(0);
   const wantPlayRef = useRef(false);
   const playingRef = useRef(false);
+  const streamAttachedRef = useRef(false);
   const attachStreamRef = useRef(() => {});
 
-  const [open, setOpen] = useState(false);
   const [playing, setPlaying] = useState(false);
   const [loading, setLoading] = useState(false);
   const [reconnecting, setReconnecting] = useState(false);
-  const [currentTime, setCurrentTime] = useState(0);
-  const [streamReady, setStreamReady] = useState(false);
 
   playingRef.current = playing;
 
@@ -63,6 +61,7 @@ export const RadioProvider = ({ children }) => {
       hlsRef.current.destroy();
       hlsRef.current = null;
     }
+    streamAttachedRef.current = false;
   }, []);
 
   const scheduleReconnect = useCallback(() => {
@@ -77,6 +76,7 @@ export const RadioProvider = ({ children }) => {
     setLoading(true);
     setPlaying(false);
     playingRef.current = false;
+    streamAttachedRef.current = false;
     retryRef.current = window.setTimeout(() => {
       const audio = audioRef.current;
       if (!audio || !wantPlayRef.current) return;
@@ -90,11 +90,10 @@ export const RadioProvider = ({ children }) => {
   const attachStream = useCallback(
     (media) => {
       destroyHls();
-      setStreamReady(false);
       setLoading(true);
 
       const tryPlayIfWanted = () => {
-        setStreamReady(true);
+        streamAttachedRef.current = true;
         setReconnecting(false);
         if (!wantPlayRef.current) {
           setLoading(false);
@@ -118,18 +117,7 @@ export const RadioProvider = ({ children }) => {
           });
       };
 
-      if (media.canPlayType("application/vnd.apple.mpegurl")) {
-        media.onerror = () => {
-          if (wantPlayRef.current) scheduleReconnect();
-        };
-        media.src = LOT_STREAM_HLS;
-        media.addEventListener("loadedmetadata", tryPlayIfWanted, {
-          once: true,
-        });
-        media.load();
-        return;
-      }
-
+      // Prefer hls.js: Chromium often reports canPlayType(mpegurl) but cannot play it.
       if (Hls.isSupported()) {
         const hls = new Hls({
           enableWorker: true,
@@ -161,7 +149,18 @@ export const RadioProvider = ({ children }) => {
         return;
       }
 
-      setStreamReady(false);
+      if (media.canPlayType("application/vnd.apple.mpegurl")) {
+        media.onerror = () => {
+          if (wantPlayRef.current) scheduleReconnect();
+        };
+        media.src = LOT_STREAM_HLS;
+        media.addEventListener("loadedmetadata", tryPlayIfWanted, {
+          once: true,
+        });
+        media.load();
+        return;
+      }
+
       scheduleReconnect();
     },
     [destroyHls, scheduleReconnect]
@@ -192,13 +191,7 @@ export const RadioProvider = ({ children }) => {
     setLoading(true);
     setReconnecting(false);
 
-    // Already attaching — MANIFEST_PARSED / loadedmetadata will call play
-    if (!streamReady && hlsRef.current) {
-      return;
-    }
-
-    // Fresh attach
-    if (!streamReady && !audio.src && !hlsRef.current) {
+    if (!streamAttachedRef.current) {
       attachStream(audio);
       return;
     }
@@ -217,7 +210,7 @@ export const RadioProvider = ({ children }) => {
       }
       attachStream(audio);
     }
-  }, [attachStream, streamReady]);
+  }, [attachStream]);
 
   const togglePlay = useCallback(() => {
     if (playing || (loading && wantPlayRef.current && !reconnecting)) {
@@ -227,35 +220,10 @@ export const RadioProvider = ({ children }) => {
     void startPlayback();
   }, [loading, playing, reconnecting, startPlayback, stopPlayback]);
 
-  const openRadio = useCallback(() => {
-    setOpen(true);
-    const audio = audioRef.current;
-    // Warm stream so play starts faster (does not autoplay)
-    if (audio && !audio.src && !hlsRef.current) {
-      attachStream(audio);
-    }
-  }, [attachStream]);
-
-  const minimizeRadio = useCallback(() => setOpen(false), []);
-
-  const closeRadio = useCallback(() => {
-    stopPlayback();
-    setOpen(false);
-    destroyHls();
-    const audio = audioRef.current;
-    if (audio) {
-      audio.removeAttribute("src");
-      audio.load();
-    }
-    setStreamReady(false);
-    setCurrentTime(0);
-  }, [destroyHls, stopPlayback]);
-
   useEffect(() => {
     const audio = audioRef.current;
     if (!audio) return undefined;
 
-    const onTime = () => setCurrentTime(audio.currentTime || 0);
     const onPlaying = () => {
       clearBufferLoader();
       setPlaying(true);
@@ -279,7 +247,6 @@ export const RadioProvider = ({ children }) => {
       setReconnecting(false);
     };
 
-    audio.addEventListener("timeupdate", onTime);
     audio.addEventListener("playing", onPlaying);
     audio.addEventListener("pause", onPause);
     audio.addEventListener("waiting", onWaiting);
@@ -289,7 +256,6 @@ export const RadioProvider = ({ children }) => {
       clearBufferLoader();
       clearRetry();
       destroyHls();
-      audio.removeEventListener("timeupdate", onTime);
       audio.removeEventListener("playing", onPlaying);
       audio.removeEventListener("pause", onPause);
       audio.removeEventListener("waiting", onWaiting);
@@ -301,33 +267,21 @@ export const RadioProvider = ({ children }) => {
 
   const value = useMemo(
     () => ({
-      open,
       playing,
       loading,
       reconnecting,
-      currentTime,
-      streamReady,
       active,
-      openRadio,
-      minimizeRadio,
-      closeRadio,
       togglePlay,
       startPlayback,
       stopPlayback,
     }),
     [
       active,
-      closeRadio,
-      currentTime,
       loading,
-      minimizeRadio,
-      open,
-      openRadio,
       playing,
       reconnecting,
       startPlayback,
       stopPlayback,
-      streamReady,
       togglePlay,
     ]
   );

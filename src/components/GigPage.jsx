@@ -28,7 +28,8 @@ export const GigPage = ({
   tgAppLabel,
   lang,
   onSetLang,
-  radioOpen,
+  radioPlay,
+  radioPause,
   menuOpen,
   onCloseMenu,
   onToggleMenu,
@@ -58,7 +59,8 @@ export const GigPage = ({
         tgAppLabel={tgAppLabel}
         lang={lang}
         onSetLang={onSetLang}
-        radioOpen={radioOpen}
+        radioPlay={radioPlay}
+        radioPause={radioPause}
         menuOpen={menuOpen}
         onCloseMenu={onCloseMenu}
         onToggleMenu={onToggleMenu}

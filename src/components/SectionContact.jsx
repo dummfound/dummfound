@@ -65,10 +65,10 @@ export const SectionContact = ({
               aria-modal="true"
               aria-labelledby={titleId}
             >
-              <header className={styles.contactDrawerChrome}>
-                <h3 id={titleId} className={styles.contactDrawerTitle}>
-                  {contactFormToggleOpen}
-                </h3>
+              <h3 id={titleId} className={styles.contactDrawerTitle}>
+                {contactFormToggleOpen}
+              </h3>
+              <div className={styles.contactDrawerBody} data-lenis-prevent="">
                 <button
                   type="button"
                   className={styles.contactDrawerClose}
@@ -90,8 +90,6 @@ export const SectionContact = ({
                     />
                   </svg>
                 </button>
-              </header>
-              <div className={styles.contactDrawerBody} data-lenis-prevent="">
                 {contactFormIntro ? (
                   <p className={styles.contactFormIntro}>{contactFormIntro}</p>
                 ) : null}
