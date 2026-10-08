@@ -2,11 +2,15 @@ import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import gsap from "gsap";
+import { CustomEase } from "gsap/CustomEase";
 import { HoverSlideText } from "./HoverSlideText";
 import { OsAppIcon } from "./OsAppIcon";
 import { RadioTrigger } from "./Radio";
 import { scrollTo } from "../hooks/useLenis";
 import styles from "../styles.module.scss";
+
+gsap.registerPlugin(CustomEase);
+CustomEase.create("pk", "0.625, 0.05, 0, 1");
 
 const scrollToTop = () => {
   const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -16,7 +20,35 @@ const scrollToTop = () => {
 const TG_APP_HREF = "https://t.me/dummfoundOSbot/app";
 const MOBILE_MQ = "(max-width: 768px)";
 const SCROLL_SOLID_AT = 24;
+/** Expand when at/near top; compact only after scrolling past this (hysteresis). */
+const COMPACT_OFF_AT = 20;
+const COMPACT_ON_AT = 56;
+const DIR_DELTA = 8;
 const MENU_CLOSE_MS = 480;
+const COMPACT_DURATION = 0.4;
+
+const readScrollY = () => {
+  if (typeof window === "undefined") return 0;
+  const y =
+    window.scrollY ||
+    window.pageYOffset ||
+    document.documentElement.scrollTop ||
+    document.body.scrollTop ||
+    0;
+  // iOS rubber-band can report tiny negatives
+  return Math.max(0, y);
+};
+
+const readChromeMetrics = () => {
+  const root = getComputedStyle(document.documentElement);
+  const desktop = window.matchMedia("(min-width: 769px)").matches;
+  return {
+    desktop,
+    fullH: root.getPropertyValue("--chrome-h").trim() || "3.35rem",
+    compactH: root.getPropertyValue("--chrome-h-compact").trim() || "2.15rem",
+    inset: root.getPropertyValue("--chrome-inset").trim() || "1.25rem",
+  };
+};
 
 export const SiteHeader = ({
   logoAria,
@@ -37,14 +69,21 @@ export const SiteHeader = ({
   const location = useLocation();
   const navigate = useNavigate();
   const isHome = location.pathname === "/";
+  const headerRef = useRef(null);
+  const barRef = useRef(null);
+  const badgeRef = useRef(null);
+  const langRef = useRef(null);
   const panelRef = useRef(null);
   const menuBtnRef = useRef(null);
   const linksRef = useRef(null);
   const tlRef = useRef(null);
   const openRef = useRef(false);
   const lastScrollY = useRef(0);
-  const [scrolled, setScrolled] = useState(false);
-  const [compact, setCompact] = useState(false);
+  const compactTweenRef = useRef(null);
+  const compactSkipAnimRef = useRef(true);
+  const [scrolled, setScrolled] = useState(() => location.pathname !== "/");
+  const [compact, setCompact] = useState(() => location.pathname !== "/");
+  const compactVisual = compact && !menuOpen;
 
   const handleLogoClick = () => {
     onCloseMenu();
@@ -65,7 +104,7 @@ export const SiteHeader = ({
   };
 
   useEffect(() => {
-    lastScrollY.current = window.scrollY || window.pageYOffset || 0;
+    lastScrollY.current = readScrollY();
 
     const onSectionRoute = location.pathname !== "/";
     // Section routes land below the fold → compact bar from the start so
@@ -75,29 +114,129 @@ export const SiteHeader = ({
       setScrolled(true);
     }
 
+    let raf = 0;
     const sync = () => {
-      const y = window.scrollY || window.pageYOffset || 0;
+      const y = readScrollY();
       const prev = lastScrollY.current;
       setScrolled(y > SCROLL_SOLID_AT || onSectionRoute);
 
-      // Scroll down → compact; scroll up → expand. At top on home → full.
-      // Stay compact on section routes even while scrollY is still near 0
-      // (nav scroll hasn't moved yet).
-      if (y <= SCROLL_SOLID_AT) {
+      // Always full chrome at the top on home (iOS momentum often skips
+      // intermediate scroll events — force expand by position).
+      if (y <= COMPACT_OFF_AT) {
         setCompact(onSectionRoute);
-      } else if (y > prev + 6) {
+      } else if (y >= COMPACT_ON_AT && y > prev + DIR_DELTA) {
         setCompact(true);
-      } else if (y < prev - 6) {
+      } else if (y < prev - DIR_DELTA) {
         setCompact(false);
       }
 
       lastScrollY.current = y;
     };
 
+    const onScroll = () => {
+      if (raf) return;
+      raf = window.requestAnimationFrame(() => {
+        raf = 0;
+        sync();
+      });
+    };
+
+    // iOS: final position after inertia / URL-bar chrome show-hide
+    const onSettle = () => {
+      if (raf) {
+        window.cancelAnimationFrame(raf);
+        raf = 0;
+      }
+      sync();
+    };
+
     sync();
-    window.addEventListener("scroll", sync, { passive: true });
-    return () => window.removeEventListener("scroll", sync);
+    window.addEventListener("scroll", onScroll, { passive: true });
+    window.addEventListener("touchend", onSettle, { passive: true });
+    window.addEventListener("scrollend", onSettle, { passive: true });
+    window.visualViewport?.addEventListener("resize", onSettle);
+    window.visualViewport?.addEventListener("scroll", onSettle);
+    return () => {
+      if (raf) window.cancelAnimationFrame(raf);
+      window.removeEventListener("scroll", onScroll);
+      window.removeEventListener("touchend", onSettle);
+      window.removeEventListener("scrollend", onSettle);
+      window.visualViewport?.removeEventListener("resize", onSettle);
+      window.visualViewport?.removeEventListener("scroll", onSettle);
+    };
   }, [location.pathname]);
+
+  useEffect(() => {
+    const header = headerRef.current;
+    const bar = barRef.current;
+    const badge = badgeRef.current;
+    const lang = langRef.current;
+    const menuBtn = menuBtnRef.current;
+    if (!header || !bar || !badge || !lang || !menuBtn) return undefined;
+
+    const radio = bar.querySelector(`.${styles.radioTrigger}`);
+    const { desktop, fullH, compactH, inset } = readChromeMetrics();
+    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const immediate = compactSkipAnimRef.current || reduced;
+    compactSkipAnimRef.current = false;
+
+    const full = {
+      bar: {
+        height: fullH,
+        minHeight: fullH,
+        fontSize: "clamp(0.95rem, 1.35vw, 1.15rem)",
+      },
+      badge: {
+        width: "2.35rem",
+        height: "2.35rem",
+        fontSize: "0.78rem",
+        borderWidth: "1.5px",
+      },
+      ctrl: { height: "2.35rem" },
+      radio: { width: "2.35rem", height: "2.35rem" },
+      header: desktop
+        ? { paddingTop: inset, paddingBottom: inset }
+        : { paddingTop: 0, paddingBottom: 0 },
+    };
+
+    const shrunk = {
+      bar: {
+        height: compactH,
+        minHeight: compactH,
+        fontSize: "clamp(0.72rem, 1vw, 0.82rem)",
+      },
+      badge: {
+        width: "1.4rem",
+        height: "1.4rem",
+        fontSize: "0.5rem",
+        borderWidth: "1px",
+      },
+      ctrl: { height: "1.4rem" },
+      radio: { width: "1.4rem", height: "1.4rem" },
+      header: desktop
+        ? { paddingTop: "0.25rem", paddingBottom: "0.25rem" }
+        : { paddingTop: 0, paddingBottom: 0 },
+    };
+
+    const to = compactVisual ? shrunk : full;
+    const duration = immediate ? 0 : COMPACT_DURATION;
+
+    compactTweenRef.current?.kill();
+    const tl = gsap.timeline({
+      defaults: { duration, ease: "pk", overwrite: "auto" },
+    });
+    tl.to(bar, { ...to.bar }, 0);
+    tl.to(badge, { ...to.badge }, 0);
+    tl.to([lang, menuBtn], { ...to.ctrl }, 0);
+    if (radio) tl.to(radio, { ...to.radio }, 0);
+    if (desktop) tl.to(header, { ...to.header }, 0);
+    compactTweenRef.current = tl;
+
+    return () => {
+      tl.kill();
+      if (compactTweenRef.current === tl) compactTweenRef.current = null;
+    };
+  }, [compactVisual]);
 
   useEffect(() => {
     document.documentElement.classList.toggle("nav-open", menuOpen);
@@ -325,18 +464,23 @@ export const SiteHeader = ({
   return (
     <>
       <header
+        ref={headerRef}
         className={`${styles.siteHeader}${
           scrolled || menuOpen ? ` ${styles.siteHeaderSolid}` : ""
-        }${compact && !menuOpen ? ` ${styles.siteHeaderCompact}` : ""}`}
+        }${compactVisual ? ` ${styles.siteHeaderCompact}` : ""}`}
       >
-        <div className={styles.chromeBar}>
+        <div className={styles.chromeBar} ref={barRef}>
           <Link
             className={styles.chromeBrand}
             to="/"
             onClick={handleLogoClick}
             aria-label={logoAria}
           >
-            <span className={styles.chromeBrandBadge} aria-hidden="true">
+            <span
+              className={styles.chromeBrandBadge}
+              ref={badgeRef}
+              aria-hidden="true"
+            >
               df
             </span>
           </Link>
@@ -344,6 +488,7 @@ export const SiteHeader = ({
           <div className={styles.chromeTrail}>
             <div
               className={styles.langSwitch}
+              ref={langRef}
               role="group"
               aria-label={langGroup}
             >

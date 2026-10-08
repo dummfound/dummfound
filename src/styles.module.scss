@@ -119,58 +119,7 @@
 }
 
 .siteHeaderCompact .chromeBar {
-  height: var(--chrome-h-compact);
-  min-height: var(--chrome-h-compact);
-  font-size: clamp(0.72rem, 1vw, 0.82rem);
   background: transparent;
-  transition:
-    height 0.28s var(--ease-pk),
-    min-height 0.28s var(--ease-pk),
-    font-size 0.28s var(--ease-pk);
-}
-
-.siteHeaderCompact .chromeBrandBadge {
-  width: 1.4rem;
-  height: 1.4rem;
-  font-size: 0.5rem;
-  border-width: 1px;
-  transition:
-    width 0.28s var(--ease-pk),
-    height 0.28s var(--ease-pk),
-    font-size 0.28s var(--ease-pk);
-}
-
-.siteHeaderCompact .chromeMenuBtn,
-.siteHeaderCompact .langSwitch,
-.siteHeaderCompact .radioTrigger {
-  height: 1.4rem;
-}
-
-.siteHeaderCompact .radioTrigger {
-  width: 1.4rem;
-}
-
-.siteHeader:not(.siteHeaderCompact) .chromeBar,
-.siteHeader:not(.siteHeaderCompact) .chromeBrandBadge {
-  transition:
-    height 0.28s var(--ease-pk),
-    min-height 0.28s var(--ease-pk),
-    font-size 0.28s var(--ease-pk),
-    width 0.28s var(--ease-pk);
-}
-
-@media (min-width: 769px) {
-  .siteHeaderCompact {
-    padding-block: 0.25rem;
-    transition:
-      padding-block 0.28s var(--ease-pk),
-      background-color 0.28s ease,
-      backdrop-filter 0.28s ease;
-  }
-
-  .siteHeader:not(.siteHeaderCompact) {
-    transition: padding-block 0.28s var(--ease-pk);
-  }
 }
 
 .siteHeader::before {
@@ -275,6 +224,9 @@
   letter-spacing: inherit;
   box-shadow: none;
   filter: none;
+  transition:
+    color 0.2s ease,
+    opacity 0.2s ease;
 }
 
 .chromeMenuDot {
