@@ -1297,10 +1297,10 @@
     right: auto;
   }
 
-  /* Always clear the fixed header — centered list hid HOME under chrome on 13" */
+  /* Start below the fixed chrome so HOME / ABOUT never sit under the header */
   .navPanelNav {
     justify-content: flex-start;
-    padding-top: calc(var(--chrome-h) + 2.75rem);
+    padding-top: calc(var(--chrome-h) + 3rem);
     padding-bottom: 2rem;
   }
 
@@ -1309,24 +1309,24 @@
   }
 }
 
-/* Short desktop / laptop viewports only — don't shrink mobile menu type */
+/* 13–14" laptops (~800–900px tall): keep the list under the header, scale type */
 @media (max-height: 900px) and (min-width: 769px) {
   .navPanelNav {
     justify-content: flex-start;
-    padding-top: calc(var(--chrome-h) + 1.25rem);
-    padding-bottom: 0.75rem;
+    padding-top: calc(var(--chrome-h) + 2.75rem);
+    padding-bottom: 0.85rem;
   }
 
   .navPanelLink {
-    font-size: clamp(1.35rem, 5.2vmin, 2.35rem);
+    font-size: clamp(1.2rem, 4.4vmin, 1.95rem);
   }
 
   .navPanelFooter {
-    margin-top: 0.85rem;
+    margin-top: 0.75rem;
   }
 
   .navPanelApp {
-    font-size: clamp(0.95rem, 2.8vmin, 1.35rem);
+    font-size: clamp(0.9rem, 2.6vmin, 1.25rem);
   }
 }
 
@@ -1545,19 +1545,6 @@
   text-align: center;
 }
 
-@media (max-width: 768px) {
-  .heroInner {
-    justify-content: flex-end;
-    /* ~30% viewport lift above Safari chrome / bottom edge */
-    padding-bottom: calc(30vh + env(safe-area-inset-bottom, 0px) + 1.5rem);
-  }
-
-  .heroCopy {
-    gap: 1rem;
-    margin-bottom: 0;
-  }
-}
-
 .heroCopy {
   display: grid;
   gap: 0.85rem;
@@ -1571,13 +1558,36 @@
 
 .heroIntro {
   margin: 0;
-  max-width: 28rem;
+  max-width: 22rem;
   font-family: var(--font-sans);
-  font-size: clamp(0.85rem, 1.6vw, 1.05rem);
+  font-size: clamp(0.82rem, 2.8vw, 1.05rem);
   font-weight: 500;
-  line-height: 1.45;
-  letter-spacing: 0.02em;
-  color: rgba(242, 242, 242, 0.78);
+  line-height: 1.4;
+  letter-spacing: 0.04em;
+  color: rgba(242, 242, 242, 0.72);
+  text-wrap: balance;
+}
+
+@media (max-width: 768px) {
+  .heroInner {
+    justify-content: flex-end;
+    padding-bottom: calc(26vh + env(safe-area-inset-bottom, 0px) + 1.25rem);
+  }
+
+  .heroCopy {
+    gap: 0.85rem;
+    margin-bottom: 0;
+  }
+
+  .heroIntro {
+    max-width: 18rem;
+    font-size: 0.88rem;
+    letter-spacing: 0.03em;
+  }
+
+  .heroTitle {
+    font-size: clamp(2.85rem, 13vw, 4.2rem);
+  }
 }
 
 .heroTitle {
@@ -2040,6 +2050,8 @@
 .sectionAbout {
   overflow: hidden;
   isolation: isolate;
+  /* Matte PK gray — photo only lightly mixed in */
+  background: #c5c5c5;
 }
 
 .aboutBg {
@@ -2048,6 +2060,9 @@
   z-index: 0;
   pointer-events: none;
   overflow: hidden;
+  /* Soft wash so the photo melts into the matte gray */
+  mix-blend-mode: multiply;
+  opacity: 0.55;
 }
 
 .aboutBgImg {
@@ -2056,8 +2071,8 @@
   height: 100%;
   object-fit: cover;
   object-position: center 40%;
-  opacity: 0.28;
-  filter: grayscale(0.15) contrast(1.05);
+  opacity: 0.35;
+  filter: grayscale(0.85) contrast(0.95) brightness(1.15);
 }
 
 .section[data-section="gigs"] {

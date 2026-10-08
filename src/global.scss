@@ -90,8 +90,8 @@
     --chrome-inset-top: var(--chrome-inset);
     --chrome-pad-x: clamp(2.5rem, 5.5vw, 4.5rem);
     --chrome-offset: calc(var(--chrome-h) + (var(--chrome-inset) * 2));
-    /* compact bar + padding-block 0.25rem × 2 */
-    --chrome-offset-compact: calc(var(--chrome-h-compact) + 0.5rem);
+    /* compact bar + padding-block 0.25rem × 2 + hairline under chrome */
+    --chrome-offset-compact: calc(var(--chrome-h-compact) + 0.85rem);
   }
 }
 

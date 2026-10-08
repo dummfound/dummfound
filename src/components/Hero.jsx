@@ -176,13 +176,13 @@ export const Hero = ({ ctaMusic, ctaBooking }) => {
       gsap.set(stampRef.current, { y: 28, autoAlpha: 0 });
       gsap.set(ctasScrollRef.current, { autoAlpha: 1, y: 0 });
 
-      const intro = gsap.timeline({ defaults: { ease: REVEAL_EASE } });
-      intro.to(
+      const introTl = gsap.timeline({ defaults: { ease: REVEAL_EASE } });
+      introTl.to(
         bgRef.current,
         { scale: 1, duration: 1.35 },
         0
       );
-      intro.to(
+      introTl.to(
         stampRef.current,
         { y: 0, autoAlpha: 1, duration: 0.9 },
         0.25
