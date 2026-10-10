@@ -63,6 +63,8 @@
 
   --chrome-h: 4.25rem;
   --chrome-h-compact: 2.15rem;
+  --chrome-ctrl: 2.35rem;
+  --chrome-ctrl-compact: 1.4rem;
   --badge-h: 1.5rem;
   --chrome-safe-top: 0px;
   --chrome-inset-top: 0px;
@@ -98,6 +100,7 @@
 @media (max-width: 768px) {
   :root {
     --chrome-h: 3.35rem;
+    --chrome-ctrl: 2.1rem;
     --badge-h: 1.35rem;
     --chrome-inset-top: 0px;
     --chrome-offset: var(--chrome-h);

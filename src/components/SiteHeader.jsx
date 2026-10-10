@@ -46,6 +46,9 @@ const readChromeMetrics = () => {
     desktop,
     fullH: root.getPropertyValue("--chrome-h").trim() || "3.35rem",
     compactH: root.getPropertyValue("--chrome-h-compact").trim() || "2.15rem",
+    ctrl: root.getPropertyValue("--chrome-ctrl").trim() || "2.35rem",
+    ctrlCompact:
+      root.getPropertyValue("--chrome-ctrl-compact").trim() || "1.4rem",
     inset: root.getPropertyValue("--chrome-inset").trim() || "1.25rem",
   };
 };
@@ -175,7 +178,9 @@ export const SiteHeader = ({
     if (!header || !bar || !badge || !lang || !menuBtn) return undefined;
 
     const radio = bar.querySelector(`.${styles.radioTrigger}`);
-    const { desktop, fullH, compactH, inset } = readChromeMetrics();
+    const trail = bar.querySelector(`.${styles.chromeTrail}`);
+    const { desktop, fullH, compactH, ctrl, ctrlCompact, inset } =
+      readChromeMetrics();
     const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     const immediate = compactSkipAnimRef.current || reduced;
     compactSkipAnimRef.current = false;
@@ -187,13 +192,14 @@ export const SiteHeader = ({
         fontSize: "clamp(0.95rem, 1.35vw, 1.15rem)",
       },
       badge: {
-        width: "2.35rem",
-        height: "2.35rem",
-        fontSize: "0.78rem",
+        width: ctrl,
+        height: ctrl,
+        fontSize: "0.72em",
         borderWidth: "1.5px",
       },
-      ctrl: { height: "2.35rem" },
-      radio: { width: "2.35rem", height: "2.35rem" },
+      ctrl: { height: ctrl },
+      radio: { width: ctrl, height: ctrl },
+      trail: { height: ctrl },
       header: desktop
         ? { paddingTop: inset, paddingBottom: inset }
         : { paddingTop: 0, paddingBottom: 0 },
@@ -206,13 +212,14 @@ export const SiteHeader = ({
         fontSize: "clamp(0.72rem, 1vw, 0.82rem)",
       },
       badge: {
-        width: "1.4rem",
-        height: "1.4rem",
-        fontSize: "0.5rem",
+        width: ctrlCompact,
+        height: ctrlCompact,
+        fontSize: "0.72em",
         borderWidth: "1px",
       },
-      ctrl: { height: "1.4rem" },
-      radio: { width: "1.4rem", height: "1.4rem" },
+      ctrl: { height: ctrlCompact },
+      radio: { width: ctrlCompact, height: ctrlCompact },
+      trail: { height: ctrlCompact },
       header: desktop
         ? { paddingTop: "0.25rem", paddingBottom: "0.25rem" }
         : { paddingTop: 0, paddingBottom: 0 },
@@ -228,6 +235,7 @@ export const SiteHeader = ({
     tl.to(bar, { ...to.bar }, 0);
     tl.to(badge, { ...to.badge }, 0);
     tl.to([lang, menuBtn], { ...to.ctrl }, 0);
+    if (trail) tl.to(trail, { ...to.trail }, 0);
     if (radio) tl.to(radio, { ...to.radio }, 0);
     if (desktop) tl.to(header, { ...to.header }, 0);
     compactTweenRef.current = tl;

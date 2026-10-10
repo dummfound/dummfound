@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { BrandLoader } from "./BrandLoader";
+import { HeroIndustrial } from "./HeroIndustrial";
 import { HoverSlideText } from "./HoverSlideText";
 import { RevealText, REVEAL_EASE } from "./RevealText";
 import styles from "../styles.module.scss";
@@ -249,6 +250,42 @@ export const Hero = ({ ctaMusic, ctaBooking }) => {
         }`}
         aria-hidden="true"
       >
+        {/* Black field + multiply grain. Photo sits above — no grain on it. */}
+        <div className={styles.heroBgField} aria-hidden="true">
+          <svg className={styles.heroBgFieldFilter} aria-hidden="true">
+            <filter
+              id="df-hero-grain"
+              x="0%"
+              y="0%"
+              width="100%"
+              height="100%"
+              colorInterpolationFilters="sRGB"
+            >
+              <feTurbulence
+                type="fractalNoise"
+                baseFrequency="1.6"
+                numOctaves="2"
+                stitchTiles="stitch"
+                result="noise"
+              />
+              <feColorMatrix
+                in="noise"
+                type="matrix"
+                values="0 0 0 0 0.5
+                        0 0 0 0 0.5
+                        0 0 0 0 0.5
+                        0 0 0 0.4 0"
+                result="grain"
+              />
+              <feBlend in="SourceGraphic" in2="grain" mode="multiply" />
+            </filter>
+          </svg>
+          <HeroIndustrial
+            active={heroMediaReady && !reduceMotion && isDesktop}
+            sectionRef={sectionRef}
+            titleRef={stampRef}
+          />
+        </div>
         <img
           className={styles.heroPhoto}
           src={HERO_IMAGE}
@@ -296,7 +333,12 @@ export const Hero = ({ ctaMusic, ctaBooking }) => {
                   { to: "/music", label: ctaMusic },
                   { to: "/booking", label: ctaBooking },
                 ].map(({ to, label }) => (
-                  <Link key={to} className={styles.heroCtaBtn} to={to}>
+                  <Link
+                    key={to}
+                    className={styles.heroCtaBtn}
+                    to={to}
+                    data-cursor=""
+                  >
                     <HoverSlideText text={label} />
                   </Link>
                 ))}

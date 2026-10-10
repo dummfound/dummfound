@@ -1,6 +1,7 @@
 import { useLayoutEffect } from "react";
 import { Navigate, Route, Routes, useLocation } from "react-router-dom";
 import { GigPage } from "./components/GigPage";
+import { HeavyCursor } from "./components/HeavyCursor";
 import { Hero } from "./components/Hero";
 import { SectionAbout } from "./components/SectionAbout";
 import { SectionBooking } from "./components/SectionBooking";
@@ -254,6 +255,7 @@ const App = () => {
 
   return (
     <RadioProvider>
+      <HeavyCursor />
       <Routes>
         <Route path="/gigs/:slug" element={<GigPageRoute />} />
         <Route path="*" element={<HomePage />} />
